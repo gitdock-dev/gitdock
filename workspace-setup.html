@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitDock - Setup Workspace</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    padding: 24px;
+  }
+
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 48px 40px;
+    text-align: center;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .logo {
+    width: 88px; height: 88px; margin: 0 auto 24px;
+    border-radius: 50%; overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: contain; }
+
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #f0f6fc; }
+
+  .subtitle {
+    font-size: 14px; color: #8b949e; margin-bottom: 32px; line-height: 1.5;
+  }
+
+  .step {
+    display: flex; gap: 14px; text-align: left; margin-bottom: 20px;
+  }
+  .step-num {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: #21262d; color: #8b949e; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .step-num.active { background: #238636; color: #fff; }
+  .step-content { flex: 1; min-width: 0; }
+  .step-content label {
+    display: block; font-size: 13px; font-weight: 600; color: #e6edf3; margin-bottom: 6px;
+  }
+  .step-content p {
+    font-size: 12px; color: #8b949e; line-height: 1.5; margin-bottom: 8px;
+  }
+
+  .path-input {
+    width: 100%; padding: 10px 14px;
+    font-size: 14px; font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+    color: #f0f6fc; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .path-input:focus {
+    border-color: #238636; box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.2);
+  }
+
+  .path-preview {
+    margin-top: 10px; padding: 10px 14px;
+    background: #0d1117; border: 1px solid #1c2128; border-radius: 8px;
+    font-size: 12px; color: #8b949e; font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    text-align: left; line-height: 1.7;
+  }
+  .path-preview .dir { color: #58a6ff; }
+  .path-preview .file { color: #8b949e; }
+
+  .btn {
+    width: 100%; padding: 12px 24px; font-size: 15px; font-weight: 600;
+    border: none; border-radius: 8px; cursor: pointer;
+    transition: background 0.2s, transform 0.1s; margin-top: 16px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: #238636; color: #fff; }
+  .btn-primary:hover { background: #2ea043; }
+  .btn-primary:disabled { background: #21262d; color: #484f58; cursor: not-allowed; transform: none; }
+
+  .message {
+    margin-top: 16px; padding: 10px 14px; border-radius: 8px;
+    font-size: 13px; display: none; line-height: 1.4;
+  }
+  .message.error {
+    display: block; background: rgba(248, 81, 73, 0.1);
+    border: 1px solid rgba(248, 81, 73, 0.3); color: #f85149;
+  }
+  .message.success {
+    display: block; background: rgba(35, 134, 54, 0.1);
+    border: 1px solid rgba(35, 134, 54, 0.3); color: #3fb950;
+  }
+
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
+    border-top-color: #fff; animation: spin 0.6s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo"><img src="/gitdock-logo-nobg.png" alt="GitDock"></div>
+      <h1>Setup Workspace</h1>
+      <p class="subtitle">Choose where GitDock stores your configuration and cloned repositories.</p>
+
+      <div class="step">
+        <span class="step-num active">1</span>
+        <div class="step-content">
+          <label>Workspace folder</label>
+          <p>All repos, configs, and git data will live here. One folder per GitHub account inside it.</p>
+          <input type="text" class="path-input" id="workspacePath" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <label>What gets created</label>
+          <div class="path-preview" id="preview">
+            <span class="dir" id="previewRoot">C:\Users\You\GitDock\</span><br>
+            <span class="file">&nbsp;&nbsp;config.json</span><br>
+            <span class="file">&nbsp;&nbsp;<em>your-account/</em> &larr; repos cloned here</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="setupBtn">Create Workspace &amp; Continue</button>
+      <div class="message" id="message"></div>
+    </div>
+  </div>
+
+<script>
+  const input = document.getElementById('workspacePath');
+  const btn = document.getElementById('setupBtn');
+  const msg = document.getElementById('message');
+  const previewRoot = document.getElementById('previewRoot');
+
+  // Load default path from API
+  fetch('/api/workspace/status')
+    .then(r => r.json())
+    .then(data => {
+      input.value = data.defaultPath || '';
+      updatePreview();
+    })
+    .catch(() => {});
+
+  input.addEventListener('input', updatePreview);
+
+  function updatePreview() {
+    const p = input.value.trim();
+    if (p) {
+      const sep = p.includes('/') ? '/' : '\\';
+      previewRoot.textContent = p.replace(/[\/\\]+$/, '') + sep;
+    }
+    btn.disabled = p.length < 3;
+  }
+
+  btn.addEventListener('click', setup);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !btn.disabled) setup(); });
+
+  async function setup() {
+    const dirPath = input.value.trim();
+    if (dirPath.length < 3) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Creating workspace...';
+    msg.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/workspace/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-GitDock': '1' },
+        body: JSON.stringify({ path: dirPath }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        msg.className = 'message success';
+        msg.textContent = 'Workspace created! Restarting GitDock...';
+        msg.style.display = 'block';
+        btn.innerHTML = 'Done ✓';
+        // Server needs restart to pick up new BASE_DIR — redirect after brief delay
+        setTimeout(() => { window.location.href = '/'; }, 2000);
+      } else {
+        msg.className = 'message error';
+        msg.textContent = data.error || 'Setup failed.';
+        msg.style.display = 'block';
+        btn.innerHTML = 'Create Workspace &amp; Continue';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      msg.className = 'message error';
+      msg.textContent = 'Connection error. Please try again.';
+      msg.style.display = 'block';
+      btn.innerHTML = 'Create Workspace &amp; Continue';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

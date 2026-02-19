@@ -1,0 +1,19 @@
+{
+  "name": "gitdock",
+  "version": "1.0.0",
+  "description": "Local dashboard for managing multiple GitHub accounts",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gitdock-dev/gitdock.git"
+  },
+  "homepage": "https://gitdock.dev",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "bin": "server.js",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

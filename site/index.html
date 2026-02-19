@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitDock | Organize Git Projects, One Dashboard</title>
+  <style>
+    :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg0);color:var(--t1);line-height:1.6;overflow-x:hidden}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Navigation */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+    .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--t1);text-decoration:none}
+    .nav-brand:hover{text-decoration:none;color:var(--t1)}
+    .nav-logo{width:28px;height:28px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;transform:scale(1.25);transform-origin:center}
+    .nav-logo img{width:100%;height:100%;object-fit:cover;transform:scale(1.25);transform-origin:center}
+    .nav-links{display:flex;gap:24px;align-items:center}
+    .nav-links a{color:var(--t2);font-size:13px;text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--t1);text-decoration:none}
+    .btn-nav{padding:6px 16px;border-radius:6px;background:var(--blue);color:#fff!important;font-weight:500;font-size:13px;transition:opacity .2s}
+    .btn-nav:hover{opacity:.9;text-decoration:none!important}
+
+    /* Hero */
+    .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(88,166,255,.08) 0%,rgba(188,140,255,.04) 40%,transparent 70%);pointer-events:none}
+    #hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+    .hero-content{position:relative;max-width:720px;z-index:1}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg1);font-size:12px;color:var(--t2);margin-bottom:24px}
+    .hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .hero h1{font-size:clamp(36px,6vw,64px);font-weight:700;line-height:1.1;margin-bottom:20px;letter-spacing:-.02em}
+    .hero h1 .grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:clamp(16px,2vw,20px);color:var(--t2);max-width:600px;margin:0 auto 36px;line-height:1.5}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn-hero{padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .btn-hero:hover{text-decoration:none}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-primary:hover{background:#4a96ef;box-shadow:0 0 20px rgba(88,166,255,.3)}
+    .btn-secondary{background:transparent;color:var(--t1);border:1px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--t2);background:var(--bg1)}
+    .hero-stats{display:flex;gap:32px;justify-content:center;margin-top:48px;padding-top:32px;border-top:1px solid var(--border)}
+    .hero-stat{text-align:center}
+    .hero-stat .num{font-size:28px;font-weight:700;color:var(--t1)}
+    .hero-stat .label{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+
+    /* Section base */
+    .section{padding:100px 24px}
+    .section-inner{max-width:1100px;margin:0 auto}
+    .section-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--blue);font-weight:600;margin-bottom:8px}
+    .section-title{font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:16px;letter-spacing:-.01em}
+    .section-desc{font-size:16px;color:var(--t2);max-width:600px;line-height:1.6}
+    .section-header{margin-bottom:56px}
+
+    /* Problem */
+    .problem{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:40px}
+    .pain-card{padding:24px;border-radius:10px;border:1px solid var(--border);background:var(--bg0);transition:all .25s;position:relative;overflow:hidden}
+    .pain-card:hover{border-color:rgba(88,166,255,.25);box-shadow:0 4px 24px rgba(0,0,0,.25)}
+    .pain-icon{margin-bottom:12px;display:flex;align-items:center;justify-content:center}
+    .pain-card h4{font-size:14px;font-weight:600;margin-bottom:6px}
+    .pain-card p{font-size:13px;color:var(--t2);line-height:1.5}
+
+    /* Features */
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+    .feat-card{padding:28px;border-radius:12px;border:1px solid var(--border);background:var(--bg1);transition:all .25s;position:relative;overflow:hidden}
+    .feat-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+    .feat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0;transition:opacity .25s;z-index:3}
+    .feat-card:hover::after{opacity:1}
+    .feat-card::before,.pain-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;border-radius:inherit;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(88,166,255,.06),transparent 40%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:1}
+    .feat-card:hover::before,.pain-card:hover::before{opacity:1}
+    .feat-card>*,.pain-card>*{position:relative;z-index:2}
+    .feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:18px}
+    .feat-icon.blue{background:rgba(88,166,255,.1);color:var(--blue)}
+    .feat-icon.green{background:rgba(63,185,80,.1);color:var(--green)}
+    .feat-icon.purple{background:rgba(188,140,255,.1);color:var(--purple)}
+    .feat-icon.orange{background:rgba(240,136,62,.1);color:var(--orange)}
+    .feat-icon.yellow{background:rgba(210,153,34,.1);color:var(--yellow)}
+    .feat-icon.red{background:rgba(248,81,73,.1);color:var(--red)}
+.feat-icon.cyan{background:rgba(57,197,207,.1);color:var(--cyan)}
+    .feat-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
+    .feat-card p{font-size:13px;color:var(--t2);line-height:1.5}
+    .feat-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+    .feat-tag{padding:2px 8px;border-radius:4px;font-size:10px;background:var(--bg2);color:var(--t3);border:1px solid var(--border)}
+
+    /* How it works */
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-top:48px}
+    .step{text-align:center;padding:32px 24px}
+    .step-num{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--blue);margin:0 auto 16px}
+    .step h4{font-size:15px;font-weight:600;margin-bottom:8px}
+    .step p{font-size:13px;color:var(--t2);line-height:1.5}
+    .step-connector{display:none}
+
+    /* Security */
+    .security{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .security-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:40px}
+    .sec-item{display:flex;align-items:flex-start;gap:10px;padding:16px;border-radius:8px;background:var(--bg0);border:1px solid var(--border)}
+    .sec-check{flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center}
+    .sec-item h4{font-size:13px;font-weight:600;margin-bottom:2px}
+    .sec-item p{font-size:12px;color:var(--t3);line-height:1.4}
+
+    /* Editors */
+    .editors{text-align:center;padding:80px 24px}
+    .editor-logos{display:flex;gap:40px;justify-content:center;align-items:center;margin-top:32px;flex-wrap:wrap}
+    .editor-item{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--t2);font-size:12px}
+    .editor-box{width:56px;height:56px;border-radius:12px;background:var(--bg1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .2s}
+    .editor-item:hover .editor-box{border-color:var(--blue);transform:scale(1.05)}
+
+    /* CTA */
+    .cta{text-align:center;padding:100px 24px}
+    .cta-box{max-width:640px;margin:0 auto;padding:48px 40px;border-radius:16px;border:1px solid var(--border);background:var(--bg1);position:relative;overflow:hidden}
+    .cta-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+    .cta-box h2{font-size:28px;font-weight:700;margin-bottom:12px}
+    .cta-box p{color:var(--t2);margin-bottom:28px;font-size:15px}
+
+    /* Platforms */
+    .platforms{display:flex;gap:12px;justify-content:center;margin-top:20px}
+    .plat{padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px}
+
+    /* Footer */
+    .footer{padding:32px 24px;border-top:1px solid var(--border);text-align:center}
+    .footer p{font-size:12px;color:var(--t3)}
+    .footer-links{margin-bottom:8px}
+    .footer-links a{color:var(--t3);margin:0 8px;font-size:12px;text-decoration:none}
+    .footer-links a:hover{color:var(--t1)}
+
+    /* Dashboard Preview */
+    .preview{padding:0 24px 80px;margin-top:-40px;position:relative;z-index:1}
+    .preview-window{max-width:1000px;margin:0 auto;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(88,166,255,.06);position:relative;z-index:1}
+    .preview-bar{display:flex;gap:6px;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border)}
+    .preview-dot{width:10px;height:10px;border-radius:50%;opacity:.8}
+    .preview-img{width:100%;display:block;background:var(--bg0)}
+
+    /* Tentacles */
+    .tentacle-scene{position:relative;max-width:1000px;margin:0 auto}
+    .tentacle{position:absolute;pointer-events:none;mix-blend-mode:screen;user-select:none;opacity:.6;translate:var(--px,0) var(--py,0);filter:brightness(.8) contrast(2.5) drop-shadow(0 0 20px rgba(88,166,255,.12))}
+    .tentacle.t-ready{mix-blend-mode:normal;filter:drop-shadow(0 0 25px rgba(88,166,255,.15));opacity:.75}
+    .t-left{z-index:0;left:-100px;top:8%;width:320px;animation:breatheL 7s ease-in-out infinite}
+    .t-left2{z-index:0;left:-100px;bottom:12%;width:340px;opacity:.85;animation:breatheL2 8s ease-in-out infinite}
+    .t-right{z-index:0;right:-60px;top:0;width:240px;scale:-1 1;animation:breatheR 8s ease-in-out infinite}
+    .t-bl{z-index:2;bottom:-70px;left:5%;width:260px;opacity:.5;animation:breatheBL 7.5s ease-in-out infinite}
+    .t-bottom{z-index:2;bottom:-40px;right:10%;width:280px;opacity:.4;animation:breatheB 9s ease-in-out infinite}
+    .t-top{z-index:0;right:15%;top:-50px;width:160px;opacity:.5;animation:breatheT 10s ease-in-out infinite}
+    @keyframes breatheL{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(4px,-3px) rotate(.4deg)}}
+    @keyframes breatheL2{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(3px,4px) rotate(-.3deg)}}
+    @keyframes breatheR{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-3px,4px) rotate(-.3deg)}}
+    @keyframes breatheBL{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(4px,-3px) rotate(.3deg)}}
+    @keyframes breatheB{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(3px,-4px) rotate(.2deg)}}
+    @keyframes breatheT{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-2px,3px) rotate(-.2deg)}}
+
+    /* Animations */
+    .fade-in{opacity:0;transform:translateY(24px)}
+    .fade-in.visible{animation:fadeInUp .7s cubic-bezier(.16,1,.3,1) var(--stagger,0s) both}
+    @keyframes fadeInUp{to{opacity:1;transform:none}}
+
+    /* Responsive */
+    @media(max-width:900px){
+      .features-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:768px){
+      .nav-links a:not(.btn-nav){display:none}
+      .hero{min-height:auto;padding:100px 20px 60px}
+      .hero h1{font-size:28px}
+      .hero p{font-size:15px}
+      .hero-stats{flex-direction:column;gap:16px}
+      .section{padding:60px 0}
+      .section-inner{padding:0 16px}
+      .section-title{font-size:22px}
+      .features-grid{grid-template-columns:1fr}
+      .feat-card{padding:20px}
+      .pain-grid{grid-template-columns:1fr 1fr}
+      .steps{grid-template-columns:1fr}
+      .security-grid{grid-template-columns:1fr}
+      .editor-logos{gap:24px}
+      .cta-box{padding:48px 20px}
+      .cta-box h2{font-size:24px}
+      .platforms{flex-wrap:wrap;justify-content:center}
+      .preview{padding:0 16px 60px;margin-top:-20px}
+      .tentacle-scene{padding:0 24px}
+      .preview-window{max-width:96%}
+      .t-left{width:180px;left:-60px}
+      .t-left2{width:190px;left:-60px}
+      .t-right{width:140px;right:-15px}
+      .t-bl{width:150px;bottom:-40px}
+      .t-bottom{width:160px;bottom:-25px}
+      .t-top{width:90px;top:-40px}
+    }
+    @media(prefers-reduced-motion:reduce){#hero-canvas{display:none}.tentacle{animation:none}}
+    @media(max-width:480px){
+      .t-left{width:120px;left:-45px}
+      .t-left2{width:130px;left:-45px}
+      .t-right{width:100px;right:-10px}
+      .t-bl{width:110px;bottom:-30px}
+      .t-bottom{width:120px;bottom:-20px}
+      .t-top{width:70px;top:-35px}
+      .hero h1{font-size:24px}
+      .pain-grid{grid-template-columns:1fr}
+      .pain-card{padding:18px}
+      .nav-inner{padding:0 12px}
+      .editor-logos{gap:16px}
+      .hero-badge{font-size:11px;padding:6px 14px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <span class="nav-logo"><img src="./gitdock-logo.png" alt="GitDock"></span>
+      GitDock
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#hub">Hub</a>
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+      <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-nav">Download</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content fade-in">
+    <div class="hero-badge"><span class="dot"></span> Open source. Runs locally. Your data never leaves your machine.</div>
+    <h1>Your Git projects.<br><span class="grad">One Space.</span></h1>
+    <p>Stop wasting time switching between accounts, tabs, and terminals. Search, organize, and operate on all your repos from one local interface.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary">
+        Download
+      </a>
+      <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener" class="btn-hero btn-secondary">Star on GitHub</a>
+      <a href="#features" class="btn-hero btn-secondary">Explore Features</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">Local</div><div class="label">Localhost only</div></div>
+      <div class="hero-stat"><div class="num">1+</div><div class="label">Accounts (optional)</div></div>
+      <div class="hero-stat"><div class="num">Git</div><div class="label">Ops built-in</div></div>
+      <div class="hero-stat"><div class="num">0</div><div class="label">Tracking/ads</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Dashboard Preview -->
+<div class="preview fade-in">
+  <div class="tentacle-scene">
+    <img class="tentacle t-left" src="./tentacle-left.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+    <img class="tentacle t-left2" src="./tentacle-left2.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+    <img class="tentacle t-right" src="./tentacle-right.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+    <img class="tentacle t-top" src="./tentacle-top.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+    <div class="preview-window">
+      <div class="preview-bar">
+        <span class="preview-dot" style="background:var(--red)"></span>
+        <span class="preview-dot" style="background:var(--yellow)"></span>
+        <span class="preview-dot" style="background:var(--green)"></span>
+      </div>
+      <img src="./dashboard_v2.jpg" alt="GitDock Dashboard" class="preview-img">
+    </div>
+    <img class="tentacle t-bl" src="./tentacle-bottomleft.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+    <img class="tentacle t-bottom" src="./tentacle-bottom.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+  </div>
+</div>
+
+<!-- Problem -->
+<section class="problem section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label">The problem</div>
+      <div class="section-title">Keeping Git projects organized is a daily tax.</div>
+      <div class="section-desc">If you have more than one account, you’ve felt this pain.</div>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--red)"><path d="M5.22 14.78a.75.75 0 0 0 1.06-1.06L4.56 12h8.69a.75.75 0 0 0 0-1.5H4.56l1.72-1.72a.75.75 0 0 0-1.06-1.06l-3 3a.75.75 0 0 0 0 1.06l3 3Zm5.56-6.5a.75.75 0 1 1-1.06-1.06l1.72-1.72H2.75a.75.75 0 0 1 0-1.5h8.69L9.72 2.28a.75.75 0 0 1 1.06-1.06l3 3a.75.75 0 0 1 0 1.06l-3 3Z"/></svg></div>
+        <h4>Constant context switching</h4>
+        <p>Jumping between repos, tabs, terminals, and sometimes accounts. Too much friction for simple daily actions.</p>
+      </div>
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--orange)"><path d="M.513 1.513A1.75 1.75 0 0 1 1.75 1h3.5c.55 0 1.07.26 1.4.7l.9 1.2a.25.25 0 0 0 .2.1H13a1 1 0 0 1 1 1v.5H2.75a.75.75 0 0 0 0 1.5h11.978a1 1 0 0 1 .994 1.117L15 13.25A1.75 1.75 0 0 1 13.25 15H1.75A1.75 1.75 0 0 1 0 13.25V2.75c0-.464.184-.91.513-1.237Z"/></svg></div>
+        <h4>Repos scattered everywhere</h4>
+        <p>No overview, no consistency: you waste time looking for “that repo”.</p>
+      </div>
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg></div>
+        <h4>Uncommitted work goes unnoticed</h4>
+        <p>Staged, dirty, ahead/behind — you only notice when it’s inconvenient.</p>
+      </div>
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--purple)"><path d="M5.75.75a.75.75 0 0 1 .75.75v1h3v-1a.75.75 0 0 1 1.5 0v1h1.25A1.75 1.75 0 0 1 14 4.25v8.5A1.75 1.75 0 0 1 12.25 14.5H3.75A1.75 1.75 0 0 1 2 12.75v-8.5A1.75 1.75 0 0 1 3.75 2.5H5v-1a.75.75 0 0 1 .75-.75ZM3.5 7v5.75c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V7Z"/></svg></div>
+        <h4>Repetitive repo chores</h4>
+        <p>Clone, pull, fetch, open editor, open terminal — repeated across accounts and repos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label">Features</div>
+      <div class="section-title">Everything you need. Nothing you don’t.</div>
+      <div class="section-desc">Keep it fast. Keep it local. Keep it built for daily repo management.</div>
+    </div>
+    <div class="features-grid">
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon blue">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+        </div>
+        <h3>Project Dashboard</h3>
+        <p>One view for all your repositories. Works great with one GitHub account, and supports multiple accounts when you need it.</p>
+        <div class="feat-tags"><span class="feat-tag">1+ accounts</span><span class="feat-tag">Search</span><span class="feat-tag">Filters</span><span class="feat-tag">Pinned</span><span class="feat-tag">Aliases</span></div>
+      </div>
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon green">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M7.5 1.75a.75.75 0 0 1 .75-.75h1a.75.75 0 0 1 0 1.5h-1a.75.75 0 0 1-.75-.75ZM3.75 4.5a.75.75 0 0 1 .75-.75h7a.75.75 0 0 1 0 1.5h-7a.75.75 0 0 1-.75-.75ZM3 7.25A.75.75 0 0 1 3.75 6.5h8.5a.75.75 0 0 1 0 1.5h-8.5A.75.75 0 0 1 3 7.25Zm.75 2.75a.75.75 0 0 1 0-1.5h6a.75.75 0 0 1 0 1.5h-6Z"/></svg>
+        </div>
+        <h3>Clone Anything (by URL)</h3>
+        <p>Paste any GitHub repo URL, choose which account key to use, and clone into your organized structure. Optional custom local folder name included.</p>
+        <div class="feat-tags"><span class="feat-tag">Clone by URL</span><span class="feat-tag">Account select</span><span class="feat-tag">Name collisions handled</span></div>
+      </div>
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon purple">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"/></svg>
+        </div>
+        <h3>Full Git Workflow</h3>
+        <p>Commit, push, pull (with rebase), branch, revert — plus diff (staged/worktree), stash, and discard actions in one Git modal.</p>
+        <div class="feat-tags"><span class="feat-tag">Diff</span><span class="feat-tag">Stash</span><span class="feat-tag">Discard</span><span class="feat-tag">Unpushed</span></div>
+      </div>
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon yellow">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm.25-14.75v5.5a.75.75 0 0 1-1.5 0v-5.5a.75.75 0 0 1 1.5 0ZM8 10a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>
+        </div>
+        <h3>Needs-Attention Panel</h3>
+        <p>Instantly see dirty repos, staged changes, and ahead/behind status. Optional stale detection flags repos with no recent activity.</p>
+        <div class="feat-tags"><span class="feat-tag">Dirty</span><span class="feat-tag">Ahead/Behind</span><span class="feat-tag">Stale badge</span></div>
+      </div>
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon orange">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8.878.392a1.75 1.75 0 0 0-1.756 0l-5.25 3.045A1.75 1.75 0 0 0 1 4.951v6.098c0 .624.332 1.2.872 1.514l5.25 3.045a1.75 1.75 0 0 0 1.756 0l5.25-3.045c.54-.313.872-.89.872-1.514V4.951c0-.624-.332-1.2-.872-1.514ZM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>
+        </div>
+        <h3>Transfer & Migrate</h3>
+        <p>Transfer repos between accounts and migrate existing local repos into the organized structure. GitDock updates remotes for your SSH host aliases.</p>
+        <div class="feat-tags"><span class="feat-tag">Transfer</span><span class="feat-tag">Migrate</span><span class="feat-tag">Safe checks</span></div>
+      </div>
+
+      <div class="feat-card fade-in">
+        <div class="feat-icon cyan">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h2a.75.75 0 0 1 0 1.5h-2A1 1 0 0 0 3.5 2.5v2a.75.75 0 0 1-1.5 0v-2Zm10 0A2.5 2.5 0 0 0 9.5 0h-2a.75.75 0 0 0 0 1.5h2A1 1 0 0 1 12.5 2.5v2a.75.75 0 0 0 1.5 0v-2ZM2 13.5A2.5 2.5 0 0 0 4.5 16h2a.75.75 0 0 0 0-1.5h-2A1 1 0 0 1 3.5 13.5v-2a.75.75 0 0 0-1.5 0v2Zm10 0a2.5 2.5 0 0 1-2.5 2.5h-2a.75.75 0 0 1 0-1.5h2a1 1 0 0 0 1-1v-2a.75.75 0 0 1 1.5 0v2Z"/></svg>
+        </div>
+        <h3>Multi-machine Hub</h3>
+        <p>Use GitDock on several machines? The optional Hub gives you one central view: see all machines, sync issues (unpushed, behind, dirty), and browse repos per machine with search and filters. Run it locally or deploy it.</p>
+        <div class="feat-tags"><span class="feat-tag">Hub</span><span class="feat-tag">Overview</span><span class="feat-tag">Sync issues</span><span class="feat-tag">Cards & list</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Hub -->
+<section class="section problem" id="hub">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label">Multi-machine</div>
+      <div class="section-title">One dashboard per machine. One Hub for all.</div>
+      <div class="section-desc">When you run GitDock on desktop, laptop, or work machine, there’s no single place to see everything. The Hub fixes that: a small central server that receives status snapshots from each machine. Self-host it for free or use our hosted Hub at <a href="https://hub.gitdock.dev" target="_blank" rel="noopener">hub.gitdock.dev</a>. Your dashboards stay local.</div>
+    </div>
+    <div class="pain-grid" style="max-width:900px">
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h7A2.5 2.5 0 0 1 14 2.5v2a.75.75 0 0 1-1.5 0v-2A1 1 0 0 0 11.5 1.5h-7A1 1 0 0 0 3.5 2.5v11A1 1 0 0 0 4.5 15h7a1 1 0 0 0 1-1v-2a.75.75 0 0 1 1.5 0v2A2.5 2.5 0 0 1 11.5 16h-7A2.5 2.5 0 0 1 2 13.5Z"/></svg></div>
+        <h4>All machines in one place</h4>
+        <p>List of connected machines, last seen, and repo count. Click any machine to see its repos.</p>
+      </div>
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--orange)"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM6.5 4.5a.75.75 0 0 0-1.5 0v3c0 .414.336.75.75.75h3a.75.75 0 0 0 0-1.5H6.5V4.5Z"/></svg></div>
+        <h4>Sync issues at a glance</h4>
+        <p>Unpushed commits, behind remote, dirty repos — so you know what needs attention before it bites.</p>
+      </div>
+      <div class="pain-card fade-in">
+        <div class="pain-icon"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--green)"><path d="M10.68 11.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"/></svg></div>
+        <h4>Repos with search & filters</h4>
+        <p>Per machine: search by name, filter by status (clean, dirty, ahead, behind). View as cards or list.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section problem" id="how">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center">
+      <div class="section-label">How it works</div>
+      <div class="section-title">Up and running in minutes.</div>
+      <div class="section-desc" style="margin:0 auto">No cloud. No subscription. Just Node.js + Git + the GitHub CLI on your machine.</div>
+    </div>
+    <div class="steps">
+      <div class="step fade-in">
+        <div class="step-num">1</div>
+        <h4>Authenticate account(s)</h4>
+        <p>Set up SSH host aliases and log into one or more accounts with <code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px">gh auth login</code>.</p>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">2</div>
+        <h4>Start locally</h4>
+        <p>Run <code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px">node server.js</code> (or the included start scripts). If port 3847 is busy, GitDock automatically falls back.</p>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">3</div>
+        <h4>Manage repos fast</h4>
+        <p>Search, pin, clone (including by URL), pull/fetch/commit/push, transfer, and open repos in your editor — all from one dashboard.</p>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">4</div>
+        <h4>Connect to the Hub</h4>
+        <p>Using several machines? In the dashboard, set the Hub URL and API key, then restart. Open the Hub in the browser to see all machines and sync status in one place.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:40px" class="fade-in">
+      <div class="platforms">
+        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M0 0h7.6v7.6H0zm8.4 0H16v7.6H8.4zM0 8.4h7.6V16H0zm8.4 0H16V16H8.4z"/></svg> Windows</span>
+        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Z"/></svg> macOS</span>
+        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg> Linux</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section class="section" id="security">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label">Security first</div>
+      <div class="section-title">Your data stays on your machine. Period.</div>
+      <div class="section-desc">Local-only by design, with strict input and path controls.</div>
+    </div>
+    <div class="security-grid">
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>Localhost only</h4><p>Server binds to 127.0.0.1 (no network exposure)</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>IP validation</h4><p>Non-localhost requests are rejected</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>Input + path hardening</h4><p>Sanitization and traversal protection on all operations</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>No token handling</h4><p>GitDock never stores tokens — gh CLI uses the OS keyring</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>README sanitization</h4><p>Markdown content is sanitized before rendering</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>Serialized gh operations</h4><p>Prevents account-switch races during API calls</p></div>
+      </div>
+      <div class="sec-item fade-in">
+        <div class="sec-check"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></div>
+        <div><h4>Hub is optional</h4><p>If you use it, only status snapshots (repo names, branch, ahead/behind) are sent — no code or tokens</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Editors -->
+<div class="editors fade-in">
+  <div class="section-label">Works with your tools</div>
+  <div class="section-title" style="font-size:24px;font-weight:700">Open repos directly in your favorite editor.</div>
+  <div class="editor-logos">
+    <div class="editor-item">
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--blue)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      Cursor
+    </div>
+    <div class="editor-item">
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--blue)"><path d="M17.583 2.261L9.831 9.92l-3.712-2.874L3 8.562l4.312 3.45L3 15.464l3.119 1.516 3.712-2.874 7.752 7.66L21 19.665V4.36z"/></svg></div>
+      VS Code
+    </div>
+    <div class="editor-item">
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--t2)"><path d="M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z"/></svg></div>
+      Terminal
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-box fade-in">
+    <h2>Ready to take control?</h2>
+    <p>Free and open source. Clone the repo or download a release. All your repos, organized in one dashboard.</p>
+    <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary" style="font-size:14px">
+        Download Free
+      </a>
+      <a href="https://hub.gitdock.dev" target="_blank" rel="noopener" class="btn-hero btn-secondary" style="font-size:14px">
+        Try GitDock Hub
+      </a>
+    </div>
+    <div class="platforms" style="margin-top:20px">
+      <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:.6"><path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h13A1.5 1.5 0 0 1 16 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-11Z"/></svg> Windows</span>
+      <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:.6"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Z"/></svg> macOS</span>
+      <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:.6"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg> Linux</span>
+    </div>
+    <p style="font-size:12px;color:var(--t3);margin-top:16px">Node.js + Git + GitHub CLI. Optional Hub for multi-machine sync.</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+    <a href="./privacy.html">Privacy Policy</a>
+    <a href="./terms.html">Terms of Service</a>
+    <a href="mailto:support@gitdock.dev">Contact</a>
+  </div>
+  <p>GitDock | Open source. Built for developers who want to organize their Git projects and stop wasting time.</p>
+</footer>
+
+<script>
+// Stagger: assign incremental delay to grid children
+document.querySelectorAll('.pain-grid, .features-grid, .security-grid, .steps').forEach(function(grid) {
+  grid.querySelectorAll('.fade-in').forEach(function(child, i) {
+    child.style.setProperty('--stagger', (i * 0.09) + 's');
+  });
+});
+
+// Intersection Observer for scroll-reveal animations
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+      entry.target.addEventListener('animationend', function() {
+        this.classList.remove('fade-in', 'visible');
+        this.style.removeProperty('--stagger');
+      }, { once: true });
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(function(el) {
+  observer.observe(el);
+});
+
+// Spotlight: mouse-tracking glow on cards
+(function() {
+  var cards = document.querySelectorAll('.feat-card, .pain-card');
+  if (!cards.length) return;
+  cards.forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var rect = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+    }, { passive: true });
+  });
+})();
+
+// Tentacle alpha processing: convert dark pixels to transparent
+(function() {
+  var imgs = document.querySelectorAll('.tentacle');
+  if (!imgs.length) return;
+  imgs.forEach(function(img) {
+    if (img.complete && img.naturalWidth) processImg(img);
+    else img.addEventListener('load', function() { processImg(img); }, { once: true });
+  });
+  function processImg(img) {
+    try {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) return;
+      var cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      var cx = cv.getContext('2d');
+      cx.drawImage(img, 0, 0);
+      var id = cx.getImageData(0, 0, w, h);
+      var d = id.data;
+      var lo = 35, hi = 90;
+      for (var i = 0; i < d.length; i += 4) {
+        var mx = Math.max(d[i], d[i + 1], d[i + 2]);
+        if (mx < lo) {
+          d[i + 3] = 0;
+        } else if (mx < hi) {
+          d[i + 3] = Math.round(((mx - lo) / (hi - lo)) * d[i + 3]);
+        }
+      }
+      cx.putImageData(id, 0, 0);
+      img.src = cv.toDataURL('image/png');
+      img.classList.add('t-ready');
+    } catch (e) { /* CORS or security — fallback to blend mode */ }
+  }
+})();
+
+// Tentacle parallax on mouse
+(function() {
+  var scene = document.querySelector('.tentacle-scene');
+  if (!scene) return;
+  var tentacles = scene.querySelectorAll('.tentacle');
+  if (!tentacles.length) return;
+  var depths = [0.015, 0.018, 0.02, 0.012, 0.022, 0.025];
+  var ticking = false;
+  window.addEventListener('mousemove', function(e) {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+      var cx = (e.clientX / window.innerWidth - 0.5) * 2;
+      var cy = (e.clientY / window.innerHeight - 0.5) * 2;
+      tentacles.forEach(function(t, i) {
+        var d = depths[i % depths.length];
+        t.style.setProperty('--px', (cx * d * 40) + 'px');
+        t.style.setProperty('--py', (cy * d * 25) + 'px');
+      });
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+// Particle Network — Hero background
+(function() {
+  'use strict';
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  var BLUE   = { r: 88,  g: 166, b: 255 };
+  var PURPLE = { r: 188, g: 140, b: 255 };
+  var CYAN   = { r: 57,  g: 197, b: 207 };
+  var COLORS = [BLUE, BLUE, BLUE, PURPLE, PURPLE, CYAN];
+
+  var isMobile = window.innerWidth < 768;
+  var PARTICLE_COUNT   = isMobile ? 35 : 80;
+  var MAX_DIST         = isMobile ? 110 : 150;
+  var MAX_DIST_SQ      = MAX_DIST * MAX_DIST;
+  var BASE_SPEED       = 0.15;
+  var MOUSE_RADIUS     = isMobile ? 0 : 200;
+  var MOUSE_RADIUS_SQ  = MOUSE_RADIUS * MOUSE_RADIUS;
+  var MOUSE_FORCE      = 0.02;
+  var CONN_OPACITY     = 0.15;
+  var FADE_ZONE        = 150;
+
+  var width = 0, height = 0;
+  var particles = [];
+  var mouseX = -9999, mouseY = -9999;
+  var animId = 0;
+  var running = true;
+  var bottomFade = null;
+
+  function resize() {
+    var rect = canvas.parentElement.getBoundingClientRect();
+    width = rect.width;
+    height = rect.height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    bottomFade = ctx.createLinearGradient(0, height - FADE_ZONE, 0, height);
+    bottomFade.addColorStop(0, 'rgba(13,17,23,0)');
+    bottomFade.addColorStop(1, 'rgba(13,17,23,1)');
+  }
+
+  function makeParticle() {
+    var c = COLORS[(Math.random() * COLORS.length) | 0];
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * BASE_SPEED * 2,
+      vy: (Math.random() - 0.5) * BASE_SPEED * 2,
+      r: 1 + Math.random() * 1.5,
+      cr: c.r, cg: c.g, cb: c.b,
+      bo: 0.35 + Math.random() * 0.45,
+      ph: Math.random() * 6.2832,
+      ps: 0.004 + Math.random() * 0.008,
+      o: 0
+    };
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    for (var i = 0; i < PARTICLE_COUNT; i++) particles.push(makeParticle());
+  }
+
+  function tick() {
+    if (!running) return;
+
+    ctx.clearRect(0, 0, width, height);
+
+    var i, j, p, q, dx, dy, dSq, d, f, op;
+    var maxV = BASE_SPEED * 3;
+
+    for (i = 0; i < particles.length; i++) {
+      p = particles[i];
+
+      if (MOUSE_RADIUS > 0) {
+        dx = p.x - mouseX;
+        dy = p.y - mouseY;
+        dSq = dx * dx + dy * dy;
+        if (dSq < MOUSE_RADIUS_SQ && dSq > 1) {
+          d = Math.sqrt(dSq);
+          f = (1 - d / MOUSE_RADIUS) * MOUSE_FORCE;
+          p.vx += (dx / d) * f;
+          p.vy += (dy / d) * f;
+        }
+      }
+
+      p.vx *= 0.994;
+      p.vy *= 0.994;
+
+      if (p.vx > maxV) p.vx = maxV;
+      else if (p.vx < -maxV) p.vx = -maxV;
+      if (p.vy > maxV) p.vy = maxV;
+      else if (p.vy < -maxV) p.vy = -maxV;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < -50) p.x += width + 100;
+      else if (p.x > width + 50) p.x -= width + 100;
+      if (p.y < -50) p.y += height + 100;
+      else if (p.y > height + 50) p.y -= height + 100;
+
+      p.ph += p.ps;
+      p.o = p.bo * (0.65 + 0.35 * Math.sin(p.ph));
+    }
+
+    ctx.lineWidth = 0.6;
+    for (i = 0; i < particles.length; i++) {
+      p = particles[i];
+      for (j = i + 1; j < particles.length; j++) {
+        q = particles[j];
+        dx = p.x - q.x;
+        dy = p.y - q.y;
+        dSq = dx * dx + dy * dy;
+
+        if (dSq < MAX_DIST_SQ) {
+          d = Math.sqrt(dSq);
+          op = (1 - d / MAX_DIST) * CONN_OPACITY;
+
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = 'rgba(' + ((p.cr + q.cr) >> 1) + ',' + ((p.cg + q.cg) >> 1) + ',' + ((p.cb + q.cb) >> 1) + ',' + op + ')';
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (i = 0; i < particles.length; i++) {
+      p = particles[i];
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 4, 0, 6.2832);
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (p.o * 0.07) + ')';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + p.o + ')';
+      ctx.fill();
+    }
+
+    if (bottomFade) {
+      ctx.fillStyle = bottomFade;
+      ctx.fillRect(0, height - FADE_ZONE, width, FADE_ZONE);
+    }
+
+    animId = requestAnimationFrame(tick);
+  }
+
+  var hero = canvas.parentElement;
+  var mThrottle = false;
+  hero.addEventListener('mousemove', function(e) {
+    if (mThrottle) return;
+    mThrottle = true;
+    var rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+    requestAnimationFrame(function() { mThrottle = false; });
+  }, { passive: true });
+
+  hero.addEventListener('mouseleave', function() {
+    mouseX = -9999;
+    mouseY = -9999;
+  }, { passive: true });
+
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      var nowMobile = window.innerWidth < 768;
+      if (nowMobile && particles.length > 35) particles.length = 35;
+      resize();
+    }, 250);
+  }, { passive: true });
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      running = false;
+      cancelAnimationFrame(animId);
+    } else {
+      running = true;
+      animId = requestAnimationFrame(tick);
+    }
+  });
+
+  init();
+  tick();
+})();
+</script>
+</body>
+</html>
