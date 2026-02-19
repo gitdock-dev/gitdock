@@ -1,0 +1,101 @@
+name: Build Release Executables
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows-x64
+            exe: gitdock.exe
+            script: pwsh -File scripts/build-sea.ps1
+            start_script: start.ps1
+          - os: macos-latest
+            name: macos-x64
+            exe: gitdock
+            script: chmod +x scripts/build-sea.sh && ./scripts/build-sea.sh
+            start_script: start.sh
+          - os: ubuntu-latest
+            name: linux-x64
+            exe: gitdock
+            script: chmod +x scripts/build-sea.sh && ./scripts/build-sea.sh
+            start_script: start.sh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build SEA executable
+        run: ${{ matrix.script }}
+
+      - name: Prepare release folder (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item "dist\${{ matrix.exe }}" release\
+          Copy-Item dashboard.html, workspace-setup.html, ${{ matrix.start_script }} release\
+
+      - name: Prepare release folder (Unix)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          mkdir -p release
+          cp "dist/${{ matrix.exe }}" release/
+          cp dashboard.html workspace-setup.html ${{ matrix.start_script }} release/
+
+      - name: Create zip (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path release\* -DestinationPath gitdock-${{ matrix.name }}.zip -Force
+
+      - name: Create zip (Unix)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          cd release && zip -r ../gitdock-${{ matrix.name }}.zip . && cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitdock-${{ matrix.name }}
+          path: gitdock-${{ matrix.name }}.zip
+
+  upload-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Upload to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          find artifacts -name "*.zip" -type f | while read f; do
+            echo "Uploading $f"
+            gh release upload "${{ github.event.release.tag_name }}" "$f" --clobber
+          done

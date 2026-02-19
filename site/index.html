@@ -221,7 +221,7 @@
       <a href="#how">How it works</a>
       <a href="#security">Security</a>
       <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-nav">Download</a>
+      <a id="nav-download" href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-nav">Download</a>
     </div>
   </div>
 </nav>
@@ -234,9 +234,10 @@
     <h1>Your Git projects.<br><span class="grad">One Space.</span></h1>
     <p>Stop wasting time switching between accounts, tabs, and terminals. Search, organize, and operate on all your repos from one local interface.</p>
     <div class="hero-actions">
-      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary">
+      <a id="hero-download" href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary">
         Download
       </a>
+      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-secondary" style="font-size:14px">All platforms</a>
       <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener" class="btn-hero btn-secondary">Star on GitHub</a>
       <a href="#features" class="btn-hero btn-secondary">Explore Features</a>
     </div>
@@ -505,7 +506,7 @@
     <h2>Ready to take control?</h2>
     <p>Free and open source. Clone the repo or download a release. All your repos, organized in one dashboard.</p>
     <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary" style="font-size:14px">
+      <a id="cta-download" href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary" style="font-size:14px">
         Download Free
       </a>
       <a href="https://hub.gitdock.dev" target="_blank" rel="noopener" class="btn-hero btn-secondary" style="font-size:14px">
@@ -533,6 +534,30 @@
 </footer>
 
 <script>
+// Set download links to latest release asset for current OS
+(function() {
+  var ua = navigator.userAgent || navigator.platform || '';
+  var platform = 'linux-x64';
+  if (/Win(dows|32|64|CE)/i.test(ua) || navigator.platform === 'Win32') platform = 'windows-x64';
+  else if (/Mac|Darwin|iPhone|iPad/i.test(ua) || navigator.platform === 'MacIntel') platform = 'macos-x64';
+  var asset = 'gitdock-' + platform + '.zip';
+  var releasesUrl = 'https://github.com/gitdock-dev/gitdock/releases';
+  fetch('https://api.github.com/repos/gitdock-dev/gitdock/releases/latest', { headers: { Accept: 'application/vnd.github.v3+json' } })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(d) {
+      if (!d || !d.tag_name) return;
+      var hasAsset = d.assets && d.assets.some(function(a) { return a.name === asset; });
+      if (hasAsset) {
+        var url = 'https://github.com/gitdock-dev/gitdock/releases/download/' + d.tag_name + '/' + asset;
+        ['nav-download', 'hero-download', 'cta-download'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.href = url;
+        });
+      }
+    })
+    .catch(function() {});
+})();
+
 // Stagger: assign incremental delay to grid children
 document.querySelectorAll('.pain-grid, .features-grid, .security-grid, .steps').forEach(function(grid) {
   grid.querySelectorAll('.fade-in').forEach(function(child, i) {

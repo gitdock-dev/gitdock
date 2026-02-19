@@ -1,6 +1,6 @@
 {
   "name": "gitdock",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Local dashboard for managing multiple GitHub accounts",
   "license": "Apache-2.0",
   "repository": {
@@ -10,10 +10,15 @@
   "homepage": "https://gitdock.dev",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "build:bundle": "esbuild server.js --bundle --platform=node --outfile=dist/server.bundle.js --external:child_process --external:fs --external:path --external:os --external:https --external:http --external:crypto --external:net --external:tls --external:url --external:stream --external:zlib --external:events --external:util --external:querystring --external:buffer"
   },
   "bin": "server.js",
   "dependencies": {
     "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "postject": "^1.0.0-alpha.4"
   }
 }

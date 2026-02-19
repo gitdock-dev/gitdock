@@ -33,18 +33,18 @@ const PORT = parseInt(process.env.GITDOCK_PORT, 10) || 3847;
 const HOST = "127.0.0.1"; // SECURITY: localhost only
 
 // --- Configuration ---
-// When packaged with `pkg`, __dirname points to the snapshot (bundled assets).
+// When packaged (pkg or SEA), assets and config live next to the executable.
 // In dev mode, __dirname is the project directory.
-// APP_DIR = bundled assets (dashboard.html, logos) — always __dirname.
-// BASE_DIR = user data (config, repos) — workspace path (packaged) or __dirname (dev).
 const isPkg = typeof process.pkg !== "undefined";
-const APP_DIR = __dirname;
+const execBase = path.basename(process.execPath, ".exe").toLowerCase();
+const isStandalone = execBase === "gitdock";
+const APP_DIR = isPkg || isStandalone ? path.dirname(process.execPath) : __dirname;
 const workspaceModule = require("./workspace");
-let BASE_DIR = isPkg ? (workspaceModule.loadWorkspace() || path.dirname(process.execPath)) : __dirname;
+let BASE_DIR = (isPkg || isStandalone) ? (workspaceModule.loadWorkspace() || path.dirname(process.execPath)) : __dirname;
 let CONFIG_PATH = path.join(BASE_DIR, "config.json");
 
 function reloadBaseDirFromWorkspace() {
-  if (!isPkg) return;
+  if (!isPkg && !isStandalone) return;
   const ws = workspaceModule.loadWorkspace();
   if (ws) {
     BASE_DIR = ws;

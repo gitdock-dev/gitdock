@@ -1,0 +1,5 @@
+{
+  "main": "dist/server.bundle.js",
+  "output": "dist/gitdock-sea-prep.blob",
+  "disableExperimentalSEAWarning": true
+}
