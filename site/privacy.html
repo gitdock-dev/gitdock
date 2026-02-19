@@ -44,115 +44,92 @@
 
 <div class="content">
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: February 17, 2026</p>
+  <p class="updated">Last updated: February 19, 2026</p>
 
   <div class="highlight">
-    <strong>Summary:</strong> GitDock is a local-first application. Your code, repositories, and Git operations never leave your machine. We collect only the minimum data required for license activation and validation.
+    <strong>Summary:</strong> GitDock is an open-source, local-first application. Your code, repositories, and Git operations never leave your machine. No telemetry, no analytics, no tracking.
   </div>
 
   <h2>1. Who We Are</h2>
-  <p>GitDock is a desktop application for managing multiple GitHub accounts and repositories from a single local dashboard. This Privacy Policy describes how we collect, use, and protect your personal data when you purchase, activate, and use GitDock.</p>
+  <p>GitDock is an open-source desktop application for managing GitHub accounts and repositories from a single local dashboard. This Privacy Policy describes how data is handled when you use GitDock and, optionally, the GitDock Hub service.</p>
 
-  <h2>2. Data We Collect</h2>
+  <h2>2. The Local Dashboard (Open Source)</h2>
+  <p>The GitDock dashboard runs entirely on your machine. It does not phone home, collect analytics, or transmit any data to us. All data stays local.</p>
 
-  <p><strong>2.1 Purchase Data (processed by Lemon Squeezy)</strong></p>
-  <p>When you purchase GitDock, your payment is processed by <a href="https://lemonsqueezy.com" target="_blank">Lemon Squeezy</a>, which acts as the Merchant of Record. Lemon Squeezy collects and processes your payment information (credit card, billing address) under their own <a href="https://www.lemonsqueezy.com/privacy" target="_blank">Privacy Policy</a>. We do not have access to your full payment details.</p>
-
-  <p><strong>2.2 License Activation Data</strong></p>
-  <p>When you activate GitDock, the following data is sent to the Lemon Squeezy License API:</p>
+  <p><strong>2.1 Data Stored on Your Machine</strong></p>
   <ul>
-    <li><strong>Purchase email</strong> — to verify ownership of the license</li>
-    <li><strong>License key</strong> — to validate and activate your license</li>
-    <li><strong>Machine identifier</strong> — a hashed string derived from your hostname, operating system, architecture, and home directory path. This is used to enforce the activation limit (maximum 2 machines per license) and is not personally identifiable.</li>
+    <li><strong>Workspace configuration</strong> (<code>config.json</code>) - your account settings, machine name, and Hub connection preferences</li>
+    <li><strong>GitHub Personal Access Tokens</strong> - stored in your operating system's secure keychain (Windows Credential Manager, macOS Keychain, or Linux Secret Service), never in plain text files</li>
+    <li><strong>SSH keys</strong> - generated locally in <code>~/.ssh/</code> for GitHub authentication</li>
+    <li><strong>Cloned repositories</strong> - stored in your chosen workspace directory</li>
+    <li><strong>UI preferences</strong> - pins, aliases, and filter settings stored in the browser's <code>localStorage</code></li>
   </ul>
 
-  <p><strong>2.3 Data Stored Locally on Your Machine</strong></p>
-  <p>The following data is stored exclusively on your device and is never transmitted to us or any third party:</p>
+  <p><strong>2.2 External Calls Made by the Dashboard</strong></p>
+  <p>The dashboard communicates only with:</p>
   <ul>
-    <li>License file (<code>~/.gitdock/license.json</code>) — contains your license key, activation date, machine fingerprint, and an integrity checksum</li>
-    <li>Workspace configuration — your chosen workspace path and account settings</li>
-    <li>GitHub Personal Access Tokens — stored in your operating system's secure keychain (Windows Credential Manager, macOS Keychain, or Linux Secret Service), never in plain text files</li>
-    <li>SSH keys — generated locally in <code>~/.ssh/</code> for GitHub authentication</li>
-    <li>Cloned repositories — stored in your chosen workspace directory</li>
+    <li><strong>GitHub API</strong> - to list repositories, fetch READMEs, and count PRs/Issues. These calls use your own credentials (GitHub CLI or personal access token) and go directly from your machine to GitHub.</li>
   </ul>
+  <p>No data is sent to GitDock servers, analytics services, or any other third party.</p>
 
-  <p><strong>2.4 Hub Data (Optional Feature)</strong></p>
-  <p>If you choose to connect to the GitDock Hub (a multi-machine overview tool), the following metadata is sent to the Hub server you configure:</p>
+  <h2>3. GitDock Hub (Optional Paid Service)</h2>
+  <p>The Hub is an optional service that provides a multi-machine overview. If you choose to connect your dashboard to the Hub, the following metadata is sent:</p>
   <ul>
     <li>Machine name and identifier</li>
     <li>Repository names, branches, and sync status (clean, dirty, ahead, behind)</li>
+    <li>Account labels</li>
   </ul>
-  <p>No source code, file contents, tokens, credentials, or personal data are sent to the Hub. The Hub is entirely optional.</p>
+  <p>The Hub <strong>never</strong> receives:</p>
+  <ul>
+    <li>Source code or file contents</li>
+    <li>Git commit messages, diffs, or history</li>
+    <li>Tokens, passwords, or credentials</li>
+    <li>SSH keys</li>
+  </ul>
+  <p>If you use the hosted Hub at <a href="https://hub.gitdock.dev">hub.gitdock.dev</a>, your account email and API key are stored on our server to authenticate your machines. You can delete your Hub account and all associated data at any time from the Hub dashboard.</p>
 
-  <h2>3. Data We Do NOT Collect</h2>
+  <h2>4. Data We Do NOT Collect</h2>
   <ul>
     <li>Source code or file contents from your repositories</li>
     <li>Git commit messages, diffs, or history</li>
     <li>Browsing activity, analytics, or telemetry</li>
-    <li>Cookies (the application runs locally and does not use cookies)</li>
-    <li>IP addresses or geolocation data</li>
-  </ul>
-
-  <h2>4. How We Use Your Data</h2>
-  <p>The data we process is used exclusively for:</p>
-  <ul>
-    <li><strong>License activation and validation</strong> — to verify that your license is valid and within the activation limit</li>
-    <li><strong>Periodic license verification</strong> — the app checks license validity every 7 days via the Lemon Squeezy API. If offline, a 30-day grace period is allowed</li>
-    <li><strong>Customer support</strong> — your name and email (from the purchase record) may be used to respond to support requests</li>
+    <li>Cookies (the local dashboard does not use cookies)</li>
+    <li>IP addresses or geolocation data (from the local dashboard)</li>
   </ul>
 
   <h2>5. Third-Party Services</h2>
-  <p>GitDock interacts with the following third-party services:</p>
   <ul>
-    <li><strong>Lemon Squeezy</strong> (<a href="https://www.lemonsqueezy.com/privacy" target="_blank">Privacy Policy</a>) — payment processing and license management (Merchant of Record)</li>
-    <li><strong>GitHub API</strong> (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank">Privacy Statement</a>) — repository data fetching, performed locally using your own authentication credentials</li>
+    <li><strong>GitHub API</strong> (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank">Privacy Statement</a>) - repository data fetching, performed locally using your own credentials</li>
+    <li><strong>Render.com</strong> - hosts the Hub service and this website</li>
   </ul>
 
   <h2>6. Data Retention</h2>
   <ul>
-    <li><strong>License data</strong> — stored locally until you deactivate or clean up. On the Lemon Squeezy side, retained per their data retention policy.</li>
-    <li><strong>Local application data</strong> — retained until you delete it. The app includes a "Deactivate &amp; Clean Up" feature that removes all local data.</li>
+    <li><strong>Local data</strong> - retained on your machine until you delete it. Use Settings &rarr; Reset &amp; Clean Up to remove all local data.</li>
+    <li><strong>Hub data</strong> - retained until you delete your Hub account or request removal.</li>
   </ul>
 
   <h2>7. Your Rights</h2>
-  <p>Depending on your jurisdiction, you may have the following rights regarding your personal data:</p>
-  <ul>
-    <li><strong>Access</strong> — request what data we hold about you</li>
-    <li><strong>Rectification</strong> — request correction of inaccurate data</li>
-    <li><strong>Erasure</strong> — request deletion of your data</li>
-    <li><strong>Portability</strong> — receive your data in a structured format</li>
-    <li><strong>Objection</strong> — object to processing of your data</li>
-  </ul>
-  <p>For local data, you can use the "Deactivate &amp; Clean Up" feature in Settings to remove all data from your machine. For purchase-related data, contact Lemon Squeezy or reach out to us.</p>
+  <p>Depending on your jurisdiction, you may have the right to access, correct, delete, or port your personal data. Since the dashboard is fully local, you have complete control over your data at all times.</p>
+  <p>For Hub data, contact us at <a href="mailto:support@gitdock.dev">support@gitdock.dev</a> to exercise your rights, or delete your account directly from the Hub dashboard.</p>
 
-  <h2>8. International Users</h2>
-  <p>GitDock is operated from the United States. If you are accessing the Software from outside the United States, please be aware that your data may be processed in the United States or in the jurisdiction where Lemon Squeezy operates.</p>
-  <p>We are committed to complying with applicable data protection regulations regardless of your location:</p>
+  <h2>8. Security</h2>
   <ul>
-    <li><strong>European Union (GDPR)</strong> — EU residents retain all rights under the General Data Protection Regulation, including the right to lodge a complaint with a supervisory authority</li>
-    <li><strong>Brazil (LGPD)</strong> — Brazilian residents retain all rights under the Lei Geral de Prote&ccedil;&atilde;o de Dados</li>
-    <li><strong>California (CCPA)</strong> — California residents have the right to know what personal information is collected, to request deletion, and to opt out of the sale of personal information. We do not sell personal information.</li>
-  </ul>
-  <p>To exercise any of these rights, contact us at <a href="mailto:support@gitdock.dev">support@gitdock.dev</a>.</p>
-
-  <h2>9. Security</h2>
-  <p>GitDock implements the following security measures:</p>
-  <ul>
-    <li>The application server binds exclusively to <code>127.0.0.1</code> (localhost) — it is not accessible over the network</li>
+    <li>The local dashboard binds exclusively to <code>127.0.0.1</code> (localhost) - it is not accessible over the network</li>
     <li>Credentials are stored in the operating system's secure keychain, not in plain text</li>
-    <li>License data is protected by HMAC integrity verification, bound to the specific machine</li>
-    <li>All communication with external services (Lemon Squeezy, GitHub) uses HTTPS</li>
-    <li>The application enforces CSRF protection, rate limiting, and input sanitization</li>
+    <li>All communication with GitHub and the Hub uses HTTPS</li>
+    <li>The dashboard enforces input sanitization, path validation, and request size limits</li>
+    <li>The source code is open for anyone to audit</li>
   </ul>
 
-  <h2>10. Children's Privacy</h2>
+  <h2>9. Children's Privacy</h2>
   <p>GitDock is not intended for use by individuals under the age of 18. We do not knowingly collect personal data from children.</p>
 
-  <h2>11. Changes to This Policy</h2>
-  <p>We may update this Privacy Policy from time to time. Changes will be reflected by updating the "Last updated" date at the top of this page. Continued use of GitDock after changes constitutes acceptance of the updated policy.</p>
+  <h2>10. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Changes will be reflected by updating the "Last updated" date at the top of this page.</p>
 
-  <h2>12. Contact</h2>
-  <p>If you have questions about this Privacy Policy or wish to exercise your data rights, contact us at: <a href="mailto:support@gitdock.dev">support@gitdock.dev</a></p>
+  <h2>11. Contact</h2>
+  <p>If you have questions about this Privacy Policy, contact us at: <a href="mailto:support@gitdock.dev">support@gitdock.dev</a></p>
 </div>
 
 <footer class="footer">
@@ -161,7 +138,7 @@
     <a href="./privacy.html">Privacy Policy</a>
     <a href="./terms.html">Terms of Service</a>
   </p>
-  <p style="margin-top:8px">GitDock | Built for developers who want to organize their Git projects.</p>
+  <p style="margin-top:8px">GitDock | Open-source dashboard for developers.</p>
 </footer>
 
 </body>

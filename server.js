@@ -18,7 +18,7 @@ const http = require("http");
 const isWindows = process.platform === "win32";
 const isDarwin = process.platform === "darwin";
 
-// --- Credential storage: in-memory session (open source build; no keytar) ---
+// --- Credential storage: in-memory session ---
 const TOKEN_SERVICE = "GitDock";
 const HUB_KEY_SERVICE = "GitDock-Hub";
 const HUB_KEY_ACCOUNT = "hubApiKey";
@@ -252,14 +252,6 @@ app.post("/api/workspace/setup", (req, res) => {
     console.error("[workspace] Setup error:", err);
     res.status(500).json({ success: false, error: "Failed to configure workspace" });
   }
-});
-
-// Open source: no license required; stubs for dashboard compatibility
-app.get("/api/license/status", (req, res) => {
-  res.json({ licensed: true });
-});
-app.post("/api/license/deactivate", (req, res) => {
-  res.json({ success: true });
 });
 
 // Full cleanup: clear Hub key, remove SSH keys, remove workspace config
@@ -2775,7 +2767,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// --- Hub API key storage (config.json; open source build) ---
+// --- Hub API key storage (config.json) ---
 async function getHubApiKey() {
   if (cachedHubApiKey) return cachedHubApiKey;
   const config = loadConfig();

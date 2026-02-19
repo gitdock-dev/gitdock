@@ -11,7 +11,7 @@
 <h1 align="center">GitDock</h1>
 
 <p align="center">
-  <strong>Open source</strong> local dashboard to manage multiple GitHub accounts in one place.<br>
+  <strong>Open source</strong> local dashboard to manage all your GitHub repositories in one place.<br>
   View, clone, organize, and operate on dozens of repositories without leaving the browser.
 </p>
 
@@ -25,25 +25,24 @@
 
 ## What is this?
 
-GitDock is a **local tool** that runs on your machine and provides a web dashboard to manage repositories from **multiple GitHub accounts** simultaneously.
+GitDock is a **local tool** that runs on your machine and provides a web dashboard to search, organize, and operate on all your repositories from one interface.
 
-**It is not a cloud service.** It is not an extension. It is a Node.js server that listens **only on localhost (127.0.0.1)** — no data leaves your machine, no port is exposed to the network.
+**It is not a cloud service.** It is not an extension. It is a Node.js server that listens **only on localhost (127.0.0.1)** - no data leaves your machine, no port is exposed to the network.
 
 ### Who is it for?
 
 Developers who:
-- Have **more than one GitHub account** (professional + personal, for example)
-- Manage **dozens or hundreds** of repositories
-- Need to clone, pull, commit, push, transfer repos between accounts
-- Want to see the status of all projects in one place
-- Waste time switching between accounts, terminals, and GitHub tabs
+- Manage **dozens or hundreds** of repositories and want them all in one view
+- Want to clone, pull, commit, push, and see status without jumping between tabs and terminals
+- Need to see which repos have uncommitted changes, are behind remote, or are stale
+- Use one GitHub account or several (work + personal) and want everything in one dashboard
 
 ### What it is NOT
 
-- **Does not replace GitHub** — it's a local facilitator
-- **Has no database** — uses the GitHub CLI and Git directly
-- **Does not send data anywhere** — everything runs on localhost (default `127.0.0.1:3847`; auto-falls back if the port is in use)
-- **Does not require a special account** — just an authenticated GitHub CLI
+- **Does not replace GitHub** - it's a local facilitator
+- **Has no database** - uses the GitHub CLI and Git directly
+- **Does not send data anywhere** - everything runs on localhost (default `127.0.0.1:3847`; auto-falls back if the port is in use)
+- **Does not require a special account** - just an authenticated GitHub CLI
 
 ---
 
@@ -53,11 +52,11 @@ Developers who:
 
 | Feature | Description |
 |---|---|
-| **Multi-account** | See repos from all accounts in a single dashboard |
+| **Account support** | Works with one account; add more anytime if you need them |
 | **Informative cards** | Each repo displays: name, owner, description, language, stars, visibility, git status, branch, disk size |
 | **Advanced filters** | Filter by account, visibility (public/private), status (cloned/not cloned/stale), sort (updated, A-Z, Z-A, size) |
 | **Real-time search** | Search by name, description, language, or username. Shortcut: `/` key |
-| **Pinned repos** | Mark favorite repos with ★ — they appear at the top, separated |
+| **Pinned repos** | Mark favorite repos with ★ - they appear at the top, separated |
 | **Custom alias** | Give any repo a nickname to remember what it's about. Opens an elegant modal, saved locally |
 | **Stale repo detection** | "stale" badge on repos with no activity for over X months. Configurable threshold: 1, 3, 6, or 12 months |
 | **Disk size** | Each card displays the repository size (KB/MB/GB) |
@@ -72,12 +71,12 @@ Developers who:
 | Feature | Description |
 |---|---|
 | **Clone** | Clone repos with one click. Uses SSH with host aliases for multi-account |
-| **Pull** | Pull with safety check — blocks if there are uncommitted changes |
+| **Pull** | Pull with safety check - blocks if there are uncommitted changes |
 | **Fetch** | Fetch from all remotes without merging |
 | **Pull All** | Pull all cloned repos at once |
 | **Commit** | Full Git modal: view changed files, select files, write message, commit |
 | **Push** | Push directly from the Git modal, with set upstream support |
-| **Branch** | View current branch, switch branches, create new branch — all from the modal |
+| **Branch** | View current branch, switch branches, create new branch - all from the modal |
 | **Revert** | Revert specific commits directly from the history |
 | **Detailed status** | View: branch, changed files with status (modified/added/deleted/untracked), recent commits with hash, and unpushed commit badges |
 
@@ -118,7 +117,7 @@ Developers who:
 | **Modals** | 7 modals: Alias, Remove, Migrate, Transfer, Confirm Action, README, Git |
 | **Toasts** | Temporary notifications (success/error/info) in the top-right corner |
 | **Activity log** | Real-time log of all operations in the sidebar |
-| **SSE (Server-Sent Events)** | Real-time server updates — connection indicator at the top |
+| **SSE (Server-Sent Events)** | Real-time server updates - connection indicator at the top |
 | **⋮ Menu (three dots)** | Context menu on each cloned card with all quick actions |
 | **Keyboard shortcuts** | `/` for search, `Escape` to close modals, `Enter` to confirm |
 | **Responsive** | Sidebar becomes horizontal on screens smaller than 768px |
@@ -131,7 +130,7 @@ The server implements multiple layers of protection:
 
 | Measure | Detail |
 |---|---|
-| **Localhost only** | Listens exclusively on `127.0.0.1` — inaccessible from the network |
+| **Localhost only** | Listens exclusively on `127.0.0.1` - inaccessible from the network |
 | **IP validation** | Middleware rejects any request not coming from localhost (403) |
 | **Body limit** | Requests limited to 10KB (protection against payload abuse) |
 | **Input sanitization** | Repo names, branches, commit messages, and hashes are sanitized with strict regex |
@@ -219,223 +218,17 @@ sudo apt-get install -y openssh-client
 
 ## Step-by-Step Installation
 
-### 1. Clone or create the project
+### 1. Clone and install
 
 ```bash
-# Create the project folder
-mkdir github-repo-manager
-cd github-repo-manager
-```
-
-Or clone if you already have the repository:
-
-```bash
-git clone git@github.com:YOUR_USER/github-repo-manager.git
-cd github-repo-manager
-```
-
-### 2. Install dependencies
-
-```bash
+git clone https://github.com/gitdock-dev/gitdock.git
+cd gitdock
 npm install
 ```
 
-This installs only Express (the sole dependency).
+This installs Express (the sole dependency).
 
-### 3. Add accounts via the dashboard
-
-After starting the server (step 7), open the dashboard in your browser. Use **Settings** (or the initial setup flow) to add your GitHub accounts. Each account needs a label, GitHub username, and SSH host alias (e.g. `github.com-work`). Accounts and preferences are stored in `config.json` in your workspace directory.
-
-### 4. Configure SSH for multiple accounts
-
-This is the most important step. SSH allows you to use **two different GitHub accounts** on the same machine without conflict.
-
-#### Option A: Automated script (recommended)
-
-The project includes scripts that do everything automatically:
-
-**Windows (PowerShell as Administrator):**
-
-```powershell
-.\scripts\setup-ssh.ps1
-```
-
-**macOS / Linux:**
-
-```bash
-chmod +x scripts/setup-ssh.sh
-./scripts/setup-ssh.sh
-```
-
-The script will:
-1. Create the `~/.ssh` directory if it doesn't exist
-2. Generate Ed25519 SSH keys for each account
-3. Configure `~/.ssh/config` with host aliases
-4. Add keys to the SSH agent
-5. Show the public keys for you to add to GitHub
-6. Test the connections
-
-#### Option B: Manual configuration
-
-If you prefer to do it manually:
-
-**Step 4.1 — Generate SSH keys**
-
-```bash
-# Key for the professional account
-ssh-keygen -t ed25519 -C "professional@github" -f ~/.ssh/id_ed25519_professional
-
-# Key for the personal account
-ssh-keygen -t ed25519 -C "personal@github" -f ~/.ssh/id_ed25519_personal
-```
-
-When asked for a passphrase, you can leave it blank (Enter) or set a password.
-
-**Step 4.2 — Configure `~/.ssh/config`**
-
-Open (or create) the file `~/.ssh/config`:
-
-**Windows:** `C:\Users\YOUR_USERNAME\.ssh\config`
-**macOS/Linux:** `~/.ssh/config`
-
-Add:
-
-```
-# Professional account
-Host github.com-professional
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_ed25519_professional
-    IdentitiesOnly yes
-
-# Personal account
-Host github.com-personal
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_ed25519_personal
-    IdentitiesOnly yes
-```
-
-**Step 4.3 — Start the SSH Agent and add keys**
-
-**Windows (PowerShell as Administrator):**
-
-```powershell
-# Enable the SSH Agent service
-Set-Service ssh-agent -StartupType Automatic
-Start-Service ssh-agent
-
-# Add the keys
-ssh-add $env:USERPROFILE\.ssh\id_ed25519_professional
-ssh-add $env:USERPROFILE\.ssh\id_ed25519_personal
-```
-
-**macOS:**
-
-```bash
-# Start the agent (usually already running)
-eval "$(ssh-agent -s)"
-
-# Add the keys (macOS saves to Keychain)
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_professional
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_personal
-```
-
-**Linux:**
-
-```bash
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519_professional
-ssh-add ~/.ssh/id_ed25519_personal
-```
-
-**Step 4.4 — Add public keys to GitHub**
-
-For **each account**, you need to add the corresponding public key:
-
-1. Copy the public key content:
-
-```bash
-# Professional
-cat ~/.ssh/id_ed25519_professional.pub
-
-# Personal
-cat ~/.ssh/id_ed25519_personal.pub
-```
-
-**Windows (PowerShell):**
-
-```powershell
-# Professional - copy to clipboard
-Get-Content $env:USERPROFILE\.ssh\id_ed25519_professional.pub | Set-Clipboard
-
-# Personal - copy to clipboard
-Get-Content $env:USERPROFILE\.ssh\id_ed25519_personal.pub | Set-Clipboard
-```
-
-2. Log in to GitHub with the **professional account**
-3. Go directly to: **https://github.com/settings/keys**
-   - Or via the menu: click your **profile picture** (top-right corner) → **Settings** → in the **"Access"** section of the sidebar, click **SSH and GPG keys**
-4. Click **New SSH key**
-5. In "Title", give it a descriptive name (e.g., "Repo Manager - Professional")
-6. In "Key type", select **Authentication Key**
-7. In "Key", paste the **professional** public key
-8. Click **Add SSH key**
-9. **Repeat** for the personal account (log in to the other GitHub account and add the personal key)
-
-**Step 4.5 — Test the connections**
-
-```bash
-# Test professional account
-ssh -T git@github.com-professional
-# Expected: "Hi YOUR-PROF-USER! You've successfully authenticated..."
-
-# Test personal account
-ssh -T git@github.com-personal
-# Expected: "Hi YOUR-PERSONAL-USER! You've successfully authenticated..."
-```
-
-If both return "successfully authenticated", the SSH setup is correct.
-
-### 5. Authenticate the GitHub CLI
-
-The dashboard also uses the `gh` CLI for operations like listing repos and fetching API data. You need to authenticate **both** accounts:
-
-```bash
-# Authenticate the first account
-gh auth login
-# Choose: GitHub.com → HTTPS → Login with a web browser
-# Follow the instructions in the browser
-
-# Authenticate the second account
-gh auth login
-# Repeat the process logged into the other GitHub account
-```
-
-Verify that both accounts are authenticated:
-
-```bash
-gh auth status
-```
-
-Expected:
-
-```
-github.com
-  ✓ Logged in to github.com account ACCOUNT-1 (keyring)
-  ✓ Logged in to github.com account ACCOUNT-2 (keyring)
-```
-
-### 6. Create the clone directories
-
-```bash
-mkdir professional
-mkdir personal
-```
-
-These directories will store the local clones of each account's repos.
-
-### 7. Start the server
+### 2. Start the server
 
 **Windows:**
 
@@ -456,7 +249,33 @@ chmod +x start.sh
 node server.js
 ```
 
-The dashboard opens automatically at: **http://127.0.0.1:3847** (or the next available port if `3847` is already in use).
+Open your browser at **http://127.0.0.1:3847** (or the next available port if `3847` is in use).
+
+### 3. Add your account
+
+The dashboard shows an empty state: **"No repositories yet. Add a GitHub account to get started."**
+
+1. Click **Add Account** (in the empty state or via **Settings** → **Account Manager**).
+2. Fill in the form:
+   - **Account name**: one word, no spaces (e.g. `work`, `personal`) - used for the folder and SSH key name
+   - **Display label**: name shown in the app (e.g. Work, Personal)
+   - **GitHub username**: your GitHub login for this account
+   - **Email**: used for git commits
+   - **SSH host** (optional): leave empty for default `github.com-{account name}`
+3. Click **Add**. The dashboard opens a **setup timeline** that guides you through:
+   - **Step 1**: Account created (automatic)
+   - **Step 2**: Click **Generate SSH Key** - the public key appears. Click **Copy Key**, then add it at [GitHub → Settings → SSH and GPG keys](https://github.com/settings/keys)
+   - **Step 3**: Confirm the key is added on GitHub (click **Add Manually on GitHub** to open the page)
+   - **Step 4**: Connect a personal access token (or use **Advanced: use gh CLI** and run `gh auth login` in a terminal)
+   - **Step 5**: Git config created (automatic)
+   - **Step 6**: Once all steps are green, the **Load Repos & Close** button appears - click it to finish
+4. Your repositories appear in the dashboard. Clone, pull, commit, and push from there.
+
+Accounts and workspace data are stored in your workspace directory (e.g. `~/.gitdock` or a path you chose), in `config.json`.
+
+### 4. Add more accounts (optional)
+
+Repeat step 3 for each additional GitHub account. The dashboard manages SSH host aliases and keys for you.
 
 ---
 
@@ -471,7 +290,9 @@ gitdock/
 ├── package.json               # Dependencies (Express only)
 ├── start.ps1                  # Startup script (Windows)
 ├── start.sh                   # Startup script (macOS/Linux)
+├── .gitignore
 ├── LICENSE                    # Apache 2.0
+├── README.md
 ├── CONTRIBUTING.md            # Contribution guide
 ├── hub/                       # Multi-machine Hub (optional)
 │   ├── server.js              # Hub API and dashboard
@@ -481,9 +302,9 @@ gitdock/
 │   ├── index.html
 │   ├── privacy.html
 │   └── terms.html
-└── <workspace>/                # Your chosen data dir (e.g. ~/GitDock)
+└── <workspace>/               # Your chosen data dir (e.g. ~/GitDock)
     ├── config.json            # Accounts, machine, Hub settings
-    ├── account1/               # Clones for account 1
+    ├── account1/              # Clones for account 1
     └── account2/              # Clones for account 2
 ```
 
@@ -507,13 +328,13 @@ curl http://127.0.0.1:3847/api/health
 ### GitHub CLI
 
 ```bash
-# View authenticated accounts
+# View authenticated account(s)
 gh auth status
 
-# Switch active account
+# Switch active account (if you have more than one)
 gh auth switch --user YOUR_USERNAME
 
-# List repos for an account
+# List repos for a user
 gh repo list YOUR_USERNAME --limit 200
 
 # Check token permissions
@@ -523,18 +344,17 @@ gh auth status -t
 ### SSH
 
 ```bash
-# Test SSH connection
-ssh -T git@github.com-professional
-ssh -T git@github.com-personal
+# Test SSH connection (use the host alias you set for the account, e.g. github.com-work)
+ssh -T git@github.com-work
 
 # List keys in the agent
 ssh-add -l
 
 # Add key to agent
-ssh-add ~/.ssh/id_ed25519_professional
+ssh-add ~/.ssh/id_ed25519_work
 
 # Debug SSH connection (verbose)
-ssh -vT git@github.com-professional
+ssh -vT git@github.com-work
 ```
 
 ### Git
@@ -553,6 +373,34 @@ git status
 # View branches
 git branch -a
 ```
+
+---
+
+## Advanced: Manual SSH configuration
+
+If you prefer to set up SSH keys and `~/.ssh/config` yourself (instead of using the dashboard's **Generate SSH Key** flow), you can do it manually.
+
+**Generate a key** (one per account):
+
+```bash
+ssh-keygen -t ed25519 -C "yourname@github" -f ~/.ssh/id_ed25519_work
+```
+
+**Add a host block to `~/.ssh/config`** (Windows: `C:\Users\YOUR_USERNAME\.ssh\config`):
+
+```
+Host github.com-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work
+    IdentitiesOnly yes
+```
+
+**Add the key to the SSH agent** (Windows often needs `Start-Service ssh-agent` first; macOS/Linux: `eval "$(ssh-agent -s)"` then `ssh-add ~/.ssh/id_ed25519_work`).
+
+**Add the public key to GitHub**: copy `~/.ssh/id_ed25519_work.pub` and paste it at [GitHub → Settings → SSH and GPG keys](https://github.com/settings/keys).
+
+When adding the account in the dashboard, use the same **SSH host** (e.g. `github.com-work`) so GitDock uses your key for clone and push.
 
 ---
 
@@ -600,7 +448,7 @@ There is a pending transfer for the same repo. Go to GitHub, cancel the pending 
 
 ### Transfer requests email confirmation
 
-Transfers between personal GitHub accounts are **asynchronous** — they require the recipient to accept via email or the GitHub web interface. This is not a bug, it's GitHub's default behavior.
+Transfers between personal GitHub accounts are **asynchronous** - they require the recipient to accept via email or the GitHub web interface. This is not a bug, it's GitHub's default behavior.
 
 ### SSH Agent won't start (Windows)
 
@@ -624,36 +472,9 @@ Host *
 
 ## Customization
 
-### Adding more accounts
+### Adding or editing accounts
 
-Edit the `ACCOUNTS` object in `server.js` to include as many accounts as you want:
-
-```javascript
-const ACCOUNTS = {
-  professional: {
-    githubUser: "account-1",
-    sshHost: "github.com-professional",
-    localDir: path.join(BASE_DIR, "professional"),
-  },
-  personal: {
-    githubUser: "account-2",
-    sshHost: "github.com-personal",
-    localDir: path.join(BASE_DIR, "personal"),
-  },
-  freelance: {  // New account
-    githubUser: "account-3",
-    sshHost: "github.com-freelance",
-    localDir: path.join(BASE_DIR, "freelance"),
-  },
-};
-```
-
-Remember to also:
-1. Generate a new SSH key for the account
-2. Add the host alias in `~/.ssh/config`
-3. Add the public key to GitHub
-4. Authenticate in the `gh` CLI
-5. Create the local directory (`mkdir freelance`)
+Use **Settings** → **Account Manager** in the dashboard to add, edit, or remove accounts. Each account is stored in `config.json` in your workspace directory. The dashboard creates the account folder and SSH setup for you. To add another account, click **Add Account** and follow the same setup timeline (SSH key, GitHub, token).
 
 ### Changing the port
 
@@ -671,10 +492,6 @@ node server.js
 ```
 
 If the port is already in use, GitDock will automatically try the next ports.
-
-```javascript
-const PORT = 3847;  // Change to your desired port
-```
 
 ---
 
@@ -716,5 +533,5 @@ We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development
 ---
 
 <p align="center">
-  <sub>Built for devs who manage multiple GitHub accounts and want to stop wasting time.</sub>
+  <sub>Built for devs who want all their repos in one place.</sub>
 </p>

@@ -397,12 +397,6 @@ body {
   margin-top: 8px; padding-top: 16px; border-top: 1px solid rgba(248,81,73,0.2);
 }
 .settings-danger .settings-section-title { color: var(--red) }
-.btn-deactivate {
-  background: transparent; border: 1px solid rgba(248,81,73,0.4); color: var(--red);
-  padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-deactivate:hover { background: rgba(248,81,73,0.1); border-color: var(--red) }
 .btn-cleanup {
   background: rgba(248,81,73,0.1); border: 1px solid var(--red); color: #fff;
   padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -1650,11 +1644,6 @@ body {
   <div class="modal settings-panel">
     <h3>Settings</h3>
 
-    <div class="settings-section" id="settingsLicense">
-      <div class="settings-section-title">License</div>
-      <div id="settingsLicenseContent"><span style="color:var(--t3);font-size:13px">Loading...</span></div>
-    </div>
-
     <div class="settings-section" id="settingsWorkspace">
       <div class="settings-section-title">Workspace</div>
       <div id="settingsWorkspaceContent"><span style="color:var(--t3);font-size:13px">Loading...</span></div>
@@ -1675,13 +1664,13 @@ body {
     <div class="settings-section settings-danger">
       <div class="settings-section-title">Danger Zone</div>
       <p style="font-size:12px;color:var(--t3);margin-bottom:10px">
-        Deactivate your license and remove all GitDock data from this machine. This frees your license slot so you can activate on another device.
+        Remove all GitDock data from this machine (accounts, SSH keys, stored tokens, settings). Cloned repositories will NOT be deleted.
       </p>
       <div id="cleanupArea">
-        <button class="btn-cleanup" onclick="startCleanup()">Deactivate &amp; Clean Up</button>
+        <button class="btn-cleanup" onclick="startCleanup()">Reset &amp; Clean Up</button>
       </div>
       <div id="cleanupConfirm" style="display:none">
-        <p style="font-size:12px;color:var(--red);margin-bottom:6px">This will remove your license, SSH keys, stored tokens, and all settings. Cloned repositories will NOT be deleted.</p>
+        <p style="font-size:12px;color:var(--red);margin-bottom:6px">This will remove SSH keys, stored tokens, and all settings. Cloned repositories will NOT be deleted.</p>
         <p style="font-size:12px;color:var(--t2);margin-bottom:4px">Type <strong style="color:var(--t1)">DELETE</strong> to confirm:</p>
         <input type="text" class="cleanup-confirm-input" id="cleanupConfirmInput" placeholder="Type DELETE" autocomplete="off">
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -1983,35 +1972,6 @@ function openSettingsPanel() {
 }
 
 async function loadSettingsData() {
-  // Load license info
-  try {
-    var lic = await apiGet('/license/status');
-    var h = '';
-    if (lic.licensed) {
-      h += '<div class="settings-row"><span class="settings-label">Status</span><span class="settings-value" style="color:var(--green)">Active</span></div>';
-      if (lic.maskedKey) h += '<div class="settings-row"><span class="settings-label">License key</span><span class="settings-value dim" style="font-family:\'SF Mono\',\'Consolas\',monospace;font-size:12px;letter-spacing:0.5px">' + esc(lic.maskedKey) + '</span></div>';
-      if (lic.customerName) h += '<div class="settings-row"><span class="settings-label">Owner</span><span class="settings-value">' + esc(lic.customerName) + '</span></div>';
-      if (lic.activationUsage != null && lic.activationLimit != null) {
-        h += '<div class="settings-row"><span class="settings-label">Machines</span><span class="settings-value">' + lic.activationUsage + ' of ' + lic.activationLimit + '</span></div>';
-      }
-      h += '<div class="settings-row"><span class="settings-label">Expires</span><span class="settings-value dim">' + (lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString() : 'Never') + '</span></div>';
-      if (lic.activatedAt) {
-        var d = new Date(lic.activatedAt);
-        h += '<div class="settings-row"><span class="settings-label">Activated</span><span class="settings-value dim">' + d.toLocaleDateString() + '</span></div>';
-      }
-      if (lic.lastValidatedAt) {
-        var lv = new Date(lic.lastValidatedAt);
-        h += '<div class="settings-row"><span class="settings-label">Last verified</span><span class="settings-value dim">' + lv.toLocaleDateString() + ' ' + lv.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + '</span></div>';
-      }
-      h += '<div style="margin-top:10px"><button class="btn-deactivate" onclick="deactivateLicense()">Deactivate License</button></div>';
-    } else {
-      h += '<div class="settings-row"><span class="settings-label">Status</span><span class="settings-value" style="color:var(--red)">Not activated</span></div>';
-    }
-    document.getElementById('settingsLicenseContent').innerHTML = h;
-  } catch (e) {
-    document.getElementById('settingsLicenseContent').innerHTML = '<span style="color:var(--t3);font-size:12px">Could not load license info</span>';
-  }
-
   // Load workspace info
   try {
     var ws = await apiGet('/workspace/status');
@@ -2038,21 +1998,6 @@ async function loadSettingsData() {
   var ua = navigator.userAgent || '';
   var platform = ua.includes('Win') ? 'Windows' : ua.includes('Mac') ? 'macOS' : ua.includes('Linux') ? 'Linux' : 'Unknown';
   document.getElementById('settingsPlatform').textContent = platform;
-}
-
-async function deactivateLicense() {
-  if (!confirm('Deactivate your license on this machine? This frees one activation slot. You can reactivate later.')) return;
-  try {
-    var data = await apiPost('/license/deactivate', {});
-    if (data.success) {
-      toast('License deactivated. Redirecting...', 'success');
-      setTimeout(function() { window.location.href = '/'; }, 1500);
-    } else {
-      toast(data.error || 'Deactivation failed', 'error');
-    }
-  } catch (e) {
-    toast('Deactivation failed. Check your connection.', 'error');
-  }
 }
 
 function startCleanup() {
