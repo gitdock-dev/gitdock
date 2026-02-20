@@ -216,7 +216,26 @@ sudo apt-get install -y openssh-client
 
 ---
 
-## Step-by-Step Installation
+## Quick Start (Standalone Executable)
+
+If you just want to run GitDock without installing Node.js or cloning the repo:
+
+1. Go to the [latest release](https://github.com/gitdock-dev/gitdock/releases/latest) or download from [gitdock.dev](https://gitdock.dev)
+2. Download the zip for your platform (Windows, macOS, or Linux)
+3. Extract the zip to a folder of your choice
+4. Run the executable:
+   - **Windows:** double-click `start.vbs` (runs without a console window) or `gitdock.exe` (shows server logs)
+   - **macOS / Linux:** run `./gitdock` from a terminal
+
+The dashboard opens automatically in your browser.
+
+> **Windows note:** SmartScreen may warn that the app is unrecognized because the executable is not code-signed yet. Click **"More info"** then **"Run anyway"**. You can also right-click the zip before extracting, select **Properties**, and check **"Unblock"** to prevent this.
+
+You still need **Git** and **GitHub CLI (gh)** installed and authenticated. See [Prerequisites](#prerequisites) below.
+
+---
+
+## Step-by-Step Installation (Developer)
 
 ### 1. Clone and install
 
