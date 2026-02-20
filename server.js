@@ -214,7 +214,7 @@ app.use((req, res, next) => {
 // SECURITY: Serve only the dashboard file, not the entire directory
 app.get("/", (req, res) => {
   const workspace = require("./workspace");
-  if (isPkg && !workspace.isWorkspaceConfigured()) {
+  if ((isPkg || isStandalone) && !workspace.isWorkspaceConfigured()) {
     return res.sendFile(path.join(APP_DIR, "workspace-setup.html"));
   }
   res.sendFile(path.join(APP_DIR, "dashboard.html"));
@@ -2893,7 +2893,7 @@ function logServerInfo(port) {
   console.log("  Dashboard: http://" + HOST + ":" + port);
   console.log("  API:       http://" + HOST + ":" + port + "/api");
   console.log("  Security:  Localhost only (127.0.0.1)");
-  if (isPkg) console.log("  Mode:      Packaged executable");
+  if (isPkg || isStandalone) console.log("  Mode:      Standalone executable");
   console.log("============================================================");
   console.log("");
   console.log("  Press Ctrl+C to stop the server.");

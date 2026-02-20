@@ -1,2 +1,2 @@
 @echo off
-start "" /min "%~dp0gitdock.exe"
+powershell -WindowStyle Hidden -Command "Start-Process -FilePath '%~dp0gitdock.exe' -WindowStyle Hidden -WorkingDirectory '%~dp0'"
