@@ -319,8 +319,10 @@ app.get("/api/version", (req, res) => {
 // Static assets (no config files, no node_modules)
 // GitDock logo
 app.get("/gitdock-logo.png", (req, res) => {
-  const file = path.join(APP_DIR, "hub", "gitdock-logo.png");
-  if (fs.existsSync(file)) res.sendFile(file);
+  const root = path.join(APP_DIR, "gitdock-logo.png");
+  const hub = path.join(APP_DIR, "hub", "gitdock-logo.png");
+  if (fs.existsSync(root)) res.sendFile(root);
+  else if (fs.existsSync(hub)) res.sendFile(hub);
   else res.status(404).send("Not found");
 });
 // GitDock logo without background

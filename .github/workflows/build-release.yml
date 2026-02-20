@@ -45,7 +45,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path release | Out-Null
           Copy-Item "dist\${{ matrix.exe }}" release\
-          Copy-Item dashboard.html, workspace-setup.html, gitdock-logo.png, start.vbs release\
+          Copy-Item dashboard.html, workspace-setup.html, gitdock-logo.png, start.bat release\
 
       - name: Prepare release folder (Unix)
         if: matrix.os != 'windows-latest'

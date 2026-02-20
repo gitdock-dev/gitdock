@@ -224,7 +224,7 @@ If you just want to run GitDock without installing Node.js or cloning the repo:
 2. Download the zip for your platform (Windows, macOS, or Linux)
 3. Extract the zip to a folder of your choice
 4. Run the executable:
-   - **Windows:** double-click `start.vbs` (runs without a console window) or `gitdock.exe` (shows server logs)
+   - **Windows:** double-click `start.bat` (runs minimized) or `gitdock.exe` (shows server logs)
    - **macOS / Linux:** run `./gitdock` from a terminal
 
 The dashboard opens automatically in your browser.
