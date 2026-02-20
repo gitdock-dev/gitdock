@@ -327,8 +327,10 @@ app.get("/gitdock-logo.png", (req, res) => {
 });
 // GitDock logo without background
 app.get("/gitdock-logo-nobg.png", (req, res) => {
-  const logo = path.join(APP_DIR, "site", "gitdock-logo-removebg-preview.png");
-  if (fs.existsSync(logo)) res.sendFile(logo);
+  const root = path.join(APP_DIR, "gitdock-logo-nobg.png");
+  const site = path.join(APP_DIR, "site", "gitdock-logo-removebg-preview.png");
+  if (fs.existsSync(root)) res.sendFile(root);
+  else if (fs.existsSync(site)) res.sendFile(site);
   else res.status(404).send("Not found");
 });
 // SECURITY: Never serve config.json
