@@ -39,8 +39,62 @@ app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
-app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
+
+// Lemon Squeezy webhook (must use raw body for signature verification; register before express.json)
+app.post(
+  "/api/webhooks/lemonsqueezy",
+  express.raw({ type: "application/json", limit: "64kb" }),
+  (req, res) => {
+    const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
+    if (!secret) {
+      return res.status(500).json({ error: "Webhook not configured" });
+    }
+    const sig = (req.headers["x-signature"] || "").trim();
+    if (!sig) {
+      return res.status(400).json({ error: "Missing signature" });
+    }
+    const rawBody = req.body;
+    if (!Buffer.isBuffer(rawBody)) {
+      return res.status(400).json({ error: "Invalid body" });
+    }
+    const hmac = crypto.createHmac("sha256", secret);
+    hmac.update(rawBody);
+    const digest = hmac.digest("hex");
+    try {
+      if (digest.length !== sig.length || !crypto.timingSafeEqual(Buffer.from(digest, "utf8"), Buffer.from(sig, "utf8"))) {
+        return res.status(401).json({ error: "Invalid signature" });
+      }
+    } catch (e) {
+      return res.status(401).json({ error: "Invalid signature" });
+    }
+    let payload;
+    try {
+      payload = JSON.parse(rawBody.toString("utf8"));
+    } catch (e) {
+      return res.status(400).json({ error: "Invalid JSON" });
+    }
+    const eventName = payload.meta?.event_name;
+    const email = payload.data?.attributes?.user_email || payload.meta?.custom_data?.email;
+    if (!email) {
+      return res.status(200).json({ received: true });
+    }
+    const user = db.getUserByEmail(email);
+    if (!user) {
+      return res.status(200).json({ received: true });
+    }
+    const setPro = ["subscription_created", "subscription_updated", "subscription_resumed"].includes(eventName);
+    const setFree = ["subscription_expired", "subscription_cancelled", "subscription_paused"].includes(eventName);
+    if (setPro) {
+      db.setUserPlan(user.id, "pro");
+    } else if (setFree) {
+      db.setUserPlan(user.id, "free");
+    }
+    res.status(200).json({ received: true });
+  }
+);
+
+app.use(express.json({ limit: "1mb" }));
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -212,7 +266,9 @@ app.get("/api/auth/check", (req, res) => {
 app.get("/api/auth/me", apiLimiter, requireSession, (req, res) => {
   const user = db.getUserById(req.userId);
   if (!user) return res.status(401).json({ error: "Unauthorized" });
-  res.json({ email: user.email, csrfToken: req.session.csrfToken });
+  const plan = user.plan || "free";
+  const checkoutUrl = plan === "free" ? (process.env.LEMONSQUEEZY_CHECKOUT_URL || "") : "";
+  res.json({ email: user.email, plan, checkoutUrl, csrfToken: req.session.csrfToken });
 });
 
 // --- Agent: receive snapshot ---
@@ -225,6 +281,18 @@ app.post("/api/agent/snapshot", snapshotLimiter, requireApiKey, (req, res) => {
 
   if (!machineId) {
     return res.status(400).json({ error: "machineId required" });
+  }
+
+  const userId = req.userId;
+  const user = db.getUserById(userId);
+  if (user && user.plan !== "pro") {
+    const existingIds = db.getMachineIdsByUserId(userId);
+    if (existingIds.length >= 1 && !existingIds.includes(machineId)) {
+      return res.status(403).json({
+        error: "Free plan is limited to one machine. Upgrade to Pro for unlimited machines.",
+        code: "MACHINE_LIMIT",
+      });
+    }
   }
 
   const snapshot = {
@@ -246,7 +314,6 @@ app.post("/api/agent/snapshot", snapshotLimiter, requireApiKey, (req, res) => {
     })),
   };
 
-  const userId = req.userId;
   db.upsertMachine(machineId, req.apiKey.id, machineName, platform, userId);
   db.saveSnapshot(machineId, snapshot, userId);
   broadcastToUser(userId, "snapshot_updated", { machineId });

@@ -760,6 +760,11 @@
         <p id="machineDetailReposEmpty" class="repo-list-empty" style="display:none;">No repositories match the filter.</p>
       </div>
       <div id="settingsView" class="view">
+        <div id="planCard" class="plan-card" style="margin-bottom: 24px; padding: 16px; background: var(--bg2); border-radius: 10px; border: 1px solid var(--border);">
+          <div class="section-title" style="margin-bottom: 8px;">Plan</div>
+          <p id="planStatus" style="color: var(--t2); font-size: 13px; margin-bottom: 12px;">Loading…</p>
+          <a id="upgradeToProBtn" href="#" target="_blank" rel="noopener" class="btn btn-primary" style="display: none;">Upgrade to Pro ($5/month)</a>
+        </div>
         <div class="page-title">API keys</div>
         <p style="color: var(--t2); font-size: 13px; margin-bottom: 16px;">Use these keys in your local GitDock <code>config.json</code> under <code>hub.apiKey</code>. Each machine can use the same key.</p>
         <ul id="keysList" class="keys-list"></ul>
@@ -1410,6 +1415,23 @@
       });
 
       function loadKeys() {
+        apiGet('/api/auth/me').then(function(me) {
+          var plan = (me && me.plan) ? me.plan : 'free';
+          var statusEl = document.getElementById('planStatus');
+          var btnEl = document.getElementById('upgradeToProBtn');
+          if (plan === 'pro') {
+            statusEl.textContent = 'You are on Pro. Unlimited machines.';
+            btnEl.style.display = 'none';
+          } else {
+            statusEl.textContent = 'Free plan: 1 machine. Upgrade to Pro for unlimited machines.';
+            if (me.checkoutUrl) {
+              btnEl.href = me.checkoutUrl;
+              btnEl.style.display = 'inline-block';
+            } else {
+              btnEl.style.display = 'none';
+            }
+          }
+        }).catch(function() {});
         apiGet('/api/keys').then(function(data) {
           var keys = data.keys || [];
           var list = document.getElementById('keysList');

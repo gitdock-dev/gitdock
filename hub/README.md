@@ -2,6 +2,17 @@
 
 Central server for the GitDock multi-machine dashboard. Agents on each of your machines send git status snapshots to the Hub; you view all machines and sync issues in one place.
 
+## Hosted vs self-host
+
+| | Hosted (hub.gitdock.dev) | Self-host (this repo) |
+|---|--------------------------|------------------------|
+| **Infrastructure** | We manage hosting, SSL, backups, uptime | You deploy and maintain your own server |
+| **Pricing** | One machine free; unlimited machines for $5/month | No cost to us; you pay only for your server |
+| **Limits** | Free: 1 machine. Pro: unlimited | No limits; full control |
+| **Support** | Billing and hosted service support | Community support; see main [README](../README.md) |
+
+Prefer not to manage infrastructure? Use our [hosted Hub](https://hub.gitdock.dev). Otherwise, self-host by following the steps below.
+
 ## Quick start (local)
 
 1. Copy `.env.example` to `.env` and set:
@@ -53,6 +64,7 @@ Para voltar a usar o Hub em produção (ex.: Render), altere de novo a URL e a A
    - `HUB_SECRET` – a long random string (e.g. `openssl rand -hex 32`)
    - `HUB_DB_KEY` – (optional) 32+ character key to encrypt the database
    - `PORT` – Render sets this automatically; you can leave it blank
+   - For **hosted freemium** (optional): see [Lemon Squeezy (hosted Hub only)](#lemon-squeezy-hosted-hub-only) below.
 
 4. Deploy. Your Hub URL will be `https://<your-service>.onrender.com`. You can add a custom domain (e.g. `hub.gitdock.dev`) in Render → Settings → Custom Domains.
 
@@ -86,6 +98,23 @@ You can configure the Hub in `config.json` instead of the dashboard:
 - `machine.id` is created automatically when the Hub is configured; you can leave it out.
 - `machine.name` is the label shown for this machine on the Hub.
 - `hub.intervalMinutes` must be between 1 and 60.
+
+## Lemon Squeezy (hosted Hub only)
+
+If you run the **hosted** Hub (e.g. hub.gitdock.dev) and want to offer Pro ($5/month, unlimited machines) via Lemon Squeezy:
+
+1. **Lemon Squeezy**
+   - Create a subscription product (e.g. "GitDock Hub Pro") at $5/month.
+   - In **Webhooks**, add a webhook URL: `https://hub.gitdock.dev/api/webhooks/lemonsqueezy` (or your Hub URL).
+   - Choose events: `subscription_created`, `subscription_updated`, `subscription_expired`, `subscription_cancelled`, `subscription_resumed`, `subscription_paused`.
+   - Copy the **Signing secret** (used to verify webhook requests).
+
+2. **Hub environment (e.g. Render)**
+   - `LEMONSQUEEZY_WEBHOOK_SECRET` – the webhook signing secret from Lemon Squeezy.
+   - `LEMONSQUEEZY_CHECKOUT_URL` – the full checkout URL for your product (so the Hub Settings "Upgrade to Pro" button can link to it).
+
+3. **User matching**
+   - The webhook matches subscriptions to Hub users by **customer email**. Users must use the same email when signing up at the Hub and when purchasing on Lemon Squeezy.
 
 ## Security
 

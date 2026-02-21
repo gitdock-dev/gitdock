@@ -516,9 +516,10 @@ If the port is already in use, GitDock will automatically try the next ports.
 
 ## Hub (multi-machine sync)
 
-- **Hosted Hub:** Try it at [hub.gitdock.dev](https://hub.gitdock.dev). Sign up, create an API key in Settings, then in each machine's GitDock dashboard set **Hub URL** to `https://hub.gitdock.dev` and paste the key.
-- **Self-host:** The Hub is in the `hub/` folder. Deploy it to [Render](https://render.com) (or any Node host). See [hub/README.md](hub/README.md) for build steps, env vars (`HUB_SECRET`, etc.), and custom domain setup.
-- **Local app:** Run `node server.js` as usual; use the dashboard’s **Configure Hub** to point to your Hub URL and API key so this machine sends snapshots.
+The Hub code is in the `hub/` folder. You can [self-host it](hub/README.md) at no cost.
+
+We also run a hosted Hub at [hub.gitdock.dev](https://hub.gitdock.dev): one machine is free; unlimited machines are $5/month. Sign up there, create an API key in Settings, then in each machine set **Hub URL** to `https://hub.gitdock.dev` and paste the key.
+In the local GitDock dashboard use the dashboard’s **Configure Hub** to set the URL and key so this machine sends snapshots.
 
 ## Contributing
 

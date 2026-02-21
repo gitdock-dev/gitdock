@@ -44,6 +44,7 @@ function initSchema(database) {
       id TEXT PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      plan TEXT NOT NULL DEFAULT 'free',
       created_at TEXT DEFAULT (datetime('now'))
     );
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -94,6 +95,12 @@ function initSchema(database) {
     CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(user_id);
     CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at);
   `);
+
+  // Migration: add plan column to users if missing (existing DBs)
+  const cols = database.prepare("PRAGMA table_info(users)").all();
+  if (cols && !cols.some((c) => c.name === "plan")) {
+    database.exec("ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'");
+  }
 }
 
 // --- Audit ---
@@ -107,21 +114,27 @@ function logAudit(userId, action, ip) {
 function createUser(id, email, passwordHash) {
   const d = getDb();
   d.prepare(
-    "INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)"
+    "INSERT INTO users (id, email, password_hash, plan) VALUES (?, ?, ?, 'free')"
   ).run(id, email, passwordHash);
-  return { id, email, created_at: d.prepare("SELECT datetime('now') as t").get().t };
+  return { id, email, plan: "free", created_at: d.prepare("SELECT datetime('now') as t").get().t };
 }
 
 function getUserByEmail(email) {
   return getDb()
-    .prepare("SELECT id, email, password_hash FROM users WHERE email = ?")
+    .prepare("SELECT id, email, password_hash, plan FROM users WHERE email = ?")
     .get(email) || null;
 }
 
 function getUserById(id) {
   return getDb()
-    .prepare("SELECT id, email FROM users WHERE id = ?")
+    .prepare("SELECT id, email, plan FROM users WHERE id = ?")
     .get(id) || null;
+}
+
+function setUserPlan(userId, plan) {
+  const p = plan === "pro" ? "pro" : "free";
+  const r = getDb().prepare("UPDATE users SET plan = ? WHERE id = ?").run(p, userId);
+  return r.changes > 0;
 }
 
 // --- API Keys ---
@@ -191,6 +204,13 @@ function listMachines(userId) {
     .all(userId);
 }
 
+function getMachineIdsByUserId(userId) {
+  return getDb()
+    .prepare("SELECT id FROM machines WHERE user_id = ?")
+    .all(userId)
+    .map((r) => r.id);
+}
+
 function updateMachineName(machineId, name, userId) {
   const d = getDb();
   const r = d.prepare(
@@ -253,6 +273,7 @@ module.exports = {
   createUser,
   getUserByEmail,
   getUserById,
+  setUserPlan,
   createApiKey,
   getApiKeyHashesForVerification,
   listApiKeys,
@@ -260,6 +281,7 @@ module.exports = {
   upsertMachine,
   getMachine,
   listMachines,
+  getMachineIdsByUserId,
   updateMachineName,
   deleteMachine,
   saveSnapshot,
