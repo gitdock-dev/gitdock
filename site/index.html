@@ -8,10 +8,12 @@
   <link rel="icon" href="./gitdock-logo.png" type="image/png">
   <link rel="apple-touch-icon" href="./gitdock-logo.png">
   <link rel="manifest" href="./manifest.json">
+  <link rel="canonical" href="https://gitdock.dev/">
   <meta name="theme-color" content="#0d1117">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GitDock">
   <meta property="og:title" content="GitDock | Organize Git Projects, One Dashboard">
   <meta property="og:description" content="Open-source local dashboard to search, organize, and operate on all your Git repos. Clone, commit, push, pull, transfer — one interface, no cloud.">
   <meta property="og:image" content="https://gitdock.dev/dashboard_v2.jpg">
@@ -22,6 +24,29 @@
   <meta name="twitter:title" content="GitDock | Organize Git Projects, One Dashboard">
   <meta name="twitter:description" content="Open-source local dashboard to search, organize, and operate on all your Git repos. One interface, no cloud.">
   <meta name="twitter:image" content="https://gitdock.dev/dashboard_v2.jpg">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "GitDock",
+    "description": "Open-source local dashboard to search, organize, and operate on all your Git repos. One interface, no cloud.",
+    "url": "https://gitdock.dev",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Windows, macOS, Linux",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "downloadUrl": "https://gitdock.dev/download.html",
+    "screenshot": "https://gitdock.dev/dashboard_v2.jpg",
+    "softwareHelp": "https://github.com/gitdock-dev/gitdock",
+    "isAccessibleForFree": true
+  }
+  </script>
   <style>
     :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
     *{margin:0;padding:0;box-sizing:border-box}
