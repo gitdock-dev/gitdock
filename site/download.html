@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download GitDock | Free, Local Git Dashboard</title>
+  <meta name="description" content="Download GitDock for Windows, macOS, or Linux. Free, open-source, runs locally. One dashboard for all your Git repos.">
+  <link rel="icon" href="./gitdock-logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="./gitdock-logo.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0d1117">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Download GitDock | Free, Local Git Dashboard">
+  <meta property="og:description" content="Download GitDock for Windows, macOS, or Linux. Free, open-source, runs locally.">
+  <meta property="og:image" content="https://gitdock.dev/dashboard_v2.jpg">
+  <meta property="og:url" content="https://gitdock.dev/download.html">
+
+  <style>
+    :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg0);color:var(--t1);line-height:1.6;overflow-x:hidden}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Navigation */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+    .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--t1);text-decoration:none}
+    .nav-brand:hover{text-decoration:none;color:var(--t1)}
+    .nav-logo{width:28px;height:28px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;transform:scale(1.25);transform-origin:center}
+    .nav-logo img{width:100%;height:100%;object-fit:cover;transform:scale(1.25);transform-origin:center}
+    .nav-links{display:flex;gap:24px;align-items:center}
+    .nav-links a{color:var(--t2);font-size:13px;text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--t1);text-decoration:none}
+    .btn-nav{padding:6px 16px;border-radius:6px;background:var(--blue);color:#fff!important;font-weight:500;font-size:13px;transition:opacity .2s}
+    .btn-nav:hover{opacity:.9;text-decoration:none!important}
+
+    /* Page */
+    .page{max-width:800px;margin:0 auto;padding:100px 24px 60px}
+
+    /* Hero download */
+    .dl-hero{text-align:center;margin-bottom:56px}
+    .dl-hero h1{font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
+    .dl-hero h1 .grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .dl-hero p{color:var(--t2);font-size:16px;max-width:560px;margin:0 auto}
+
+    /* Main download card */
+    .dl-card{border-radius:12px;border:1px solid var(--border);background:var(--bg1);padding:36px;margin-bottom:32px;position:relative;overflow:hidden}
+    .dl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+
+    .dl-detected{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .dl-os-icon{width:48px;height:48px;border-radius:12px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .dl-os-info h2{font-size:20px;font-weight:600;margin-bottom:2px}
+    .dl-os-info p{font-size:13px;color:var(--t2)}
+
+    .dl-meta{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:24px;padding:16px;border-radius:8px;background:var(--bg0);border:1px solid var(--border)}
+    .dl-meta-item{display:flex;flex-direction:column}
+    .dl-meta-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:2px}
+    .dl-meta-value{font-size:14px;font-weight:500;color:var(--t1)}
+    .dl-meta-value code{background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px}
+
+    .btn-download{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:8px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+    .btn-download:hover{background:#4a96ef;box-shadow:0 0 24px rgba(88,166,255,.3);text-decoration:none;color:#fff}
+    .btn-download svg{flex-shrink:0}
+
+    .dl-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .dl-alt{font-size:13px;color:var(--t3)}
+    .dl-alt a{color:var(--t2);font-size:13px}
+
+    /* Other platforms */
+    .dl-others{display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
+    .dl-others-label{font-size:12px;color:var(--t3);width:100%;margin-bottom:4px}
+    .btn-other{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--t2);font-size:13px;transition:all .2s;text-decoration:none;cursor:pointer}
+    .btn-other:hover{border-color:var(--t3);color:var(--t1);text-decoration:none}
+    .btn-other.active{border-color:var(--blue);color:var(--blue)}
+
+    /* Steps */
+    .dl-section{margin-bottom:32px}
+    .dl-section h3{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .dl-section h3 svg{flex-shrink:0}
+
+    .install-steps{list-style:none;counter-reset:step;padding-left:32px;border-left:2px solid var(--border);margin:0}
+    .install-steps li{counter-increment:step;position:relative;padding:0 0 24px 20px;font-size:14px;color:var(--t2);line-height:1.6}
+    .install-steps li:last-child{padding-bottom:0}
+    .install-steps li::before{content:counter(step);position:absolute;left:-43px;top:0;width:24px;height:24px;border-radius:50%;background:var(--bg0);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue)}
+    .install-steps li strong{color:var(--t1);font-weight:500}
+    .install-steps code{background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--blue)}
+
+    /* OS warning */
+    .os-warning{margin-top:20px;padding:14px 0 0;border-top:1px dashed var(--border);display:flex;gap:10px;align-items:flex-start}
+    .os-warning svg{flex-shrink:0;margin-top:1px}
+    .os-warning p{font-size:13px;color:var(--t3);line-height:1.6}
+    .os-warning strong{color:var(--yellow);font-weight:500}
+
+    /* Requirements */
+    .req-list{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin:0;padding:0}
+    .req-list li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--t2);padding:8px 0;width:50%}
+    .req-list li svg{flex-shrink:0}
+    .req-list li strong{color:var(--t1);font-weight:500}
+    .req-optional{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg2);color:var(--t3);margin-left:2px}
+
+    /* Trust */
+    .trust-list{list-style:none;margin:0;padding:0}
+    .trust-list li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--t2);padding:6px 0}
+    .trust-list li svg{flex-shrink:0}
+    .trust-list li strong{color:var(--t1);font-weight:500}
+
+    /* Divider */
+    .dl-divider{height:1px;background:var(--border);margin:8px 0 32px}
+
+    /* Footer */
+    .footer{padding:32px 24px;border-top:1px solid var(--border);text-align:center}
+    .footer p{font-size:12px;color:var(--t3)}
+    .footer-links{margin-bottom:8px}
+    .footer-links a{color:var(--t3);margin:0 8px;font-size:12px;text-decoration:none}
+    .footer-links a:hover{color:var(--t1)}
+
+    /* Loading */
+    .dl-loading{text-align:center;padding:20px;color:var(--t3);font-size:13px}
+
+    /* Hidden */
+    .hidden{display:none!important}
+
+    /* Responsive */
+    @media(max-width:768px){
+      .nav-links a:not(.btn-nav){display:none}
+      .page{padding:80px 16px 40px}
+      .dl-card{padding:24px}
+      .dl-meta{gap:16px}
+      .dl-hero h1{font-size:24px}
+      .dl-others{flex-direction:column}
+      .dl-actions{flex-direction:column;align-items:flex-start}
+    }
+    @media(max-width:480px){
+      .dl-detected{flex-direction:column;text-align:center}
+      .req-list li{width:100%}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="./index.html" class="nav-brand">
+      <span class="nav-logo"><img src="./gitdock-logo.png" alt="GitDock"></span>
+      GitDock
+    </a>
+    <div class="nav-links">
+      <a href="./index.html#features">Features</a>
+      <a href="./index.html#hub">Hub</a>
+      <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-nav">All Releases</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="dl-hero">
+    <h1>Download <span class="grad">GitDock</span></h1>
+    <p>Free, open-source, and runs 100% on your machine. No account required. No data collected.</p>
+  </div>
+
+  <!-- Main download card -->
+  <div class="dl-card">
+    <div class="dl-detected">
+      <div class="dl-os-icon" id="os-icon"></div>
+      <div class="dl-os-info">
+        <h2 id="os-title">Detecting your system...</h2>
+        <p id="os-subtitle"></p>
+      </div>
+    </div>
+
+    <div class="dl-meta" id="dl-meta">
+      <div class="dl-meta-item">
+        <span class="dl-meta-label">File</span>
+        <span class="dl-meta-value" id="meta-file"><code>---</code></span>
+      </div>
+      <div class="dl-meta-item">
+        <span class="dl-meta-label">Version</span>
+        <span class="dl-meta-value" id="meta-version">---</span>
+      </div>
+      <div class="dl-meta-item">
+        <span class="dl-meta-label">Type</span>
+        <span class="dl-meta-value">Standalone executable (.zip)</span>
+      </div>
+      <div class="dl-meta-item">
+        <span class="dl-meta-label">License</span>
+        <span class="dl-meta-value">Open Source</span>
+      </div>
+    </div>
+
+    <div class="dl-actions">
+      <a id="btn-download" href="#" class="btn-download">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14ZM7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/></svg>
+        <span id="btn-download-text">Download for your system</span>
+      </a>
+      <span class="dl-alt">or <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener">view all releases on GitHub</a></span>
+    </div>
+
+    <div class="dl-others">
+      <div class="dl-others-label">Also available for:</div>
+      <button class="btn-other" data-platform="windows-x64" id="btn-windows">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
+        Windows
+      </button>
+      <button class="btn-other" data-platform="macos-x64" id="btn-macos">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>
+        macOS
+      </button>
+      <button class="btn-other" data-platform="linux-x64" id="btn-linux">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>
+        Linux
+      </button>
+    </div>
+  </div>
+
+  <!-- Installation steps -->
+  <div class="dl-section" id="install-section">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--blue)"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-.025 5.45a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 1 1-2.83-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25Z"/></svg>
+      How to install
+    </h3>
+
+    <!-- Windows steps -->
+    <div id="steps-windows">
+      <ol class="install-steps">
+        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Extract the zip to a folder of your choice (e.g. <code>C:\GitDock</code>)</li>
+        <li>Double-click <strong>gitdock.exe</strong> to start</li>
+        <li>GitDock opens in your browser at <code>localhost:3847</code></li>
+      </ol>
+      <div class="os-warning">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
+        <p><strong>Windows SmartScreen</strong> may show a warning since the app is unsigned. Click "More info" then "Run anyway". This is standard for open-source apps. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">View the source code</a>.</p>
+      </div>
+    </div>
+
+    <!-- macOS steps -->
+    <div id="steps-macos" class="hidden">
+      <ol class="install-steps">
+        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Extract the zip (double-click or <code>unzip gitdock-macos-x64.zip</code>)</li>
+        <li>Open Terminal, navigate to the folder, and run <code>./gitdock</code></li>
+        <li>GitDock opens in your browser at <code>localhost:3847</code></li>
+      </ol>
+      <div class="os-warning">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
+        <p><strong>macOS Gatekeeper</strong> may block the app. Go to System Settings > Privacy & Security > "Open Anyway", or run <code>xattr -cr ./gitdock</code>. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">View the source code</a>.</p>
+      </div>
+    </div>
+
+    <!-- Linux steps -->
+    <div id="steps-linux" class="hidden">
+      <ol class="install-steps">
+        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Extract: <code>unzip gitdock-linux-x64.zip</code></li>
+        <li>Make executable: <code>chmod +x gitdock</code></li>
+        <li>Run: <code>./gitdock</code> — opens in your browser at <code>localhost:3847</code></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="dl-divider"></div>
+
+  <!-- Requirements -->
+  <div class="dl-section">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      Requirements
+    </h3>
+    <ul class="req-list">
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>Git</strong> installed
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>GitHub CLI</strong> (gh)
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>SSH key</strong> configured
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--t3)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>Node.js</strong> <span class="req-optional">not needed for standalone</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="dl-divider"></div>
+
+  <!-- Trust / Why it's safe -->
+  <div class="dl-section">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--purple)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.28 5.78-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 0 1 1.06 1.06Z"/></svg>
+      Why it's safe
+    </h3>
+    <ul class="trust-list">
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>100% open source</strong> — every line of code is public on <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>Runs on localhost only</strong> — binds to 127.0.0.1, no network exposure
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>Zero tracking</strong> — no analytics, no ads, no data collection
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <strong>Built by GitHub Actions</strong> — release artifacts are automated, not manual uploads
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-links">
+    <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+    <a href="./privacy.html">Privacy Policy</a>
+    <a href="./terms.html">Terms of Service</a>
+    <a href="mailto:support@gitdock.dev">Contact</a>
+  </div>
+  <p>GitDock | Open source. Built for developers who want to organize their Git projects and stop wasting time.</p>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  // Platform detection
+  var ua = navigator.userAgent || navigator.platform || '';
+  var platform = 'linux-x64';
+  if (/Win(dows|32|64|CE)/i.test(ua) || navigator.platform === 'Win32') platform = 'windows-x64';
+  else if (/Mac|Darwin|iPhone|iPad/i.test(ua) || navigator.platform === 'MacIntel') platform = 'macos-x64';
+
+  var PLATFORMS = {
+    'windows-x64': { name: 'Windows', icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>', steps: 'steps-windows' },
+    'macos-x64':   { name: 'macOS',   icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>', steps: 'steps-macos' },
+    'linux-x64':   { name: 'Linux',   icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>', steps: 'steps-linux' }
+  };
+
+  var releaseData = null;
+  var currentPlatform = platform;
+
+  function updateUI(plat) {
+    currentPlatform = plat;
+    var info = PLATFORMS[plat];
+    var asset = 'gitdock-' + plat + '.zip';
+
+    // OS icon and title
+    document.getElementById('os-icon').innerHTML = info.icon;
+    document.getElementById('os-title').textContent = 'GitDock for ' + info.name;
+    document.getElementById('os-subtitle').textContent = 'Standalone executable — no Node.js needed';
+
+    // Meta
+    document.getElementById('meta-file').innerHTML = '<code>' + asset + '</code>';
+
+    // Download button
+    var btn = document.getElementById('btn-download');
+    document.getElementById('btn-download-text').textContent = 'Download for ' + info.name;
+
+    if (releaseData) {
+      var found = releaseData.assets.find(function(a) { return a.name === asset; });
+      if (found) {
+        btn.href = found.browser_download_url;
+        document.getElementById('meta-version').textContent = releaseData.tag_name;
+      } else {
+        btn.href = 'https://github.com/gitdock-dev/gitdock/releases';
+        document.getElementById('meta-version').textContent = releaseData.tag_name + ' (asset not found)';
+      }
+    } else {
+      btn.href = 'https://github.com/gitdock-dev/gitdock/releases';
+    }
+
+    // Steps visibility
+    ['steps-windows', 'steps-macos', 'steps-linux'].forEach(function(id) {
+      document.getElementById(id).classList.toggle('hidden', id !== info.steps);
+    });
+
+    // Platform buttons
+    document.querySelectorAll('.btn-other').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.platform === plat);
+    });
+  }
+
+  // Platform switch buttons
+  document.querySelectorAll('.btn-other').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      updateUI(btn.dataset.platform);
+    });
+  });
+
+  // Fetch latest release
+  fetch('https://api.github.com/repos/gitdock-dev/gitdock/releases/latest', {
+    headers: { Accept: 'application/vnd.github.v3+json' }
+  })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(data) {
+      if (data && data.tag_name) {
+        releaseData = data;
+        updateUI(currentPlatform);
+      }
+    })
+    .catch(function() {});
+
+  // Initial render
+  updateUI(platform);
+})();
+</script>
+</body>
+</html>
