@@ -17,6 +17,12 @@
   <meta property="og:image" content="https://gitdock.dev/dashboard_v2.jpg">
   <meta property="og:url" content="https://gitdock.dev/download.html">
 
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Download GitDock | Free, Local Git Dashboard">
+  <meta name="twitter:description" content="Download GitDock for Windows, macOS, or Linux. Free, open-source, runs locally.">
+  <meta name="twitter:image" content="https://gitdock.dev/dashboard_v2.jpg">
+
   <style>
     :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
     *{margin:0;padding:0;box-sizing:border-box}
@@ -118,9 +124,6 @@
     .footer-links a{color:var(--t3);margin:0 8px;font-size:12px;text-decoration:none}
     .footer-links a:hover{color:var(--t1)}
 
-    /* Loading */
-    .dl-loading{text-align:center;padding:20px;color:var(--t3);font-size:13px}
-
     /* Hidden */
     .hidden{display:none!important}
 
@@ -169,7 +172,11 @@
   <!-- Main download card -->
   <div class="dl-card">
     <div class="dl-detected">
-      <div class="dl-os-icon" id="os-icon"></div>
+      <div class="dl-os-icon">
+          <svg class="os-icon-svg" data-os="windows-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
+          <svg class="os-icon-svg hidden" data-os="macos-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>
+          <svg class="os-icon-svg hidden" data-os="linux-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>
+        </div>
       <div class="dl-os-info">
         <h2 id="os-title">Detecting your system...</h2>
         <p id="os-subtitle"></p>
@@ -179,7 +186,7 @@
     <div class="dl-meta" id="dl-meta">
       <div class="dl-meta-item">
         <span class="dl-meta-label">File</span>
-        <span class="dl-meta-value" id="meta-file"><code>---</code></span>
+        <span class="dl-meta-value"><code id="meta-file">---</code></span>
       </div>
       <div class="dl-meta-item">
         <span class="dl-meta-label">Version</span>
@@ -191,7 +198,7 @@
       </div>
       <div class="dl-meta-item">
         <span class="dl-meta-label">License</span>
-        <span class="dl-meta-value">Open Source</span>
+        <span class="dl-meta-value">Apache 2.0</span>
       </div>
     </div>
 
@@ -341,16 +348,16 @@
 
   var REPO = 'https://github.com/gitdock-dev/gitdock';
 
-  // Platform detection
-  var ua = navigator.userAgent || navigator.platform || '';
+  // Platform detection — userAgent only (navigator.platform is deprecated)
+  var ua = navigator.userAgent || '';
   var platform = 'linux-x64';
-  if (/Win(dows|32|64|CE)/i.test(ua) || navigator.platform === 'Win32') platform = 'windows-x64';
-  else if (/Mac|Darwin|iPhone|iPad/i.test(ua) || navigator.platform === 'MacIntel') platform = 'macos-x64';
+  if (/Windows/i.test(ua)) platform = 'windows-x64';
+  else if (/Mac|Darwin/i.test(ua)) platform = 'macos-x64';
 
   var PLATFORMS = {
-    'windows-x64': { name: 'Windows', icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>', steps: 'steps-windows' },
-    'macos-x64':   { name: 'macOS',   icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>', steps: 'steps-macos' },
-    'linux-x64':   { name: 'Linux',   icon: '<svg width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>', steps: 'steps-linux' }
+    'windows-x64': { name: 'Windows', steps: 'steps-windows' },
+    'macos-x64':   { name: 'macOS',   steps: 'steps-macos' },
+    'linux-x64':   { name: 'Linux',   steps: 'steps-linux' }
   };
 
   var currentPlatform = platform;
@@ -366,13 +373,17 @@
     var info = PLATFORMS[plat];
     var asset = 'gitdock-' + plat + '.zip';
 
-    // OS icon and title
-    document.getElementById('os-icon').innerHTML = info.icon;
+    // OS icon — toggle visibility of pre-rendered SVGs
+    document.querySelectorAll('.os-icon-svg').forEach(function(svg) {
+      svg.classList.toggle('hidden', svg.getAttribute('data-os') !== plat);
+    });
+
+    // OS title
     document.getElementById('os-title').textContent = 'GitDock for ' + info.name;
     document.getElementById('os-subtitle').textContent = 'Standalone executable — no Node.js needed';
 
-    // Meta
-    document.getElementById('meta-file').innerHTML = '<code>' + asset + '</code>';
+    // Meta — textContent only, no innerHTML
+    document.getElementById('meta-file').textContent = asset;
 
     // Download button — always ready, no API dependency
     document.getElementById('btn-download').href = getDirectURL(plat);
