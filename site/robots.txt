@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gitdock.dev/sitemap.xml
+Sitemap: https://gitdock.dev/sitemap.txt
