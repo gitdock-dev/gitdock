@@ -75,20 +75,39 @@ app.post(
       return res.status(400).json({ error: "Invalid JSON" });
     }
     const eventName = payload.meta?.event_name;
-    const email = payload.data?.attributes?.user_email || payload.meta?.custom_data?.email;
-    if (!email) {
+    const rawEmail = payload.data?.attributes?.user_email || payload.meta?.custom_data?.email;
+    if (!rawEmail) {
       return res.status(200).json({ received: true });
     }
+    const email = String(rawEmail).trim().toLowerCase();
     const user = db.getUserByEmail(email);
     if (!user) {
+      console.warn(`[webhook] No user found for email: ${email}, event: ${eventName}`);
       return res.status(200).json({ received: true });
     }
-    const setPro = ["subscription_created", "subscription_updated", "subscription_resumed"].includes(eventName);
-    const setFree = ["subscription_expired", "subscription_cancelled", "subscription_paused"].includes(eventName);
-    if (setPro) {
-      db.setUserPlan(user.id, "pro");
-    } else if (setFree) {
-      db.setUserPlan(user.id, "free");
+    const subscriptionStatus = payload.data?.attributes?.status;
+    const proStatuses = ["active", "on_trial"];
+    const freeStatuses = ["expired", "cancelled", "paused", "past_due", "unpaid"];
+    const proEvents = ["subscription_created", "subscription_resumed"];
+    const freeEvents = ["subscription_expired", "subscription_cancelled", "subscription_paused"];
+    let newPlan = null;
+    if (eventName === "subscription_updated") {
+      if (proStatuses.includes(subscriptionStatus)) {
+        newPlan = "pro";
+      } else if (freeStatuses.includes(subscriptionStatus)) {
+        newPlan = "free";
+      }
+    } else if (proEvents.includes(eventName)) {
+      newPlan = "pro";
+    } else if (freeEvents.includes(eventName)) {
+      newPlan = "free";
+    } else {
+      console.warn(`[webhook] Unhandled event: ${eventName} for user: ${email}`);
+    }
+    if (newPlan && newPlan !== user.plan) {
+      db.setUserPlan(user.id, newPlan);
+      db.logAudit(user.id, `plan_changed_to_${newPlan}`, `webhook:${eventName}`);
+      console.log(`[webhook] ${email}: ${user.plan} -> ${newPlan} (event: ${eventName}, status: ${subscriptionStatus || "n/a"})`);
     }
     res.status(200).json({ received: true });
   }
@@ -185,7 +204,7 @@ app.get("/api/health", (req, res) => {
 
 // --- Auth (dashboard) ---
 app.post("/api/auth/register", registerLimiter, (req, res) => {
-  const email = (req.body && req.body.email && String(req.body.email).trim()) || "";
+  const email = (req.body && req.body.email && String(req.body.email).trim().toLowerCase()) || "";
   const password = (req.body && req.body.password && String(req.body.password)) || "";
   if (!EMAIL_REGEX.test(email)) {
     return res.status(400).json({ success: false, error: "Invalid email" });
@@ -221,7 +240,7 @@ app.post("/api/auth/register", registerLimiter, (req, res) => {
 });
 
 app.post("/api/auth/login", loginLimiter, (req, res) => {
-  const email = (req.body && req.body.email && String(req.body.email).trim()) || "";
+  const email = (req.body && req.body.email && String(req.body.email).trim().toLowerCase()) || "";
   const password = (req.body && req.body.password && String(req.body.password)) || "";
   if (!email || !password) {
     return res.status(401).json({ success: false, error: "Invalid email or password" });
