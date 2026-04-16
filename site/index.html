@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitDock | Organize Git Projects, One Dashboard</title>
+  <meta name="description" content="Open-source local dashboard to search, organize, and operate on all your Git repos. Clone, commit, push, pull, transfer — one interface, no cloud.">
+  <link rel="icon" href="./gitdock-logo.png" type="image/png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="GitDock | Organize Git Projects, One Dashboard">
+  <meta property="og:description" content="Open-source local dashboard to search, organize, and operate on all your Git repos. Clone, commit, push, pull, transfer — one interface, no cloud.">
+  <meta property="og:image" content="https://gitdock.dev/dashboard_v2.jpg">
+  <meta property="og:url" content="https://gitdock.dev">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GitDock | Organize Git Projects, One Dashboard">
+  <meta name="twitter:description" content="Open-source local dashboard to search, organize, and operate on all your Git repos. One interface, no cloud.">
+  <meta name="twitter:image" content="https://gitdock.dev/dashboard_v2.jpg">
   <style>
     :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
     *{margin:0;padding:0;box-sizing:border-box}
@@ -81,7 +96,7 @@
     .feat-icon.orange{background:rgba(240,136,62,.1);color:var(--orange)}
     .feat-icon.yellow{background:rgba(210,153,34,.1);color:var(--yellow)}
     .feat-icon.red{background:rgba(248,81,73,.1);color:var(--red)}
-.feat-icon.cyan{background:rgba(57,197,207,.1);color:var(--cyan)}
+    .feat-icon.cyan{background:rgba(57,197,207,.1);color:var(--cyan)}
     .feat-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
     .feat-card p{font-size:13px;color:var(--t2);line-height:1.5}
     .feat-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
@@ -93,7 +108,7 @@
     .step-num{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--blue);margin:0 auto 16px}
     .step h4{font-size:15px;font-weight:600;margin-bottom:8px}
     .step p{font-size:13px;color:var(--t2);line-height:1.5}
-    .step-connector{display:none}
+
 
     /* Security */
     .security{background:var(--bg1);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -237,9 +252,7 @@
       <a id="hero-download" href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-primary">
         Download
       </a>
-      <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-hero btn-secondary" style="font-size:14px">All platforms</a>
       <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener" class="btn-hero btn-secondary">Star on GitHub</a>
-      <a href="#features" class="btn-hero btn-secondary">Explore Features</a>
     </div>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num">Local</div><div class="label">Localhost only</div></div>
@@ -276,7 +289,7 @@
     <div class="section-header fade-in">
       <div class="section-label">The problem</div>
       <div class="section-title">Keeping Git projects organized is a daily tax.</div>
-      <div class="section-desc">If you have more than one account, you’ve felt this pain.</div>
+      <div class="section-desc">Whether you manage one account or several, you’ve felt this pain.</div>
     </div>
     <div class="pain-grid">
       <div class="pain-card fade-in">
@@ -377,7 +390,7 @@
     <div class="section-header fade-in">
       <div class="section-label">Multi-machine</div>
       <div class="section-title">One dashboard per machine. One Hub for all.</div>
-      <div class="section-desc">When you run GitDock on desktop, laptop, or work machine, there’s no single place to see everything. The Hub fixes that: a small central server that receives status snapshots from each machine. Self-host for free or use our hosted Hub at <a href="https://hub.gitdock.dev" target="_blank" rel="noopener">hub.gitdock.dev</a>. One machine free; unlimited machines for $5/month. Your dashboards stay local.</div>
+      <div class="section-desc">Multiple machines, no single overview. The Hub fixes that: a small server that collects status snapshots from each machine. Self-host for free or use <a href="https://hub.gitdock.dev" target="_blank" rel="noopener">hub.gitdock.dev</a>.</div>
     </div>
     <div class="pain-grid" style="max-width:900px">
       <div class="pain-card fade-in">
@@ -429,18 +442,11 @@
         <p>Using several machines? In the dashboard, set the Hub URL and API key, then restart. Open the Hub in the browser to see all machines and sync status in one place.</p>
       </div>
     </div>
-    <div style="text-align:center;margin-top:40px" class="fade-in">
-      <div class="platforms">
-        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M0 0h7.6v7.6H0zm8.4 0H16v7.6H8.4zM0 8.4h7.6V16H0zm8.4 0H16V16H8.4z"/></svg> Windows</span>
-        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Z"/></svg> macOS</span>
-        <span class="plat"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg> Linux</span>
-      </div>
-    </div>
   </div>
 </section>
 
 <!-- Security -->
-<section class="section" id="security">
+<section class="section security" id="security">
   <div class="section-inner">
     <div class="section-header fade-in">
       <div class="section-label">Security first</div>
@@ -541,7 +547,6 @@
   if (/Win(dows|32|64|CE)/i.test(ua) || navigator.platform === 'Win32') platform = 'windows-x64';
   else if (/Mac|Darwin|iPhone|iPad/i.test(ua) || navigator.platform === 'MacIntel') platform = 'macos-x64';
   var asset = 'gitdock-' + platform + '.zip';
-  var releasesUrl = 'https://github.com/gitdock-dev/gitdock/releases';
   fetch('https://api.github.com/repos/gitdock-dev/gitdock/releases/latest', { headers: { Accept: 'application/vnd.github.v3+json' } })
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(d) {
