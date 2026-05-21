@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
 /* ============================================
-   GitDock 2.0 — Premium Developer Dashboard
+   GitDock 2.0 - Premium Developer Dashboard
    ============================================ */
 
 :root {
@@ -285,7 +285,7 @@ body {
 .sidebar-actions .btn + .btn { margin-top: 6px }
 
 /* ---- Sidebar Hub ---- */
-.sidebar-hub { padding: 10px 16px; flex-shrink: 0; border-top: 1px solid var(--border); }
+.sidebar-hub { padding: 10px 16px 16px; flex-shrink: 0; margin-top: auto; border-top: 1px solid var(--border); }
 .sidebar-hub .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--t3); margin-bottom: 6px; font-weight: 600; }
 .sidebar-hub .hub-status { font-size: 11px; color: var(--t2); margin-bottom: 8px; }
 .sidebar-hub .hub-status.connected { color: var(--green); }
@@ -294,6 +294,19 @@ body {
 .sidebar-hub .hub-disconnect-btn { flex-shrink: 0; width: 22px; height: 22px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--t2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; transition: var(--tr); }
 .sidebar-hub .hub-disconnect-btn:hover { color: var(--red); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
 .sidebar-hub .btn { width: 100% }
+.sidebar-hub .btn-hub {
+  background: linear-gradient(135deg, rgba(59,130,246,0.3) 0%, rgba(167,139,250,0.25) 100%);
+  border: 1px solid rgba(59,130,246,0.6);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 16px rgba(59,130,246,0.2), 0 0 32px rgba(167,139,250,0.08);
+}
+.sidebar-hub .btn-hub:hover {
+  background: linear-gradient(135deg, rgba(59,130,246,0.4) 0%, rgba(167,139,250,0.35) 100%);
+  border-color: rgba(59,130,246,0.75);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(59,130,246,0.28), 0 0 40px rgba(167,139,250,0.12);
+}
 
 /* ---- Main Scroll ---- */
 .main-scroll {
@@ -532,6 +545,14 @@ body {
 .card:has(.card-menu.show) {
   z-index: 10;
 }
+.card.card-cloned {
+  border: 2px solid rgba(34, 197, 94, 0.32);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.08);
+}
+.card.card-cloned:hover {
+  border-color: rgba(34, 197, 94, 0.48);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(34, 197, 94, 0.14);
+}
 
 /* ---- Card Top ---- */
 .card-top {
@@ -572,7 +593,7 @@ body {
 .badge.b-pub { color: var(--green); border-color: rgba(34,197,94,0.15); background: rgba(34,197,94,0.05) }
 .badge.b-prv { color: var(--yellow); border-color: rgba(234,179,8,0.15); background: rgba(234,179,8,0.05) }
 .badge.b-clone { color: var(--blue); border-color: rgba(59,130,246,0.15); background: rgba(59,130,246,0.05) }
-.badge.b-stale {
+.badge.b-dormant {
   color: var(--orange); border-color: rgba(249,115,22,0.2);
   background: rgba(249,115,22,0.06); font-size: 9px; letter-spacing: .03em;
 }
@@ -613,6 +634,45 @@ body {
 .setup-action-primary:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25) }
 .setup-public-key { font-family: var(--mono); font-size: 11px; word-break: break-all; background: var(--bg0); border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; margin-top: 8px; user-select: all; color: var(--t2); line-height: 1.5 }
 .setup-hint { margin-top: 6px; font-size: 12px; color: var(--t2); line-height: 1.6 }
+.setup-section-label {
+  margin: 14px 0 6px; padding: 0 2px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--t3);
+}
+.setup-section-desc { margin: 0 0 8px; padding: 0 2px; font-size: 12px; color: var(--t2); line-height: 1.5 }
+.setup-status { display: block; margin-top: 4px; font-size: 12px; line-height: 1.5 }
+.setup-status.done { color: var(--green) }
+.setup-status.pending { color: var(--amber, #d29922) }
+.setup-status.fail { color: var(--red) }
+.setup-status.muted { color: var(--t3) }
+.setup-step-actions { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap }
+.setup-verify-result {
+  margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.55; border: 1px solid;
+}
+.setup-verify-result.ok { background: rgba(46,160,67,0.12); border-color: rgba(46,160,67,0.35); color: var(--green) }
+.setup-verify-result.fail { background: rgba(248,81,73,0.1); border-color: rgba(248,81,73,0.35); color: var(--red) }
+.setup-verify-result strong { font-weight: 700 }
+.setup-status-wait {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 18px 2px; font-size: 12px; color: var(--t3);
+  font-family: var(--mono); letter-spacing: 0.02em;
+}
+.setup-status-wait .setup-wait-dots {
+  display: inline-flex; align-items: center; gap: 4px; height: 8px;
+}
+.setup-status-wait .setup-wait-dot {
+  width: 4px; height: 4px; border-radius: 50%; background: var(--t2);
+  opacity: 0.35;
+  animation: setupWaitPulse 1.1s ease-in-out infinite;
+}
+.setup-status-wait .setup-wait-dot:nth-child(2) { animation-delay: 0.18s; }
+.setup-status-wait .setup-wait-dot:nth-child(3) { animation-delay: 0.36s; }
+@keyframes setupWaitPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .setup-status-wait .setup-wait-dot { animation: none; opacity: 0.55; }
+}
 
 /* ---- Empty Account Hint ---- */
 .empty-account-hint { background: var(--bg1); border: 1px dashed var(--border); border-radius: 10px; padding: 24px; text-align: center; margin-bottom: 16px; color: var(--t1) }
@@ -665,10 +725,51 @@ body {
   background: rgba(234,179,8,0.07);
 }
 
-/* ---- Card Actions ---- */
+/* ---- Card Actions (control bar) ---- */
 .card-actions {
-  display: flex; gap: 4px; margin-top: 6px;
-  flex-wrap: wrap; align-items: center;
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+  padding: 2px;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.card-actions .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--t2);
+  box-shadow: none;
+  padding: 5px 6px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.card-actions .btn + .btn {
+  border-left: 1px solid var(--border);
+}
+.card-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--t1);
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+.card-actions .btn-primary {
+  background: rgba(59, 130, 246, 0.18);
+  color: #dbeafe;
+  font-weight: 600;
+}
+.card-actions .btn-primary:hover {
+  background: rgba(59, 130, 246, 0.28);
+  color: #fff;
+  box-shadow: none;
 }
 
 /* ---- Card Menu (⋮) ---- */
@@ -827,6 +928,61 @@ body {
 }
 .hub-get-key:hover { opacity: 1; text-decoration: underline }
 .hub-get-key svg { flex-shrink: 0; opacity: 0.7 }
+
+/* ---- Token modal ---- */
+.modal-token { max-width: 520px }
+.modal-token .modal-lead { margin-bottom: 16px; line-height: 1.55 }
+.token-account-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 18px; font-size: 12px;
+}
+.token-account-card .token-account-row { display: flex; gap: 8px; margin-top: 4px }
+.token-account-card .token-account-row:first-child { margin-top: 0 }
+.token-account-card .token-account-k { color: var(--t3); min-width: 88px; flex-shrink: 0 }
+.token-account-card .token-account-v { color: var(--t1); font-weight: 500 }
+.token-account-card code { font-family: var(--mono); font-size: 11px; color: var(--t2) }
+.token-steps-block {
+  margin-bottom: 18px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.token-steps-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--t3); margin-bottom: 12px;
+}
+.token-step { display: flex; gap: 12px; margin-bottom: 12px }
+.token-step:last-child { margin-bottom: 0 }
+.token-step-num {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--bg3); color: var(--t2); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.token-step-body { flex: 1; min-width: 0; font-size: 12px; color: var(--t2); line-height: 1.55 }
+.token-step-body strong { color: var(--t1); font-weight: 600 }
+.token-perm-list {
+  margin: 6px 0 0; padding: 8px 10px; background: var(--bg0);
+  border: 1px solid var(--border); border-radius: 8px; list-style: none;
+}
+.token-perm-list li { padding: 2px 0; font-size: 11px; color: var(--t2) }
+.token-perm-list li span { color: var(--t3) }
+.token-step-optional .token-step-num { background: transparent; border: 1px dashed var(--t3); color: var(--t3) }
+.token-input-block { margin-bottom: 12px }
+.token-input-block label { margin-bottom: 6px }
+.token-input-block input[type=password] { margin-bottom: 0 }
+.token-remember {
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px;
+  font-size: 12px; color: var(--t2); line-height: 1.5; cursor: pointer;
+}
+.token-remember input { margin-top: 3px; flex-shrink: 0; accent-color: var(--blue) }
+.token-doc-footer {
+  display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 4px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.token-doc-link {
+  font-size: 11px; color: var(--blue); text-decoration: none; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.token-doc-link:hover { text-decoration: underline; color: #93c5fd }
+.token-doc-link svg { flex-shrink: 0; opacity: 0.85 }
 .remove-modal-progress { display: flex; align-items: center; gap: 12px; padding: 20px 0; margin-top: 8px }
 .remove-modal-progress .spinner { width: 20px; height: 20px; border-width: 2px; flex-shrink: 0 }
 .remove-modal-progress p { margin: 0; color: var(--t2); font-size: 13px }
@@ -1154,36 +1310,9 @@ body {
 }
 
 /* ============================================
-   ACTIVITY LOG
-   ============================================ */
-.sidebar-log {
-  flex: 1; min-height: 120px; display: flex;
-  flex-direction: column; overflow: hidden; padding: 0 16px 16px;
-}
-.log-panel {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 12px; padding: 12px 12px;
-  flex: 1; min-height: 0; overflow-y: auto; font-size: 11px;
-}
-.log-title {
-  font-size: 12px; font-weight: 700; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 8px;
-}
-.log-entry {
-  font-size: 11px; color: var(--t2); padding: 4px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.025);
-  font-family: var(--mono);
-}
-.log-entry:last-child { border-bottom: none }
-.log-time { color: var(--t3); margin-right: 8px }
-.log-empty { color: var(--t3); font-size: 11px; padding: 8px 0 }
-.log-ok { color: var(--green) }
-.log-err { color: var(--red) }
-.log-warn { color: var(--yellow) }
-
-/* ============================================
    MISC
    ============================================ */
+.log-err { color: var(--red); font-size: 13px }
 .empty { text-align: center; padding: 80px 20px; color: var(--t2); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px }
 .empty p { margin: 0 }
 .empty .empty-title { font-size: 18px; font-weight: 600; color: var(--t1); margin-bottom: 8px }
@@ -1269,19 +1398,13 @@ body {
     <div class="sidebar-hub" id="hubSection">
       <div class="section-title">Multi-machine (Hub)</div>
       <div id="hubStatusWrap">
-        <div id="hubStatus" class="hub-status">—</div>
+        <div id="hubStatus" class="hub-status">-</div>
         <div id="hubStatusRow" class="hub-status-row" style="display:none">
           <span id="hubStatusText" class="hub-status-text"></span>
           <button type="button" class="hub-disconnect-btn" id="hubDisconnectBtn" onclick="openHubDisconnectModal()" title="Remove Hub connection">&times;</button>
         </div>
       </div>
-      <button type="button" class="btn btn-sm" onclick="openHubModal()">Configure Hub</button>
-    </div>
-    <div class="sidebar-log" id="logSection">
-      <div class="log-panel" id="logPanel">
-        <div class="log-title">Activity Log <span class="sec-cnt" id="logCount">0</span></div>
-        <div id="logEntries"></div>
-      </div>
+      <button type="button" class="btn btn-sm btn-hub" onclick="openHubModal()">Configure Hub</button>
     </div>
   </aside>
   <div class="main-scroll">
@@ -1493,13 +1616,11 @@ body {
       </div>
     </div>
     <div id="accountManagerSetup" style="display:none">
-      <h4 id="accountManagerSetupTitle" style="margin-bottom:4px">Setup: <span></span></h4>
-      <p style="color:var(--t2);font-size:12px;margin-bottom:12px">Complete each step to connect this account.</p>
+      <h4 id="accountManagerSetupTitle" style="margin-bottom:12px">Setup: <span></span></h4>
       <div id="accountManagerSetupTimeline" class="setup-timeline"></div>
-      <div id="accountManagerSetupActions" class="modal-actions" style="margin-top:16px;gap:8px">
+      <div id="accountManagerSetupActions" class="modal-actions" style="margin-top:16px;gap:8px;flex-wrap:wrap">
         <button class="btn" onclick="closeSetupView()">&#8592; Back</button>
-        <button class="setup-action" onclick="recheckSetup()" style="margin-top:0">Re-check</button>
-        <button class="setup-action-primary setup-action" id="setupLoadReposBtn" style="display:none;margin-top:0" onclick="setupDoneLoadRepos()">Load Repos &amp; Close</button>
+        <button class="setup-action setup-action-primary" id="setupLoadReposBtn" style="display:none;margin-top:0" onclick="setupDoneLoadRepos()">Load Repos &amp; Close</button>
       </div>
     </div>
   </div>
@@ -1507,29 +1628,95 @@ body {
 
 <!-- GitHub Token Modal -->
 <div class="modal-overlay" id="tokenModal">
-  <div class="modal" style="max-width:560px">
-    <h3>Connect GitHub Account</h3>
-    <p>Paste a GitHub fine-grained personal access token. Stored securely in your OS keychain — never written to <code>config.json</code>.</p>
+  <div class="modal modal-token">
+    <h3>Connect GitHub API</h3>
+    <p class="modal-lead">
+      Part B of account setup: list repositories in GitDock (including private).
+      Git operations still use SSH (Part A). Uses a
+      <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens" target="_blank" rel="noopener">fine-grained personal access token</a>.
+    </p>
     <input type="hidden" id="tokenModalAccount" value="">
-    <div id="tokenModalFor" style="background:var(--bg2);border-radius:8px;padding:10px;margin:10px 0;font-size:12px;color:var(--t2)"></div>
-    <label>Personal access token</label>
-    <input type="password" id="tokenModalToken" placeholder="github_pat_..." autocomplete="off">
-    <label style="display:flex;gap:8px;align-items:center;margin-top:10px">
-      <input type="checkbox" id="tokenModalRemember" checked>
-      <span>Remember on this machine</span>
-    </label>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;font-size:12px;color:var(--t2);line-height:1.7">
-      <div style="font-weight:600;color:var(--t1);margin-bottom:6px">How to create a token</div>
-      <div>1. Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank">GitHub &rarr; New fine-grained token</a></div>
-      <div>2. Set <strong>Repository access</strong> to <strong>All repositories</strong></div>
-      <div>3. Under <strong>Permissions &rarr; Repository permissions</strong>, enable:</div>
-      <div style="padding-left:16px">
-        <strong>Contents</strong> &mdash; Read-only <span style="color:var(--t3)">(required &mdash; lists all repos including private)</span><br>
-        <strong>Metadata</strong> &mdash; Read-only <span style="color:var(--t3)">(auto-selected)</span><br>
-        <strong>Administration</strong> &mdash; Read &amp; write <span style="color:var(--t3)">(optional &mdash; allows uploading SSH keys)</span>
+    <div id="tokenModalFor" class="token-account-card"></div>
+
+    <div class="token-steps-block">
+      <div class="token-steps-title">Create token on GitHub</div>
+
+      <div class="token-step">
+        <span class="token-step-num">1</span>
+        <div class="token-step-body">
+          Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">New fine-grained token</a>
+          for the GitHub user shown above.
+        </div>
       </div>
-      <div>4. Click <strong>Generate token</strong> and paste it above</div>
+
+      <div class="token-step">
+        <span class="token-step-num">2</span>
+        <div class="token-step-body">
+          <strong>Repository access:</strong> All repositories, or only repos you use in GitDock.
+        </div>
+      </div>
+
+      <div class="token-step">
+        <span class="token-step-num">3</span>
+        <div class="token-step-body">
+          <strong>Repository permissions</strong> <span>(required to list repos via <code>GET /user/repos</code>)</span>
+          <ul class="token-perm-list">
+            <li><strong>Contents:</strong> Read-only</li>
+            <li><strong>Metadata:</strong> Read-only <span>(GitHub selects with Contents)</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="token-step token-step-optional">
+        <span class="token-step-num">+</span>
+        <div class="token-step-body">
+          <strong>Optional:</strong> only if you use <em>Upload key via API</em> in setup (<code>POST /user/keys</code>):
+          <ul class="token-perm-list">
+            <li><strong>Account &rarr; Git SSH keys:</strong> Read and write</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="token-step">
+        <span class="token-step-num">4</span>
+        <div class="token-step-body">
+          Click <strong>Generate token</strong>, copy it once, then paste below.
+        </div>
+      </div>
     </div>
+
+    <div class="token-input-block">
+      <label for="tokenModalToken">Paste token here</label>
+      <input type="password" id="tokenModalToken" placeholder="github_pat_..." autocomplete="off">
+    </div>
+    <label class="token-remember">
+      <input type="checkbox" id="tokenModalRemember" checked>
+      <span>Remember in OS credential store (Windows Credential Manager, macOS Keychain, or Linux Secret Service). Never saved in <code>config.json</code>.</span>
+    </label>
+
+    <details class="token-alt-pat" style="margin-bottom:12px">
+      <summary style="cursor:pointer;color:var(--t3);font-size:12px">Classic token (alternative)</summary>
+      <p style="margin:8px 0 0;font-size:12px;color:var(--t2);line-height:1.55">
+        GitHub also supports <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic-" target="_blank" rel="noopener">classic personal access tokens</a>
+        with the <strong>repo</strong> scope to access the API. Fine-grained tokens are recommended for least privilege.
+      </p>
+    </details>
+
+    <div class="token-doc-footer">
+      <a class="token-doc-link" href="https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        PAT permissions reference
+      </a>
+      <a class="token-doc-link" href="https://docs.github.com/en/rest/users/keys" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Git SSH keys API
+      </a>
+      <a class="token-doc-link" href="https://docs.github.com/en/github-cli/github-cli/using-multiple-accounts" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Use gh CLI instead
+      </a>
+    </div>
+
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('tokenModal')">Cancel</button>
       <button class="btn btn-danger" id="tokenModalDisconnectBtn" style="display:none" onclick="disconnectToken()">Disconnect</button>
@@ -1569,7 +1756,7 @@ body {
 <!-- Git Modal -->
 <div class="modal-overlay" id="gitModal">
   <div class="modal modal-git">
-    <h3>Git — <span id="gitModalRepoName"></span></h3>
+    <h3>Git: <span id="gitModalRepoName"></span></h3>
     <div id="gitModalLoading" class="readme-loading" style="display:none"><span class="spinner"></span> Loading...</div>
     <div id="gitModalBody" style="display:none">
       <div class="git-section">
@@ -1778,7 +1965,6 @@ function togglePin(account, name) {
 let pendingConfirmAction = null; // { action: 'pull'|'fetch', account, name }
 let gitModalRepo = null; // { account, name }
 let gitModalPushState = null; // { currentBranch, hasUpstream, unpushedCount } for Push button and set-upstream
-let logEntries = [];
 let repoExtras = {}; // { "account/name": { prs: N, issues: N } }
 
 var repoAliases = JSON.parse(localStorage.getItem('repoAliases') || '{}');
@@ -1793,7 +1979,7 @@ function setAlias(account, name) {
   pendingAlias = { account: account, name: name };
   var key = account + '/' + name;
   var current = repoAliases[key] || '';
-  document.getElementById('aliasModalTitle').textContent = 'Alias — ' + name;
+  document.getElementById('aliasModalTitle').textContent = 'Alias: ' + name;
   var input = document.getElementById('aliasInput');
   input.value = current;
   openModal('aliasModal');
@@ -1819,13 +2005,20 @@ function confirmAlias(clear) {
 function setAliasFromMenu(btn) {
   setAlias(btn.dataset.account, btn.dataset.name);
 }
-var staleDays = parseInt(localStorage.getItem('staleDays') || '90');
+var dormantDays = parseInt(localStorage.getItem('dormantDays') || localStorage.getItem('inactiveDays') || localStorage.getItem('staleDays') || '90', 10);
 
-function isStale(r) {
+function isDormant(r) {
   var refDate = (r.isCloned && r.lastCommit && r.lastCommit.date) ? r.lastCommit.date : r.updatedAt;
   if (!refDate) return false;
   var days = Math.floor((new Date() - new Date(refDate)) / 86400000);
-  return days > staleDays;
+  return days > dormantDays;
+}
+
+function dormantPeriodLabel() {
+  if (dormantDays <= 30) return '1 month';
+  if (dormantDays <= 90) return '3 months';
+  if (dormantDays <= 180) return '6 months';
+  return '1 year';
 }
 
 function formatSize(kb) {
@@ -1933,37 +2126,44 @@ function openTerminal(btn) {
   });
 })();
 
-// --- Activity Log ---
-function addLog(msg, type) {
-  var now = new Date().toLocaleTimeString();
-  logEntries.unshift({time: now, msg: msg, type: type || 'info'});
-  if (logEntries.length > 50) logEntries.pop();
-  renderLog();
-}
-
-function renderLog() {
-  var el = document.getElementById('logEntries');
-  var section = document.getElementById('logSection');
-  var countEl = document.getElementById('logCount');
-  if (countEl) countEl.textContent = logEntries.length;
-  if (logEntries.length === 0) {
-    el.innerHTML = '<div class="log-empty">No activity yet</div>';
-  } else {
-    el.innerHTML = logEntries.map(function(e) {
-      var cls = e.type === 'ok' ? 'log-ok' : e.type === 'err' ? 'log-err' : e.type === 'warn' ? 'log-warn' : '';
-      return '<div class="log-entry"><span class="log-time">' + esc(e.time) + '</span><span class="' + cls + '">' + esc(e.msg) + '</span></div>';
-    }).join('');
-  }
-  section.style.display = 'flex';
-}
-
 // --- Modal ---
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-  if (id === 'accountManagerModal') { currentSetupAccount = null; }
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('show');
+  if (id === 'accountManagerModal') {
+    currentSetupAccount = null;
+    var list = document.getElementById('accountManagerList');
+    var form = document.getElementById('accountManagerForm');
+    var setup = document.getElementById('accountManagerSetup');
+    if (list) list.style.display = 'block';
+    if (form) form.style.display = 'none';
+    if (setup) setup.style.display = 'none';
+  }
   if (id === 'settingsModal') { cancelCleanup(); }
 }
+
+function closeOpenModals() {
+  document.querySelectorAll('.modal-overlay.show').forEach(function(el) {
+    if (el.id) closeModal(el.id);
+  });
+}
+
+(function initModalBackdropClose() {
+  document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target !== overlay) return;
+      var id = overlay.id;
+      if (!id || !overlay.classList.contains('show')) return;
+      if (id === 'removeModal') {
+        var prog = document.getElementById('removeModalProgress');
+        if (prog && prog.style.display !== 'none') return;
+      }
+      closeModal(id);
+    });
+  });
+})();
 
 // --- Settings Panel ---
 function openSettingsPanel() {
@@ -2080,9 +2280,7 @@ async function loadAccounts() {
       populateAccountSelects();
       return true;
     }
-    if (typeof addLog === 'function') addLog('Accounts API returned no list', 'warn');
   } catch (e) {
-    if (typeof addLog === 'function') addLog('Accounts list could not be loaded: ' + (e.message || 'network error'), 'warn');
   }
   return false;
 }
@@ -2197,7 +2395,7 @@ async function loadHubStatus() {
     }
   } catch (e) {
     el.style.display = '';
-    el.textContent = '—';
+    el.textContent = '-';
     el.classList.remove('connected');
     if (row) row.style.display = 'none';
     if (hubLink) {
@@ -2229,7 +2427,7 @@ async function confirmHubDisconnect() {
 }
 
 function openHubModal() {
-  // Open immediately with defaults — never make the user wait
+  // Open immediately with defaults  never make the user wait
   document.getElementById('hubUrlInput').value = 'https://hub.gitdock.dev';
   document.getElementById('hubApiKeyInput').value = '';
   document.getElementById('hubMachineNameInput').value = '';
@@ -2374,7 +2572,7 @@ async function saveAccountForm() {
       });
       var data2 = await r2.json();
       if (data2.ok) {
-        toast('Account added — complete the setup below', 'success');
+        toast('Account added. Complete the setup below.', 'success');
         await loadAccounts();
         hideAccountForm();
         renderAccountList();
@@ -2405,6 +2603,7 @@ var currentSetupAccount = null;
 function openSetupView(name) {
   currentSetupAccount = name;
   lastPublicKey = null;
+  lastSetupSshVerify = null;
   var acc = allAccounts[name];
   document.getElementById('accountManagerSetupTitle').querySelector('span').textContent = (acc && acc.label) ? acc.label + ' (' + (acc.githubUser || '') + ')' : name;
   document.getElementById('accountManagerList').style.display = 'none';
@@ -2422,19 +2621,65 @@ function closeSetupView() {
 }
 
 var lastPublicKey = null;
+var lastSetupSshVerify = null;
+var setupStatusLoading = false;
 
-async function checkAccountStatus(name, publicKeyToShow) {
+function setupStatusWaitHtml(label) {
+  return '<div class="setup-status-wait" role="status" aria-live="polite">' +
+    '<span class="setup-wait-dots" aria-hidden="true">' +
+    '<span class="setup-wait-dot"></span><span class="setup-wait-dot"></span><span class="setup-wait-dot"></span>' +
+    '</span><span>' + esc(label) + '</span></div>';
+}
+
+function setupSshVerifyBanner(ok, message, host) {
+  var label = ok ? 'SSH verified' : 'SSH not verified yet';
+  var cls = ok ? 'ok' : 'fail';
+  var h = '<div class="setup-verify-result ' + cls + '"><strong>' + label + '.</strong> ' + esc(message || '') + '</div>';
+  if (host) {
+    h += '<div class="setup-hint">Command tested locally: <code>ssh -T git@' + esc(host) + '</code></div>';
+  }
+  return h;
+}
+
+async function checkAccountStatus(name, publicKeyToShow, options) {
+  options = options || {};
   var el = document.getElementById('accountManagerSetupTimeline');
   if (!el) return;
-  el.innerHTML = '<p style="color:var(--t2)">Checking status...</p>';
+  if (setupStatusLoading) return;
+  setupStatusLoading = true;
+  el.innerHTML = options.verify
+    ? setupStatusWaitHtml('Running ssh -T test')
+    : setupStatusWaitHtml('Checking status');
   var requestedFor = name;
   if (publicKeyToShow) lastPublicKey = publicKeyToShow;
   try {
     var url = API + '/accounts/' + encodeURIComponent(name) + '/status?_=' + Date.now();
     var r = await fetch(url);
-    var s = await r.json();
+    var s = {};
+    try { s = await r.json(); } catch (parseErr) { s = {}; }
+    if (!r.ok) {
+      var errMsg = (s && s.error) ? s.error : ('Status check failed (HTTP ' + r.status + ').');
+      if (options.verify) toast(errMsg, 'error');
+      if (currentSetupAccount === requestedFor) {
+        el.innerHTML = '<p class="log-err">' + esc(errMsg) + '</p>';
+      }
+      return;
+    }
     if (currentSetupAccount !== requestedFor) return;
     if (s.accountName && s.accountName !== requestedFor) return;
+
+    if (options.verify && s.sshTest) {
+      lastSetupSshVerify = {
+        ok: !!s.sshConnects,
+        message: s.sshTest.message || (s.sshConnects ? 'GitHub accepted your SSH key.' : 'SSH verification failed.'),
+        host: s.sshHost || '',
+      };
+      if (s.sshConnects) {
+        toast('SSH verified.', 'success');
+      } else {
+        toast('SSH verification failed. See step 3.', 'error');
+      }
+    }
     var acc = allAccounts[requestedFor];
     var ghUser = (acc ? acc.githubUser : '');
 
@@ -2448,71 +2693,130 @@ async function checkAccountStatus(name, publicKeyToShow) {
     }
 
     var h = '';
-    var step = function(num, title, done, extra) {
-      var dotClass = done ? 'done' : (extra ? 'pending' : 'pending');
-      var dotText = done ? '\u2713' : num;
-      h += '<div class="setup-step"><div class="setup-step-dot ' + dotClass + '">' + dotText + '</div><div class="setup-step-body"><strong>' + title + '</strong>' + (extra || '') + '</div></div>';
+    var step = function(num, title, done, statusHtml, extra) {
+      var dotClass = done ? 'done' : 'pending';
+      var dotText = done ? '\u2713' : String(num);
+      h += '<div class="setup-step"><div class="setup-step-dot ' + dotClass + '">' + dotText + '</div><div class="setup-step-body">' +
+        '<strong>' + title + '</strong>' + (statusHtml || '') + (extra || '') + '</div></div>';
+    };
+    var section = function(label, desc) {
+      h += '<div class="setup-section-label">' + esc(label) + '</div>';
+      if (desc) h += '<p class="setup-section-desc">' + desc + '</p>';
+    };
+    var statusDone = '<small class="setup-status done">Complete</small>';
+    var statusPending = function(msg) {
+      return '<small class="setup-status pending">' + esc(msg) + '</small>';
+    };
+    var statusFail = function(msg) {
+      return '<small class="setup-status fail">' + esc(msg) + '</small>';
     };
 
-    // Step 1: Account registered
-    step(1, 'Account registered', true);
+    // Step 1: Account
+    var step1Extra = '<div class="setup-hint">Per-account git config' +
+      (s.gitconfigExists ? ' is ready.' : ' will be created automatically.') + '</div>';
+    step(1, 'Account saved locally', true, statusDone, step1Extra);
 
-    // Step 2: SSH key
+    section('Part A: Git over SSH', 'Clone, pull, and push use this key. Independent from the API token below.');
+
+    // Step 2: Generate SSH key
+    var step2Status = s.sshKeyExists ? statusDone : statusPending('Generate a key on this machine.');
     var step2Extra = '';
     if (s.sshKeyExists && (publicKeyToShow || lastPublicKey)) {
       var key = publicKeyToShow || lastPublicKey;
       step2Extra = '<div class="setup-public-key">' + esc(key) + '</div>' +
-        '<div style="margin-top:8px"><button class="setup-action" onclick="copyPublicKey()">Copy Key</button></div>' +
-        '<div class="setup-hint">Copy the key, then <a href="https://github.com/settings/ssh/new" target="_blank" style="color:var(--green);text-decoration:underline">add it on GitHub</a> in the next step.</div>';
+        '<div class="setup-step-actions"><button type="button" class="setup-action" onclick="copyPublicKey()">Copy public key</button></div>' +
+        '<div class="setup-hint">Paste this key on GitHub in step 3. GitHub recommends protecting keys with a passphrase and ssh-agent; GitDock generates a local key without a passphrase for simpler setup. <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent" target="_blank" rel="noopener">Learn more</a></div>';
     } else if (!s.sshKeyExists) {
-      step2Extra = '<div style="margin-top:8px"><button class="setup-action setup-action-primary" onclick="runSetupSSH(\'' + escAttr(requestedFor) + '\')">Generate SSH Key</button></div>';
+      step2Extra = '<div class="setup-step-actions">' +
+        '<button type="button" class="setup-action setup-action-primary" onclick="runSetupSSH(\'' + escAttr(requestedFor) + '\')">Generate SSH key</button></div>';
     } else if (s.sshKeyExists && !lastPublicKey) {
-      step2Extra = '<div style="margin-top:8px"><button class="setup-action" onclick="recheckSetup()">Load Key</button></div>';
+      step2Extra = '<div class="setup-step-actions">' +
+        '<button type="button" class="setup-action" onclick="recheckSetup()">Show public key</button></div>';
     }
-    step(2, 'SSH key generated', s.sshKeyExists, step2Extra);
+    step(2, 'Create SSH key on this PC', s.sshKeyExists, step2Status, step2Extra);
 
-    // Step 3: SSH key on GitHub
-    var step3Extra = '';
-    if (s.sshKeyExists && !s.sshConnects) {
-      step3Extra = '<div class="setup-hint">Required for cloning and pushing repos.</div>' +
-        '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
-        (s.tokenAuthenticated ? ('<button class="setup-action setup-action-primary" onclick="uploadSshKey(\'' + escAttr(requestedFor) + '\')">Upload Key to GitHub</button>') : '') +
-        '<a href="https://github.com/settings/keys" target="_blank" class="setup-action" style="text-decoration:none">Add Manually on GitHub &rarr;</a>' +
-        '</div>';
-    }
-    step(3, 'SSH key added to GitHub', s.sshConnects, step3Extra);
-
-    // Step 4: GitHub API auth (private repos)
-    var authDone = !!(s.tokenAuthenticated || s.ghAuthenticated);
-    var authExtra = '';
-    if (s.tokenAuthenticated) {
-      authExtra = '<div style="display:flex;gap:8px;align-items:center;margin-top:6px">' +
-        '<span style="color:var(--green);font-size:12px">&#10003; Connected as <strong>' + esc(s.tokenLogin || ghUser) + '</strong></span>' +
-        '<button class="setup-action" onclick="openTokenModal(\'' + escAttr(requestedFor) + '\')">Manage</button></div>';
-    } else if (!s.ghAuthenticated) {
-      authExtra = '<div class="setup-hint">Connect a personal access token to load all repos (including private).</div>' +
-        '<div style="margin-top:8px"><button class="setup-action setup-action-primary" onclick="openTokenModal(\'' + escAttr(requestedFor) + '\')">Connect Token</button></div>' +
-        '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--t3);font-size:12px">Advanced: use gh CLI instead</summary>' +
-        '<div class="setup-public-key" style="margin-top:6px">gh auth login</div>' +
-        '<div class="setup-hint">If multiple accounts, switch with: <code>gh auth switch --user ' + esc(ghUser) + '</code></div></details>';
-    } else if (s.ghAuthenticated && s.ghActive === false) {
-      authExtra = '<div class="setup-hint" style="color:var(--t3)">Using gh CLI, but not active. Run: <code>gh auth switch --user ' + esc(ghUser) + '</code></div>';
+    // Step 3: GitHub SSH (paste + verify)
+    var step3Done = !!s.sshConnects;
+    var step3Status;
+    if (step3Done) {
+      step3Status = statusDone;
+    } else if (!s.sshKeyExists) {
+      step3Status = statusPending('Complete step 2 first.');
+    } else if (options.verify && s.sshTest && s.sshTest.message) {
+      step3Status = statusFail(s.sshTest.message);
+    } else if (lastSetupSshVerify && !lastSetupSshVerify.ok) {
+      step3Status = statusFail(lastSetupSshVerify.message);
     } else {
-      authExtra = '<div style="margin-top:4px;font-size:12px;color:var(--green)">&#10003; Using gh CLI</div>';
+      step3Status = statusPending('Add the key on GitHub, then click Verify SSH.');
     }
-    step(4, 'GitHub access (private repos)', authDone, authExtra);
+    var step3Extra = '';
+    if (lastSetupSshVerify && !step3Done) {
+      step3Extra += setupSshVerifyBanner(lastSetupSshVerify.ok, lastSetupSshVerify.message, lastSetupSshVerify.host);
+    }
+    if (s.sshKeyExists && !s.sshConnects) {
+      step3Extra +=
+        '<div class="setup-hint">1) Copy the key from step 2. 2) Paste it on GitHub. 3) Click <strong>Verify SSH</strong>. You will see success or a specific error here and in a notification.</div>' +
+        '<div class="setup-step-actions">' +
+        '<a href="https://github.com/settings/ssh/new" target="_blank" rel="noopener" class="setup-action setup-action-primary" style="text-decoration:none">Open GitHub to add key</a>' +
+        '<button type="button" class="setup-action" id="setupVerifySshBtn" onclick="verifySshSetup()">Verify SSH</button>' +
+        (s.tokenApiReady ? ('<button type="button" class="setup-action" onclick="uploadSshKey(\'' + escAttr(requestedFor) + '\')">Upload key via API</button>') : '') +
+        '</div>';
+      if (!s.sshConfigured && s.sshTest && s.sshTest.reason === 'not_configured') {
+        step3Extra += '<div class="setup-hint" style="color:var(--red)">' + esc(s.sshTest.message) + '</div>';
+      }
+    } else if (step3Done) {
+      var okMsg = (s.sshTest && s.sshTest.message) ? s.sshTest.message : 'GitHub accepted your SSH key for this account.';
+      step3Extra = setupSshVerifyBanner(true, okMsg, s.sshHost || '');
+    }
+    step(3, 'Add SSH key on GitHub and verify', step3Done, step3Status, step3Extra);
 
-    // Step 5: Git config
-    step(5, 'Git config created', s.gitconfigExists, '');
+    section('Part B: Dashboard API', 'Lists repositories via GitHub REST API or GitHub CLI (<a href="https://docs.github.com/en/github-cli/github-cli/using-multiple-accounts" target="_blank" rel="noopener">multiple accounts</a>).');
 
-    // Step 6: Ready
+    // Step 4: API auth
+    var authDone = !!(s.tokenApiReady || s.ghAuthenticated);
+    var authStatus = authDone ? statusDone : statusPending('Connect a token (with Contents read) or gh CLI.');
+    var authExtra = '';
+    if (s.tokenAuthenticated && !s.tokenApiReady) {
+      authExtra = '<div class="setup-verify-result fail"><strong>Token not sufficient.</strong> ' +
+        esc(s.tokenMessage || 'Fine-grained: Contents (read). Classic: repo scope. See token modal or GitHub docs.') + '</div>' +
+        '<div class="setup-step-actions">' +
+        '<button type="button" class="setup-action setup-action-primary" onclick="openTokenModal(\'' + escAttr(requestedFor) + '\')">Update token</button></div>';
+    } else if (s.tokenApiReady) {
+      authExtra = '<div class="setup-step-actions">' +
+        '<span style="color:var(--green);font-size:12px;align-self:center">API ready as <strong>' + esc(s.tokenLogin || ghUser) + '</strong> (token)</span>' +
+        '<button type="button" class="setup-action" onclick="openTokenModal(\'' + escAttr(requestedFor) + '\')">Manage token</button>' +
+        '<button type="button" class="setup-action" onclick="recheckSetup()">Refresh status</button></div>';
+    } else if (s.ghAuthenticated && s.ghActive === false) {
+      authExtra = '<div class="setup-hint">gh CLI is logged in as <code>' + esc(ghUser) + '</code> but not active. Run in a terminal:</div>' +
+        '<div class="setup-public-key">gh auth switch --user ' + esc(ghUser) + '</div>' +
+        '<div class="setup-step-actions"><button type="button" class="setup-action setup-action-primary" onclick="recheckSetup()">Refresh status</button></div>';
+    } else if (s.ghAuthenticated) {
+      authExtra = '<div class="setup-hint" style="color:var(--green)">Using GitHub CLI (gh) for API access.</div>' +
+        '<div class="setup-step-actions"><button type="button" class="setup-action" onclick="recheckSetup()">Refresh status</button></div>';
+    } else {
+      authExtra =
+        '<div class="setup-hint"><strong>Option A (recommended):</strong> fine-grained PAT with Contents (read) for <code>GET /user/repos</code>.</div>' +
+        '<div class="setup-step-actions">' +
+        '<button type="button" class="setup-action setup-action-primary" onclick="openTokenModal(\'' + escAttr(requestedFor) + '\')">Connect token</button></div>' +
+        '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--t3);font-size:12px">Option B: GitHub CLI (gh)</summary>' +
+        '<div class="setup-public-key" style="margin-top:8px">gh auth login</div>' +
+        '<div class="setup-hint">Multiple accounts: <code>gh auth switch --user ' + esc(ghUser) + '</code>, then click Refresh status.</div>' +
+        '<div class="setup-step-actions"><button type="button" class="setup-action" onclick="recheckSetup()">Refresh status</button></div></details>';
+    }
+    step(4, 'Connect GitHub API for repo list', authDone, authStatus, authExtra);
+
+    // Step 5: Ready
     var readyExtra = '';
     if (s.ready) {
-      readyExtra = '<div style="margin-top:6px;color:var(--green);font-size:13px;font-weight:500">&#10003; All set! Click <strong>Load Repos &amp; Close</strong> below.</div>';
+      readyExtra = '<div class="setup-hint" style="color:var(--green);font-weight:500">SSH and API are ready. Use <strong>Load Repos &amp; Close</strong> below.</div>';
     } else {
-      readyExtra = '<div class="setup-hint">Complete the steps above, then click <strong>Re-check</strong>.</div>';
+      var missing = [];
+      if (!s.sshKeyExists) missing.push('SSH key');
+      if (!s.sshConnects) missing.push('SSH verified on GitHub');
+      if (!s.tokenApiReady && !s.ghAuthenticated) missing.push('API (token with Contents read, or gh CLI)');
+      readyExtra = '<div class="setup-hint">Still needed: ' + esc(missing.join(', ') || 'complete the steps above') + '.</div>';
     }
-    step(6, 'Ready', s.ready, readyExtra);
+    step(5, 'Ready to use this account', s.ready, s.ready ? statusDone : statusPending('Finish parts A and B.'), readyExtra);
 
     el.innerHTML = h;
 
@@ -2522,13 +2826,21 @@ async function checkAccountStatus(name, publicKeyToShow) {
   } catch (e) {
     if (currentSetupAccount !== requestedFor) return;
     el.innerHTML = '<p class="log-err">Failed to load status: ' + esc(e.message) + '</p>';
+    if (options.verify) toast('SSH verification failed: ' + e.message, 'error');
+  } finally {
+    setupStatusLoading = false;
   }
+}
+
+function verifySshSetup() {
+  if (!currentSetupAccount) return;
+  checkAccountStatus(currentSetupAccount, null, { verify: true });
 }
 
 function recheckSetup() {
   if (!currentSetupAccount) return;
   lastPublicKey = lastPublicKey || null;
-  checkAccountStatus(currentSetupAccount, null);
+  checkAccountStatus(currentSetupAccount, null, { verify: false });
 }
 
 
@@ -2544,7 +2856,7 @@ async function runSetupSSH(name) {
     var r = await fetch(API + '/accounts/' + encodeURIComponent(name) + '/setup-ssh', { method: 'POST', headers: { 'X-GitDock': '1' } });
     var data = await r.json();
     if (data.ok && data.publicKey) {
-      toast('SSH key generated. Now add it to GitHub.', 'success');
+      toast('SSH key generated. Copy it, add on GitHub, then click Verify SSH.', 'success');
       lastPublicKey = data.publicKey;
       checkAccountStatus(name, data.publicKey);
     } else { toast(data.error || 'Setup failed', 'error'); }
@@ -2557,8 +2869,12 @@ function openTokenModal(accountName) {
   document.getElementById('tokenModalToken').value = '';
   document.getElementById('tokenModalRemember').checked = true;
   document.getElementById('tokenModalFor').innerHTML =
-    'Account: <strong>' + esc(acc && acc.label ? acc.label : accountName) + '</strong>' +
-    (acc && acc.githubUser ? ('<div style="margin-top:4px">GitHub user: <code>' + esc(acc.githubUser) + '</code></div>') : '');
+    '<div class="token-account-row"><span class="token-account-k">Account</span><span class="token-account-v">' +
+      esc(acc && acc.label ? acc.label : accountName) + '</span></div>' +
+    (acc && acc.githubUser
+      ? ('<div class="token-account-row"><span class="token-account-k">GitHub user</span><span class="token-account-v"><code>' +
+          esc(acc.githubUser) + '</code></span></div>')
+      : '');
   // Toggle disconnect button based on current status (best-effort).
   var disconnectBtn = document.getElementById('tokenModalDisconnectBtn');
   if (disconnectBtn) disconnectBtn.style.display = 'none';
@@ -2580,8 +2896,11 @@ async function saveToken() {
     var data = await apiPost('/accounts/' + encodeURIComponent(name) + '/auth/token', { token: token, remember: remember });
     if (data && data.ok) {
       closeModal('tokenModal');
-      toast('Account connected: ' + (data.login || name), 'success');
-      checkAccountStatus(name);
+      var msg = 'API connected: ' + (data.login || name);
+      if (data.storageMethod) msg += ' (stored in ' + data.storageMethod + ')';
+      toast(msg, 'success');
+      if (data.warning) toast(data.warning, 'info');
+      checkAccountStatus(name, null, { verify: false });
       refreshRepos();
     } else {
       toast((data && data.error) ? data.error : 'Failed to connect token', 'error');
@@ -2613,7 +2932,7 @@ async function uploadSshKey(name) {
     var data = await apiPost('/accounts/' + encodeURIComponent(name) + '/github/ssh-key', {});
     if (data && data.ok) {
       toast(data.alreadyExists ? 'SSH key already exists on GitHub.' : 'SSH key uploaded to GitHub.', 'success');
-      checkAccountStatus(name);
+      checkAccountStatus(name, null, { verify: true });
     } else {
       toast((data && data.error) ? data.error : 'Upload failed', 'error');
     }
@@ -2638,7 +2957,6 @@ async function refreshRepos() {
   var spinner = document.getElementById('refreshSpinner');
   if (spinner) spinner.style.display = 'inline-block';
   await loadAccounts();
-  addLog('Refreshing repos from GitHub...', 'info');
   try {
     var data = await apiGet('/repos');
     if (data.success) {
@@ -2646,7 +2964,6 @@ async function refreshRepos() {
       accountErrors = data.accountErrors || {};
       document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date(data.timestamp).toLocaleTimeString();
       renderAll();
-      addLog('Loaded ' + allRepos.length + ' repos', 'ok');
       if (Object.keys(allAccounts).length === 0 && allRepos.length > 0) {
         var retry = await loadAccounts();
         if (retry) renderAll();
@@ -2654,12 +2971,10 @@ async function refreshRepos() {
       loadExtras();
     } else {
       toast('Failed to load repos: ' + data.error, 'error');
-      addLog('Failed to load repos: ' + data.error, 'err');
     }
   } catch(e) {
     toast('Server not running. Start with: node server.js', 'error');
     document.getElementById('lastUpdated').innerHTML = '<span class="status-dot-live dot-off"></span> Server offline';
-    addLog('Server connection failed', 'err');
   }
   if (spinner) spinner.style.display = 'none';
 }
@@ -2746,7 +3061,7 @@ function updateBulkBar() {
       parts.push(byAccount[acc] + ' ' + getAccountLabel(acc));
     });
     var suffix = '';
-    if (parts.length === 1) suffix = '— ' + getAccountLabel(Object.keys(byAccount)[0]) + ' only';
+    if (parts.length === 1) suffix = ' ' + getAccountLabel(Object.keys(byAccount)[0]) + ' only';
     else if (parts.length > 1) suffix = '(' + parts.join(', ') + ')';
     if (byAccEl) byAccEl.textContent = suffix ? ' ' + suffix : '';
   } else {
@@ -2765,11 +3080,10 @@ async function bulkClone() {
   var notCloned = sel.filter(function(s) { return allRepos.some(function(r){ return r.account===s.account && r.name===s.name && !r.isCloned; }); });
   if (notCloned.length === 0) { toast('All selected repos are already cloned', 'info'); return; }
   toast('Cloning ' + notCloned.length + ' repos...', 'info');
-  addLog('Bulk clone: ' + notCloned.length + ' repos', 'warn');
   bulkClearSelection();
   for (var i = 0; i < notCloned.length; i++) {
     try { await apiPost('/repos/clone', { account: notCloned[i].account, repoName: notCloned[i].name }); }
-    catch(e) { addLog('Clone failed: ' + notCloned[i].name, 'err'); }
+    catch(e) { }
   }
   refreshRepos();
 }
@@ -2779,7 +3093,6 @@ async function bulkPull() {
   var cloned = sel.filter(function(s) { return allRepos.some(function(r){ return r.account===s.account && r.name===s.name && r.isCloned; }); });
   if (cloned.length === 0) { toast('No cloned repos selected', 'info'); return; }
   toast('Pulling ' + cloned.length + ' repos...', 'info');
-  addLog('Bulk pull: ' + cloned.length + ' repos', 'warn');
   bulkClearSelection();
   var ok = 0, fail = 0;
   for (var i = 0; i < cloned.length; i++) {
@@ -2789,7 +3102,6 @@ async function bulkPull() {
     } catch(e) { fail++; }
   }
   toast('Pulled ' + ok + ' repos' + (fail > 0 ? ', ' + fail + ' failed' : ''), ok > 0 ? 'success' : 'error');
-  addLog('Bulk pull: ' + ok + ' ok, ' + fail + ' failed', 'ok');
   refreshRepos();
 }
 
@@ -2798,7 +3110,6 @@ async function bulkFetch() {
   var cloned = sel.filter(function(s) { return allRepos.some(function(r){ return r.account===s.account && r.name===s.name && r.isCloned; }); });
   if (cloned.length === 0) { toast('No cloned repos selected', 'info'); return; }
   toast('Fetching ' + cloned.length + ' repos...', 'info');
-  addLog('Bulk fetch: ' + cloned.length + ' repos', 'warn');
   bulkClearSelection();
   var ok = 0, fail = 0;
   for (var i = 0; i < cloned.length; i++) {
@@ -2808,7 +3119,6 @@ async function bulkFetch() {
     } catch(e) { fail++; }
   }
   toast('Fetched ' + ok + ' repos' + (fail > 0 ? ', ' + fail + ' failed' : ''), ok > 0 ? 'success' : 'error');
-  addLog('Bulk fetch: ' + ok + ' ok, ' + fail + ' failed', 'ok');
   refreshRepos();
 }
 
@@ -2816,13 +3126,13 @@ function renderStats() {
   var total = allRepos.length;
   var cloned = allRepos.filter(function(r){return r.isCloned}).length;
   var dirty = allRepos.filter(function(r){return r.localStatus==='dirty'}).length;
-  var stale = allRepos.filter(function(r){return isStale(r)}).length;
+  var dormant = allRepos.filter(function(r){return isDormant(r)}).length;
   document.getElementById('statsBar').innerHTML =
     '<div class="sidebar-stats-line">'+
       '<span><strong class="n-total">'+total+'</strong> repos</span>'+
       '<span><strong class="n-cloned">'+cloned+'</strong> cloned</span>'+
       '<span><strong class="n-dirty">'+dirty+'</strong> uncommitted</span>'+
-      (stale > 0 ? '<span><strong style="color:var(--orange)">'+stale+'</strong> stale</span>' : '')+
+      (dormant > 0 ? '<span><strong style="color:var(--orange)">'+dormant+'</strong> dormant</span>' : '')+
     '</div>';
 }
 
@@ -2888,7 +3198,7 @@ function renderFilters() {
     h+='<button class="fbtn'+(filters.visibility===v[0]?' on':'')+'" onclick="setF(\'visibility\',\''+v[0]+'\')">'+v[1]+'</button>';
   });
   h+='</div></div><div class="filter-group"><span class="filter-label">Status</span><div class="filter-btns">';
-  [['all','All'],['cloned','Cloned'],['not_cloned','Not cloned'],['stale','Stale']].forEach(function(s){
+  [['all','All'],['cloned','Cloned'],['not_cloned','Not cloned'],['dormant','Dormant']].forEach(function(s){
     h+='<button class="fbtn'+(filters.status===s[0]?' on':'')+'" onclick="setF(\'status\',\''+s[0]+'\')">'+s[1]+'</button>';
   });
   h+='</div></div><div class="filter-group"><span class="filter-label">Sort</span><div class="filter-btns">';
@@ -2903,9 +3213,9 @@ function renderFilters() {
   [['main','main'],['master','master']].forEach(function(b){
     h+='<button class="fbtn'+(primaryBranchName===b[0]?' on':'')+'" onclick="setPrimaryBranch(\''+b[0]+'\')">'+b[1]+'</button>';
   });
-  h+='</div></div><div class="filter-group"><span class="filter-label">Stale after</span><div class="filter-btns">';
+  h+='</div></div><div class="filter-group"><span class="filter-label" title="Mark repos with no local commit or GitHub update longer than this">Dormant after</span><div class="filter-btns">';
   [['30','1 mo'],['90','3 mo'],['180','6 mo'],['365','1 yr']].forEach(function(s){
-    h+='<button class="fbtn'+(String(staleDays)===s[0]?' on':'')+'" onclick="setStaleDays('+s[0]+')">'+s[1]+'</button>';
+    h+='<button class="fbtn'+(String(dormantDays)===s[0]?' on':'')+'" onclick="setDormantDays('+s[0]+')">'+s[1]+'</button>';
   });
   h+='</div></div>';
   el.innerHTML = h;
@@ -2913,7 +3223,7 @@ function renderFilters() {
 
 function setF(t,v){ filters[t]=v; renderFilters(); renderRepos(); }
 function setPrimaryBranch(name){ primaryBranchName=name; localStorage.setItem('primaryBranchName',name); renderFilters(); renderRepos(); }
-function setStaleDays(d){ staleDays=d; localStorage.setItem('staleDays',String(d)); renderFilters(); renderRepos(); renderStats(); renderAttention(); }
+function setDormantDays(d){ dormantDays=d; localStorage.setItem('dormantDays',String(d)); renderFilters(); renderRepos(); renderStats(); renderAttention(); }
 
 function getFiltered() {
   var list = allRepos.filter(function(r){
@@ -2921,7 +3231,7 @@ function getFiltered() {
     if(filters.visibility!=='all'&&r.visibility!==filters.visibility) return false;
     if(filters.status==='cloned'&&!r.isCloned) return false;
     if(filters.status==='not_cloned'&&r.isCloned) return false;
-    if(filters.status==='stale'&&!isStale(r)) return false;
+    if(filters.status==='dormant'&&!isDormant(r)) return false;
     if(filters.branch==='primary'&&(!r.isCloned||(r.branch||'').trim()!==primaryBranchName)) return false;
     if(filters.branch==='not_primary'&&(!r.isCloned||!(r.branch||'').trim()||(r.branch||'').trim()===primaryBranchName)) return false;
     if(search){var q=search.toLowerCase();return r.name.toLowerCase().indexOf(q)>=0||r.description.toLowerCase().indexOf(q)>=0||r.language.toLowerCase().indexOf(q)>=0||(r.githubUser||'').toLowerCase().indexOf(q)>=0;}
@@ -2943,7 +3253,7 @@ function repoStatusText(r) {
   if (r.localStatus === 'dirty') return 'Uncommitted';
   if (r.localStatus === 'ahead') return 'Ahead +' + r.ahead;
   if (r.localStatus === 'behind') return 'Behind -' + r.behind;
-  return '—';
+  return '';
 }
 
 function tableRowHTML(r) {
@@ -2964,11 +3274,11 @@ function tableRowHTML(r) {
   return '<tr><td><input type="checkbox" class="card-check" data-account="'+a+'" data-name="'+n+'" onchange="updateBulkBar()" title="Select"></td>'+
     '<td class="t-name"><a href="'+esc(r.url)+'" target="_blank">'+esc(r.name)+'</a></td>'+
     '<td><span class="badge '+getAccountBadgeClass(r.account)+'">'+esc(getAccountLabel(r.account))+'</span></td>'+
-    '<td>'+(r.branch ? esc(r.branch) : '—')+'</td>'+
+    '<td>'+(r.branch ? esc(r.branch) : '')+'</td>'+
     '<td>'+esc(repoStatusText(r))+'</td>'+
-    '<td>'+(r.stars>0 ? r.stars : '—')+'</td>'+
-    '<td>'+(r.diskUsage>0 ? formatSize(r.diskUsage) : '—')+'</td>'+
-    '<td>'+(upd ? esc(upd) : '—')+'</td>'+
+    '<td>'+(r.stars>0 ? r.stars : '')+'</td>'+
+    '<td>'+(r.diskUsage>0 ? formatSize(r.diskUsage) : '')+'</td>'+
+    '<td>'+(upd ? esc(upd) : '')+'</td>'+
     '<td><span class="extras-pills" data-extras-key="'+a+'/'+n+'"></span></td>'+
     '<td class="t-actions">'+actions+'</td></tr>';
 }
@@ -3022,7 +3332,8 @@ function cardHTML(r) {
   }
   var cardMeta = metaParts.length ? '<div class="card-meta">'+metaParts.join('')+'</div>' : '';
   var extrasPills = (minimal || !prefs.showExtras) ? '' : '<span class="extras-pills" data-extras-key="'+a+'/'+n+'"></span>';
-  return '<div class="card'+(pinned?' card-pinned':'')+'" id="card-'+esc(r.name)+'">'+
+  var cardCls = 'card' + (pinned ? ' card-pinned' : '') + (r.isCloned ? ' card-cloned' : '');
+  return '<div class="'+cardCls+'" id="card-'+esc(r.name)+'">'+
     '<div class="card-top">'+
       '<input type="checkbox" class="card-check" data-account="'+a+'" data-name="'+n+'" onchange="updateBulkBar()" title="Select for bulk action">'+
       '<div class="card-name-grp">'+
@@ -3035,7 +3346,7 @@ function cardHTML(r) {
         '<span class="badge '+getAccountBadgeClass(r.account)+'">'+esc(getAccountLabel(r.account))+'</span>'+
         (minimal ? '' : '<span class="badge b-'+(r.visibility==='private'?'prv':'pub')+'">'+esc(r.visibility)+'</span>'+
         (r.isCloned?'<span class="badge b-clone">cloned</span>':'')+
-        (isStale(r)?'<span class="badge b-stale">stale</span>':''))+
+        (isDormant(r)?'<span class="badge b-dormant" title="No activity for '+esc(dormantPeriodLabel())+' or more">dormant</span>':''))+
         (r.isCloned && r.localPath ? cardMenu : '')+
       '</div>'+
     '</div>'+
@@ -3211,11 +3522,11 @@ async function loadFocusViewData() {
         if (commitsData.success && commitsData.recentCommits && commitsData.recentCommits.length) {
           var list = commitsData.recentCommits;
           commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><ul class="focus-commit-list">' +
-            list.map(function(c){ return '<li><code>'+esc(c.hash)+'</code> '+esc(c.subject)+' — '+esc(c.author)+' '+(c.date ? esc(c.date) : '')+'</li>'; }).join('') + '</ul>';
-        } else commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><p class="focus-placeholder">—</p>';
+            list.map(function(c){ return '<li><code>'+esc(c.hash)+'</code> '+esc(c.subject)+' · '+esc(c.author)+' '+(c.date ? esc(c.date) : '')+'</li>'; }).join('') + '</ul>';
+        } else commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><p class="focus-placeholder"></p>';
       }
     } catch (e) {
-      if (commitsEl) commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><p class="focus-placeholder">—</p>';
+      if (commitsEl) commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><p class="focus-placeholder"></p>';
     }
   } else {
     if (statusEl) statusEl.innerHTML = '<strong>Status</strong>: Loading...';
@@ -3223,7 +3534,7 @@ async function loadFocusViewData() {
       var statusData = await apiGet('/repos/' + encodeURIComponent(account) + '/' + encodeURIComponent(name) + '/git-status');
       if (statusData.success) {
         var s = statusData;
-        var st = 'Branch: ' + (s.currentBranch || '—');
+        var st = 'Branch: ' + (s.currentBranch || '');
         if (s.upstream && s.upstream.hasUpstream) {
           if (s.upstream.ahead) st += ' · Ahead ' + s.upstream.ahead;
           if (s.upstream.behind) st += ' · Behind ' + s.upstream.behind;
@@ -3238,11 +3549,11 @@ async function loadFocusViewData() {
         if (commitsEl && s.recentCommits && s.recentCommits.length) {
           var list = s.recentCommits.slice(0, 5);
           commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><ul class="focus-commit-list">' +
-            list.map(function(c){ return '<li><code>'+esc(c.hash)+'</code> '+esc(c.subject)+' — '+esc(c.author)+' '+esc(c.date)+'</li>'; }).join('') + '</ul>';
+            list.map(function(c){ return '<li><code>'+esc(c.hash)+'</code> '+esc(c.subject)+' · '+esc(c.author)+' '+esc(c.date)+'</li>'; }).join('') + '</ul>';
         } else if (commitsEl) commitsEl.innerHTML = '<p class="focus-section-title">Recent commits</p><p class="focus-placeholder">None</p>';
       } else if (statusEl) statusEl.innerHTML = '<strong>Status</strong>: ' + (statusData.error || 'Failed to load');
     } catch (e) {
-      if (statusEl) statusEl.innerHTML = '<strong>Status</strong>: Error — ' + esc(e.message || 'Failed');
+      if (statusEl) statusEl.innerHTML = '<strong>Status</strong>: Error: ' + esc(e.message || 'Failed');
     }
     if (actionsEl) actionsEl.innerHTML = '<p class="focus-section-title">Actions</p><div class="focus-actions-btns">'+
       '<button class="btn btn-sm" onclick="openGitModal(\''+a+'\',\''+n+'\')">Git</button>'+
@@ -3258,8 +3569,8 @@ async function loadFocusViewData() {
     var exText = [];
     if (ex.prs > 0) exText.push(ex.prs + ' PR' + (ex.prs !== 1 ? 's' : ''));
     if (ex.issues > 0) exText.push(ex.issues + ' issue' + (ex.issues !== 1 ? 's' : ''));
-    extrasEl.innerHTML = '<p class="focus-section-title">PRs / Issues</p><p>' + (exText.length ? esc(exText.join(' · ')) : '—') + '</p>';
-  } else if (extrasEl) extrasEl.innerHTML = '<p class="focus-section-title">PRs / Issues</p><p class="focus-placeholder">—</p>';
+    extrasEl.innerHTML = '<p class="focus-section-title">PRs / Issues</p><p>' + (exText.length ? esc(exText.join(' · ')) : '') + '</p>';
+  } else if (extrasEl) extrasEl.innerHTML = '<p class="focus-section-title">PRs / Issues</p><p class="focus-placeholder"></p>';
 
   if (readmeEl) {
     if (!r || !r.isCloned) readmeEl.innerHTML = '<p class="focus-section-title">README</p><p class="focus-placeholder">Loading...</p>';
@@ -3329,13 +3640,13 @@ async function loadGitStatus(clearFeedback, silent) {
     if (!silent) body.style.display = 'block';
     var commitBtn = document.getElementById('gitCommitBtn');
     if (commitBtn) commitBtn.disabled = false;
-    var currentBranch = data.currentBranch || '—';
+    var currentBranch = data.currentBranch || '';
     document.getElementById('gitCurrentBranch').textContent = currentBranch;
     var op = data.operation || {};
     var opBanner = document.getElementById('gitModalOperationBanner');
     if (opBanner) {
       if (op.isMerging || op.isRebasing) {
-        opBanner.textContent = op.isMerging ? 'Merge in progress — resolve conflicts before committing.' : 'Rebase in progress — resolve before continuing.';
+        opBanner.textContent = op.isMerging ? 'Merge in progress. Resolve conflicts before committing.' : 'Rebase in progress. Resolve before continuing.';
         opBanner.style.display = 'block';
       } else {
         opBanner.style.display = 'none';
@@ -3442,7 +3753,7 @@ async function loadGitDiffContent(filePath, mode) {
     var url = '/repos/' + encodeURIComponent(gitModalRepo.account) + '/' + encodeURIComponent(gitModalRepo.name) + '/git/diff?path=' + encodeURIComponent(filePath) + '&mode=' + encodeURIComponent(mode);
     var data = await apiGet(url);
     if (content) {
-      if (data.binary) content.textContent = '(Binary file — diff not shown)';
+      if (data.binary) content.textContent = '(Binary file, diff not shown)';
       else if (data.diff) content.textContent = data.diff + (data.truncated ? '\n\n[Output truncated]' : '');
       else content.textContent = data.output || '(No diff)';
     }
@@ -3625,7 +3936,6 @@ async function doGitCommit() {
     if (data.success) {
       var out = (data.output && data.output.split('\n')[0]) ? data.output.split('\n')[0].trim() : '';
       gitModalFeedback(out ? 'Commit done. ' + out : 'Commit done.', 'success');
-      addLog('Commit: ' + gitModalRepo.name, 'ok');
       document.getElementById('gitCommitMessage').value = '';
       if (pushBtn) pushBtn.disabled = false;
       loadGitStatus(false, true);
@@ -3667,7 +3977,6 @@ async function doGitPull(useRebase) {
     var data = await apiPost('/repos/' + encodeURIComponent(gitModalRepo.account) + '/' + encodeURIComponent(gitModalRepo.name) + '/git/pull', { rebase: !!useRebase });
     if (data.success) {
       gitModalFeedback(data.output ? 'Pull done. ' + data.output.split('\n')[0] : 'Pull done.', 'success');
-      addLog('Pull: ' + gitModalRepo.name, 'ok');
       loadGitStatus(false, true);
       refreshRepos();
     } else {
@@ -3694,7 +4003,6 @@ async function doGitPush() {
     if (data.success) {
       var out = (data.output && data.output.split('\n')[0]) ? data.output.split('\n')[0].trim() : '';
       gitModalFeedback(out ? 'Push done. ' + out : 'Push done.', 'success');
-      addLog('Push: ' + gitModalRepo.name, 'ok');
       if (commitBtn) commitBtn.disabled = false;
       if (pushBtn) pushBtn.disabled = false;
       loadGitStatus(false, true);
@@ -3789,12 +4097,10 @@ function hideCloneOverlay() {
 
 async function doClone(account, name) {
   showCloneOverlay(name);
-  addLog('Cloning '+name+'...','info');
   try {
     var data = await apiPost('/repos/clone',{account:account,repoName:name});
-    if(data.success){addLog('Clone started: '+name,'ok');}
-    else{hideCloneOverlay();toast('Clone failed: '+data.error,'error');addLog('Clone failed: '+name+' - '+data.error,'err');}
-  }catch(e){hideCloneOverlay();toast('Error: '+e.message,'error');addLog('Clone error: '+e.message,'err');}
+    if (!data.success) { hideCloneOverlay(); toast('Clone failed: '+data.error,'error'); }
+  } catch(e) { hideCloneOverlay(); toast('Error: '+e.message,'error'); }
 }
 
 function openCloneUrlModal() {
@@ -3824,48 +4130,39 @@ async function doCloneUrl() {
   closeModal('cloneUrlModal');
   var displayName = folderName || url.split('/').pop().replace(/\.git$/, '') || 'repo';
   showCloneOverlay(displayName);
-  addLog('Cloning from URL...','info');
   try {
     var body = { account: account, url: url };
     if (folderName) body.folderName = folderName;
     var data = await apiPost('/repos/clone-url', body);
-    if (data.success) {
-      var used = data.usedFolder || data.repo || '';
-      addLog('Clone URL started' + (used ? (': ' + used) : ''), 'ok');
-    } else {
+    if (!data.success) {
       hideCloneOverlay();
       toast('Clone failed: ' + (data.error || 'unknown error'), 'error');
-      addLog('Clone URL failed: ' + (data.error || 'unknown error'), 'err');
     }
   } catch (e) {
     hideCloneOverlay();
     toast('Error: ' + (e.message || 'Request failed'), 'error');
-    addLog('Clone URL error: ' + (e.message || 'Request failed'), 'err');
   }
 }
 
 async function doPull(account, name) {
-  addLog('Pulling '+name+'...','info');
   try {
     var data = await apiPost('/repos/pull',{account:account,repoName:name});
-    if(data.success){toast(name+' updated!','success');addLog('Pulled: '+name,'ok');}
-    else{toast('Pull failed: '+data.error,'error');addLog('Pull failed: '+name+' - '+data.error,'err');}
+    if(data.success){toast(name+' updated!','success')}
+    else{toast('Pull failed: '+data.error,'error')}
   }catch(e){toast('Error: '+e.message,'error');}
   refreshRepos();
 }
 
 async function doFetch(account, name) {
-  addLog('Fetching '+name+'...','info');
   try {
     var data = await apiPost('/repos/fetch',{account:account,repoName:name});
-    if(data.success){toast(name+' fetched!','success');addLog('Fetched: '+name,'ok');}
+    if(data.success){toast(name+' fetched!','success')}
     else{toast('Fetch failed: '+data.error,'error');}
   }catch(e){toast('Error: '+e.message,'error');}
   refreshRepos();
 }
 
 async function doPullAll() {
-  addLog('Pulling all local repos...','info');
   toast('Updating all local repos...','info');
   try {
     var data = await apiPost('/repos/pull-all',{});
@@ -3873,7 +4170,6 @@ async function doPullAll() {
       var ok = data.results.filter(function(r){return r.success}).length;
       var fail = data.results.filter(function(r){return !r.success}).length;
       toast('Updated '+ok+' repos'+(fail>0?', '+fail+' skipped':''),'success');
-      addLog('Pull all: '+ok+' ok, '+fail+' skipped','ok');
     }
   }catch(e){toast('Error: '+e.message,'error');}
   refreshRepos();
@@ -3903,12 +4199,11 @@ async function confirmRemove() {
   document.getElementById('removeModalConfirm').style.display = 'none';
   document.getElementById('removeModalProgress').style.display = 'flex';
   document.getElementById('removeProgressText').textContent = 'Removing "'+name+'" from your computer…';
-  addLog('Removing '+name+'...','warn');
   try {
     var data = await apiPost('/repos/remove',{account:pendingRemove.account,repoName:pendingRemove.name,force:true});
     closeModal('removeModal');
-    if(data.success){ toast(data.message,'success'); addLog('Removed: '+name,'ok'); }
-    else{ toast('Remove failed: '+data.error,'error'); addLog('Remove failed: '+data.error,'err'); }
+    if(data.success){ toast(data.message,'success') }
+    else{ toast('Remove failed: '+data.error,'error') }
   }catch(e){
     closeModal('removeModal');
     toast('Error: '+e.message,'error');
@@ -3959,7 +4254,6 @@ async function doTransfer() {
   if(typed !== pendingTransfer.name){toast('Repo name does not match. Transfer cancelled.','error');return;}
   closeModal('transferModal');
   pendingTransfer.toAccount = toAccount;
-  addLog('Transferring '+pendingTransfer.name+'...','warn');
   toast('Transferring '+pendingTransfer.name+'...','info');
   try {
     var payload = { repoName: pendingTransfer.name, fromAccount: pendingTransfer.fromAccount, toAccount: pendingTransfer.toAccount };
@@ -3967,13 +4261,11 @@ async function doTransfer() {
     if(data.success){
       if(data.transferComplete){
         toast(data.message,'success');
-        addLog('Transfer complete: '+pendingTransfer.name,'ok');
       } else {
         toast(data.message,'info');
-        addLog('Transfer pending acceptance: '+pendingTransfer.name,'warn');
       }
     }
-    else{toast('Transfer failed: '+data.error,'error');addLog('Transfer failed: '+data.error,'err');}
+    else{toast('Transfer failed: '+data.error,'error')}
   }catch(e){toast('Error: '+e.message,'error');}
   pendingTransfer = null;
   setTimeout(refreshRepos, 2000);
@@ -3985,11 +4277,10 @@ async function doMigrate() {
   var account = document.getElementById('migrateAccount').value;
   if(!sourcePath||!repoName){toast('Fill in all fields','error');return;}
   closeModal('migrateModal');
-  addLog('Migrating '+repoName+'...','info');
   try {
     var data = await apiPost('/repos/migrate',{sourcePath:sourcePath,account:account,repoName:repoName});
-    if(data.success){toast(data.message,'success');addLog('Migrated: '+repoName,'ok');}
-    else{toast('Migrate failed: '+data.error,'error');addLog('Migrate failed: '+data.error,'err');}
+    if(data.success){toast(data.message,'success')}
+    else{toast('Migrate failed: '+data.error,'error')}
   }catch(e){toast('Error: '+e.message,'error');}
   document.getElementById('migratePath').value='';
   document.getElementById('migrateName').value='';
@@ -4002,7 +4293,14 @@ function clearSearch(){var input=document.getElementById('searchInput');input.va
 document.addEventListener('keydown',function(e){
   var inp=document.getElementById('searchInput');
   if(e.key==='/'&&document.activeElement!==inp){e.preventDefault();inp.focus();}
-  if(e.key==='Escape'){inp.blur();inp.value='';search='';renderRepos();closeModal('removeModal');closeModal('migrateModal');closeModal('cloneUrlModal');closeModal('transferModal');closeModal('confirmActionModal');closeModal('readmeModal');closeModal('gitModal');closeModal('accountManagerModal');closeModal('hubModal');}
+  if (e.key === 'Escape') {
+    inp.blur();
+    inp.value = '';
+    search = '';
+    renderRepos();
+    document.getElementById('searchClear').classList.remove('visible');
+    closeOpenModals();
+  }
 });
 
 // --- SSE (real-time updates) ---
@@ -4012,11 +4310,6 @@ function connectSSE() {
     es.onmessage = async function(e) {
       var data = JSON.parse(e.data);
       if(data.type === 'operation_complete') {
-        if(data.success) {
-          addLog(data.operation + ' completed: ' + data.repo, 'ok');
-        } else {
-          addLog(data.operation + ' failed: ' + data.repo, 'err');
-        }
         await refreshRepos();
         hideCloneOverlay();
         if(data.success) {
@@ -4038,18 +4331,18 @@ function connectSSE() {
 // --- Alias modal keyboard support ---
 document.getElementById('aliasInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { e.preventDefault(); confirmAlias(false); }
-  if (e.key === 'Escape') { e.preventDefault(); closeModal('aliasModal'); }
+  if (e.key === 'Escape') { e.preventDefault(); closeOpenModals(); }
 });
 
 // --- Clone URL modal keyboard support ---
 document.getElementById('cloneUrlInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { e.preventDefault(); doCloneUrl(); }
-  if (e.key === 'Escape') { e.preventDefault(); closeModal('cloneUrlModal'); }
+  if (e.key === 'Escape') { e.preventDefault(); closeOpenModals(); }
 });
 
 document.getElementById('cloneUrlFolderName').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { e.preventDefault(); doCloneUrl(); }
-  if (e.key === 'Escape') { e.preventDefault(); closeModal('cloneUrlModal'); }
+  if (e.key === 'Escape') { e.preventDefault(); closeOpenModals(); }
 });
 
 // --- Init ---
