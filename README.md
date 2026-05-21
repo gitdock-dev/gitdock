@@ -34,7 +34,7 @@ GitDock is a **local tool** that runs on your machine and provides a web dashboa
 Developers who:
 - Manage **dozens or hundreds** of repositories and want them all in one view
 - Want to clone, pull, commit, push, and see status without jumping between tabs and terminals
-- Need to see which repos have uncommitted changes, are behind remote, or are stale
+- Need to see which repos have uncommitted changes, are behind remote, or are dormant
 - Use one GitHub account or several (work + personal) and want everything in one dashboard
 
 ### What it is NOT
@@ -54,16 +54,16 @@ Developers who:
 |---|---|
 | **Account support** | Works with one account; add more anytime if you need them |
 | **Informative cards** | Each repo displays: name, owner, description, language, stars, visibility, git status, branch, disk size |
-| **Advanced filters** | Filter by account, visibility (public/private), status (cloned/not cloned/stale), sort (updated, A-Z, Z-A, size) |
+| **Advanced filters** | Filter by account, visibility (public/private), status (cloned/not cloned/dormant), sort (updated, A-Z, Z-A, size) |
 | **Real-time search** | Search by name, description, language, or username. Shortcut: `/` key |
 | **Pinned repos** | Mark favorite repos with ★ - they appear at the top, separated |
 | **Custom alias** | Give any repo a nickname to remember what it's about. Opens an elegant modal, saved locally |
-| **Stale repo detection** | "stale" badge on repos with no activity for over X months. Configurable threshold: 1, 3, 6, or 12 months |
+| **Dormant repo detection** | "dormant" badge when activity is older than your threshold (1, 3, 6, or 12 months). **Cloned repos:** date of the last **local** commit. **Not cloned:** GitHub `updated_at` from the API. This is not ahead/behind or uncommitted changes |
 | **Disk size** | Each card displays the repository size (KB/MB/GB) |
 | **Last local commit** | For cloned repos, shows when the last local commit was made |
 | **Open PRs and Issues** | Colored pills on the card showing the count of open Pull Requests and Issues (loaded in the background via GraphQL) |
 | **Attention panel** | Sidebar lists repos that need attention: uncommitted changes, ahead, behind. Click to navigate directly to the card |
-| **Statistics** | Sidebar displays: total repos, cloned, with uncommitted changes, stale |
+| **Statistics** | Sidebar displays: total repos, cloned, with uncommitted changes, dormant |
 | **README viewer** | "README" button on each card opens the content rendered in Markdown (local or via GitHub API) |
 
 ### Git Operations
@@ -114,12 +114,13 @@ Developers who:
 |---|---|
 | **Dark theme** | Dark interface inspired by GitHub Dark |
 | **Sidebar + grid layout** | Fixed sidebar with filters and stats, scrollable main area with responsive card grid |
-| **Modals** | 7 modals: Alias, Remove, Migrate, Transfer, Confirm Action, README, Git |
+| **Modals** | Account Manager (setup timeline), Settings, Hub, token connect, Git, README, clone/remove/migrate/transfer, and more |
+| **Modal UX** | Click outside the backdrop or press `Escape` to close any open modal |
+| **Repo cards** | Cloned repos use a subtle green border; action buttons sit in one segmented control bar |
 | **Toasts** | Temporary notifications (success/error/info) in the top-right corner |
-| **Activity log** | Real-time log of all operations in the sidebar |
 | **SSE (Server-Sent Events)** | Real-time server updates - connection indicator at the top |
 | **⋮ Menu (three dots)** | Context menu on each cloned card with all quick actions |
-| **Keyboard shortcuts** | `/` for search, `Escape` to close modals, `Enter` to confirm |
+| **Keyboard shortcuts** | `/` for search, `Escape` to close modals and clear search, `Enter` to confirm |
 | **Responsive** | Sidebar becomes horizontal on screens smaller than 768px |
 
 ---
@@ -281,13 +282,13 @@ The dashboard shows an empty state: **"No repositories yet. Add a GitHub account
    - **GitHub username**: your GitHub login for this account
    - **Email**: used for git commits
    - **SSH host** (optional): leave empty for default `github.com-{account name}`
-3. Click **Add**. The dashboard opens a **setup timeline** that guides you through:
-   - **Step 1**: Account created (automatic)
-   - **Step 2**: Click **Generate SSH Key** - the public key appears. Click **Copy Key**, then add it at [GitHub → Settings → SSH and GPG keys](https://github.com/settings/keys)
-   - **Step 3**: Confirm the key is added on GitHub (click **Add Manually on GitHub** to open the page)
-   - **Step 4**: Connect a personal access token (or use **Advanced: use gh CLI** and run `gh auth login` in a terminal)
-   - **Step 5**: Git config created (automatic)
-   - **Step 6**: Once all steps are green, the **Load Repos & Close** button appears - click it to finish
+3. Click **Add**. The dashboard opens a **setup timeline** with two parts (both required):
+   - **Part A (SSH):** [GitHub SSH docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh): generate Ed25519 key → add at [SSH keys](https://github.com/settings/ssh/new) → **Verify SSH** (`ssh -T git@github.com-{account}`)
+   - **Part B (API):** [fine-grained PAT](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with **Contents: Read-only** (lists repos via `GET /user/repos`), or **gh CLI** for the same user
+   - Optional: **Git SSH keys: Read and write** on the token only if you use *Upload key via API* (`POST /user/keys`)
+   - GitHub host keys for `github.com` are added to `~/.ssh/known_hosts` from [GitHub's published keys](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints) (update `server.js` if GitHub rotates them; see [meta API](https://docs.github.com/en/rest/meta/meta#get-github-meta-information))
+   - **Classic PAT** (optional): `repo` scope instead of fine-grained Contents read
+   - When all steps are green, click **Load Repos & Close**
 4. Your repositories appear in the dashboard. Clone, pull, commit, and push from there.
 
 Accounts and workspace data are stored in your workspace directory (e.g. `~/.gitdock` or a path you chose), in `config.json`.
@@ -521,6 +522,8 @@ The Hub code is in the `hub/` folder. You can [self-host it](hub/README.md) at n
 We also run a hosted Hub at [hub.gitdock.dev](https://hub.gitdock.dev): one machine is free; unlimited machines are $5/month. Sign up there, create an API key in Settings, then in each machine set **Hub URL** to `https://hub.gitdock.dev` and paste the key.
 In the local GitDock dashboard use the dashboard’s **Configure Hub** to set the URL and key so this machine sends snapshots.
 
+**Terminology:** The main dashboard uses **dormant** for repos with no recent activity (commits or GitHub updates). The optional Hub uses **stale** only for machines that have not reported in over an hour (offline / last seen), not for repository age.
+
 ## Contributing
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style (vanilla JS, no frameworks), and how to submit pull requests and report issues.
@@ -531,21 +534,21 @@ We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development
 
 | Aspect | Detail |
 |---|---|
-| **Where is data stored?** | Everything is local. Cloned repos in the project folder. Preferences (pins, aliases, filters) in the browser's `localStorage` |
-| **What is sent to the internet?** | Only calls to the GitHub API (via `gh` CLI) to list repos, fetch READMEs, and count PRs/Issues. These are the same calls you would make manually |
+| **Where is data stored?** | Everything is local. Cloned repos in your workspace directory (e.g. `~/.gitdock`), not inside the GitDock source tree. Account settings in `config.json`. UI preferences (pins, aliases, filters) in the browser's `localStorage` |
+| **What is sent to the internet?** | Only HTTPS calls to the GitHub API (via `gh` CLI or your PAT) to list repos, fetch READMEs, and count PRs/Issues. These go from your machine to `api.github.com`, same as manual use |
 | **Can anyone access the dashboard?** | No. The server only accepts connections from `127.0.0.1`. No device on your network can access it |
-| **Are tokens exposed?** | No. The `gh` CLI manages tokens in the operating system's keyring. The server never touches tokens directly |
+| **Are tokens exposed?** | Tokens are never written to `config.json` or sent to GitDock servers. Use **GitHub CLI** (`gh`, OS keyring) or a **personal access token**: kept in server memory for the current session only, or stored with **Remember** in your OS credential store (Windows Credential Manager, macOS Keychain, or Linux Secret Service via `secret-tool`). The server uses them only for local GitHub API calls |
 | **Can I use it on a corporate network?** | Yes. No port is opened externally. Traffic flows only between the browser and the server, both on your machine |
 
 ---
 
 ## Tech Stack
 
-- **Backend:** Node.js + Express (single server, ~1100 lines)
-- **Frontend:** HTML + CSS + vanilla JavaScript (single file, ~1400 lines, zero frameworks)
+- **Backend:** Node.js + Express (`server.js`, ~3.1k lines)
+- **Frontend:** HTML + CSS + vanilla JavaScript (`dashboard.html`, ~4.1k lines, zero frameworks)
 - **Git authentication:** SSH with host aliases (Ed25519)
-- **GitHub API:** GitHub CLI (`gh`) + REST API + GraphQL API
-- **Data:** GitHub CLI for remote repos, Git for local status, `localStorage` for preferences
+- **GitHub API:** GitHub CLI (`gh`), optional fine-grained or classic PAT, REST API + GraphQL API
+- **Data:** Git for local status, GitHub API for remote metadata, `localStorage` for UI preferences
 - **Real-time:** Server-Sent Events (SSE) for asynchronous operations
 - **Markdown:** marked.js + DOMPurify for secure README rendering
 - **Security:** 10+ layers of protection (see Security section)

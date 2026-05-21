@@ -371,6 +371,137 @@ function sanitizeSshHostAlias(host) {
   return trimmed;
 }
 
+// Published by GitHub for ~/.ssh/known_hosts (verify when GitHub rotates keys):
+// https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints
+// https://docs.github.com/en/rest/meta/meta#get-github-meta-information
+const GITHUB_KNOWN_HOSTS_MARKER = "# --- GitHub host keys (managed by GitDock) ---";
+const GITHUB_KNOWN_HOSTS_END = "# --- End GitHub host keys ---";
+const GITHUB_OFFICIAL_KNOWN_HOSTS_LINES = [
+  "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
+  "github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=",
+  "github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=",
+];
+
+function githubOfficialKeysInKnownHosts(content) {
+  if (!content || typeof content !== "string") return false;
+  return GITHUB_OFFICIAL_KNOWN_HOSTS_LINES.every((line) => content.includes(line));
+}
+
+/** Add GitHub's documented host key lines to ~/.ssh/known_hosts (no ssh-keyscan). */
+function ensureGitHubKnownHosts() {
+  const sshDir = ensureSSHDir();
+  const knownPath = path.join(sshDir, "known_hosts");
+  let existing = "";
+  try {
+    if (fs.existsSync(knownPath)) existing = fs.readFileSync(knownPath, "utf8");
+  } catch (e) {
+    return { ok: false, added: false, message: "Could not read known_hosts: " + e.message };
+  }
+  if (githubOfficialKeysInKnownHosts(existing)) {
+    return { ok: true, added: false, message: "GitHub host keys already in known_hosts." };
+  }
+
+  const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const reBlock = new RegExp(
+    `${escapeRe(GITHUB_KNOWN_HOSTS_MARKER)}[\\s\\S]*?${escapeRe(GITHUB_KNOWN_HOSTS_END)}`,
+    "g"
+  );
+  const cleaned = existing.replace(reBlock, "").trimEnd();
+  const block = [
+    "",
+    GITHUB_KNOWN_HOSTS_MARKER,
+    ...GITHUB_OFFICIAL_KNOWN_HOSTS_LINES,
+    GITHUB_KNOWN_HOSTS_END,
+    "",
+  ].join("\n");
+  try {
+    fs.writeFileSync(knownPath, (cleaned ? cleaned + "\n" : "") + block, "utf8");
+  } catch (e) {
+    return { ok: false, added: false, message: "Could not update known_hosts: " + e.message };
+  }
+  return {
+    ok: true,
+    added: true,
+    message: "Added GitHub host keys from official documentation to known_hosts.",
+  };
+}
+
+/** Run ssh -T per https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection */
+function testAccountSshConnection(host, expectedGithubUser) {
+  const safeHost = sanitizeSshHostAlias(host);
+  if (!safeHost) {
+    return { tested: false, ok: false, reason: "invalid_host", message: "Invalid SSH host alias for this account." };
+  }
+  let r;
+  try {
+    r = spawnSync(
+      "ssh",
+      ["-T", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", `git@${safeHost}`],
+      { encoding: "utf8", timeout: 15000, windowsHide: true }
+    );
+  } catch (e) {
+    return { tested: true, ok: false, reason: "ssh_error", message: e.message || "SSH test could not run." };
+  }
+  if (r.error && (r.error.code === "ENOENT" || /ENOENT/i.test(String(r.error.message || "")))) {
+    return {
+      tested: true,
+      ok: false,
+      reason: "ssh_not_found",
+      message: "The ssh command was not found. Install Git for Windows or enable the OpenSSH Client feature.",
+    };
+  }
+  const out = String((r.stdout || "") + (r.stderr || "")).trim();
+  if (out.includes("successfully authenticated")) {
+    const loginMatch = out.match(/Hi\s+([^!]+)!/i);
+    const login = loginMatch ? loginMatch[1].trim() : null;
+    const expected = String(expectedGithubUser || "").trim();
+    if (expected && login && login.toLowerCase() !== expected.toLowerCase()) {
+      return {
+        tested: true,
+        ok: false,
+        reason: "login_mismatch",
+        message:
+          `SSH authenticated as ${login}, but this GitDock account expects ${expected}. Add the correct key to GitHub or use the matching account.`,
+        githubLogin: login,
+        expectedGithubUser: expected,
+      };
+    }
+    return {
+      tested: true,
+      ok: true,
+      reason: "ok",
+      message: login
+        ? `GitHub accepted your SSH key (Hi ${login}! GitHub does not provide shell access).`
+        : "GitHub accepted your SSH key.",
+      githubLogin: login,
+    };
+  }
+  let reason = "failed";
+  let message =
+    "GitHub did not accept this SSH key yet. Add the public key from step 2 at GitHub Settings → SSH and GPG keys, then verify again.";
+  if (/permission denied/i.test(out)) {
+    reason = "permission_denied";
+    message =
+      "Permission denied (publickey). Per GitHub docs, the key must be added to your account. Paste the full public key from step 2 into GitHub, then verify again.";
+  } else if (/host key verification failed/i.test(out)) {
+    reason = "host_key";
+    message =
+      "Host key verification failed. GitDock adds GitHub's published github.com keys to known_hosts. Click Verify SSH again, or see GitHub SSH key fingerprints in the documentation.";
+  } else if (/could not resolve|connection timed out|timed out/i.test(out)) {
+    reason = "network";
+    message = "Could not reach GitHub over SSH. Check your network or firewall.";
+  } else if (/no such identity|identity file|can't open|cannot open/i.test(out)) {
+    reason = "identity";
+    message = "SSH could not use this account's private key. Regenerate the key in step 2, add it on GitHub, then verify again.";
+  } else if (out) {
+    const snippet = out.replace(/\s+/g, " ").slice(0, 240);
+    message = "SSH test failed: " + snippet;
+  } else if (r.status === 255) {
+    message = "SSH connection failed (exit 255). Confirm the public key is on GitHub and matches step 2.";
+  }
+  return { tested: true, ok: false, reason, message };
+}
+
 function parseGitHubRepoUrl(input) {
   if (!input || typeof input !== "string") return null;
   const raw = input.trim();
@@ -659,40 +790,264 @@ async function githubApiForAccount(accountName, apiPath, opts = {}) {
 }
 
 // =============================================================================
-// Per-account token storage (no terminal required)
+// Per-account token storage (session + optional OS credential store)
 // =============================================================================
+function readOsStoredToken(accountName) {
+  const key = sanitizeAccountName(accountName);
+  if (!key) return null;
+  try {
+    if (isDarwin) {
+      const r = spawnSync("security", ["find-generic-password", "-s", TOKEN_SERVICE, "-a", key, "-w"], {
+        encoding: "utf8",
+        timeout: 8000,
+        windowsHide: true,
+      });
+      return r.status === 0 && r.stdout ? String(r.stdout).trim() : null;
+    }
+    if (isWindows) {
+      const b64Account = Buffer.from(key, "utf8").toString("base64");
+      const ps = [
+        "$ErrorActionPreference='Stop'",
+        "Add-Type -AssemblyName System.Runtime.WindowsRuntime",
+        "$null=[Windows.Security.Credentials.PasswordVault,Windows.Security.Credentials,ContentType=WindowsRuntime]",
+        `$u=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${b64Account}'))`,
+        "$v=New-Object Windows.Security.Credentials.PasswordVault",
+        "($v.Retrieve('GitDock',$u)).Password",
+      ].join("; ");
+      const r = spawnSync("powershell", ["-NoProfile", "-NonInteractive", "-Command", ps], {
+        encoding: "utf8",
+        timeout: 12000,
+        windowsHide: true,
+      });
+      return r.status === 0 && r.stdout ? String(r.stdout).trim() : null;
+    }
+    const r = spawnSync("secret-tool", ["lookup", "service", TOKEN_SERVICE, "account", key], {
+      encoding: "utf8",
+      timeout: 8000,
+      windowsHide: true,
+    });
+    return r.status === 0 && r.stdout ? String(r.stdout).trim() : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeOsStoredToken(accountName, token) {
+  const key = sanitizeAccountName(accountName);
+  if (!key || !token) return { ok: false, message: "Invalid account or token." };
+  try {
+    if (isDarwin) {
+      spawnSync("security", ["delete-generic-password", "-s", TOKEN_SERVICE, "-a", key], {
+        encoding: "utf8",
+        timeout: 5000,
+        windowsHide: true,
+      });
+      const r = spawnSync("security", ["add-generic-password", "-U", "-s", TOKEN_SERVICE, "-a", key, "-w", token], {
+        encoding: "utf8",
+        timeout: 8000,
+        windowsHide: true,
+      });
+      if (r.status !== 0) {
+        return { ok: false, message: (r.stderr || r.stdout || "security add-generic-password failed").trim() };
+      }
+      return { ok: true, method: "macOS Keychain" };
+    }
+    if (isWindows) {
+      const b64Account = Buffer.from(key, "utf8").toString("base64");
+      const b64Token = Buffer.from(token, "utf8").toString("base64");
+      const ps = [
+        "$ErrorActionPreference='Stop'",
+        "Add-Type -AssemblyName System.Runtime.WindowsRuntime",
+        "$null=[Windows.Security.Credentials.PasswordVault,Windows.Security.Credentials,ContentType=WindowsRuntime]",
+        `$u=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${b64Account}'))`,
+        `$p=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${b64Token}'))`,
+        "$v=New-Object Windows.Security.Credentials.PasswordVault",
+        "try { $v.Remove('GitDock',$u) } catch {}",
+        "$c=New-Object Windows.Security.Credentials.PasswordCredential('GitDock',$u,'github-pat')",
+        "$c.Password=$p",
+        "$v.Add($c)",
+      ].join("; ");
+      const r = spawnSync("powershell", ["-NoProfile", "-NonInteractive", "-Command", ps], {
+        encoding: "utf8",
+        timeout: 12000,
+        windowsHide: true,
+      });
+      if (r.status !== 0) {
+        return { ok: false, message: (r.stderr || r.stdout || "Windows Credential Manager store failed").trim() };
+      }
+      return { ok: true, method: "Windows Credential Manager" };
+    }
+    spawnSync("secret-tool", ["clear", "service", TOKEN_SERVICE, "account", key], {
+      encoding: "utf8",
+      timeout: 5000,
+      windowsHide: true,
+    });
+    const r = spawnSync(
+      "secret-tool",
+      ["store", "--label", `GitDock ${key}`, "service", TOKEN_SERVICE, "account", key],
+      { input: token, encoding: "utf8", timeout: 8000, windowsHide: true }
+    );
+    if (r.status !== 0) {
+      const msg = (r.stderr || r.stdout || "").trim();
+      if (/not found|ENOENT/i.test(msg) || (r.error && r.error.code === "ENOENT")) {
+        return { ok: false, message: "secret-tool not found (install libsecret / gnome-keyring)." };
+      }
+      return { ok: false, message: msg || "secret-tool store failed" };
+    }
+    return { ok: true, method: "Linux Secret Service" };
+  } catch (e) {
+    return { ok: false, message: e.message || "OS credential store failed" };
+  }
+}
+
+function deleteOsStoredToken(accountName) {
+  const key = sanitizeAccountName(accountName);
+  if (!key) return;
+  try {
+    if (isDarwin) {
+      spawnSync("security", ["delete-generic-password", "-s", TOKEN_SERVICE, "-a", key], {
+        encoding: "utf8",
+        timeout: 5000,
+        windowsHide: true,
+      });
+      return;
+    }
+    if (isWindows) {
+      const b64Account = Buffer.from(key, "utf8").toString("base64");
+      const ps = [
+        "$ErrorActionPreference='SilentlyContinue'",
+        "Add-Type -AssemblyName System.Runtime.WindowsRuntime",
+        "$null=[Windows.Security.Credentials.PasswordVault,Windows.Security.Credentials,ContentType=WindowsRuntime]",
+        `$u=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${b64Account}'))`,
+        "$v=New-Object Windows.Security.Credentials.PasswordVault",
+        "$v.Remove('GitDock',$u)",
+      ].join("; ");
+      spawnSync("powershell", ["-NoProfile", "-NonInteractive", "-Command", ps], {
+        encoding: "utf8",
+        timeout: 10000,
+        windowsHide: true,
+      });
+      return;
+    }
+    spawnSync("secret-tool", ["clear", "service", TOKEN_SERVICE, "account", key], {
+      encoding: "utf8",
+      timeout: 5000,
+      windowsHide: true,
+    });
+  } catch (e) { /* ignore */ }
+}
+
+function loadPersistedTokensOnStartup() {
+  try {
+    for (const name of Object.keys(getAccounts())) {
+      const token = readOsStoredToken(name);
+      if (token) sessionTokens.set(name, token);
+    }
+  } catch (e) { /* ignore */ }
+}
+
 async function getAccountToken(accountName) {
-  return sessionTokens.get(accountName) || null;
+  if (sessionTokens.has(accountName)) return sessionTokens.get(accountName);
+  const fromOs = readOsStoredToken(accountName);
+  if (fromOs) {
+    sessionTokens.set(accountName, fromOs);
+    return fromOs;
+  }
+  return null;
 }
 
 async function setAccountToken(accountName, token, remember) {
   sessionTokens.delete(accountName);
   tokenCache.delete(accountName);
   sessionTokens.set(accountName, token);
-  return { stored: "session" };
+  if (!remember) {
+    deleteOsStoredToken(accountName);
+    return { stored: "session", method: null, warning: null };
+  }
+  const osStore = writeOsStoredToken(accountName, token);
+  if (osStore.ok) {
+    return { stored: "os-credential", method: osStore.method, warning: null };
+  }
+  return {
+    stored: "session",
+    method: null,
+    warning:
+      osStore.message ||
+      "Token is active for this server session only; OS credential store was unavailable.",
+  };
 }
 
 async function deleteAccountToken(accountName) {
   sessionTokens.delete(accountName);
   tokenCache.delete(accountName);
+  deleteOsStoredToken(accountName);
 }
 
+/** Validate PAT: GET /user + list repos (needs Contents read for private repo list). */
 async function validateAccountToken(accountName, account, token) {
-  if (!token) return { ok: false, reason: "missing" };
+  if (!token) return { ok: false, apiReady: false, reposAccess: false, reason: "missing", login: null };
   const cached = tokenCache.get(accountName);
   const now = Date.now();
-  if (cached && (now - cached.checkedAtMs) < TOKEN_CACHE_TTL_MS) return cached;
+  if (cached && now - cached.checkedAtMs < TOKEN_CACHE_TTL_MS) return cached;
 
   const r = await githubRequestJson({ url: "https://api.github.com/user", token, timeoutMs: 15000 });
   if (!r.ok || !r.json || !r.json.login) {
-    const res = { ok: false, reason: "invalid", checkedAtMs: now, login: null };
+    const res = {
+      ok: false,
+      apiReady: false,
+      reposAccess: false,
+      reason: "invalid",
+      checkedAtMs: now,
+      login: null,
+      message: "Token rejected by GitHub (GET /user failed).",
+    };
     tokenCache.set(accountName, res);
     return res;
   }
   const login = String(r.json.login);
   const expected = String(account.githubUser || "");
-  const ok = login.toLowerCase() === expected.toLowerCase();
-  const res = { ok, reason: ok ? "ok" : "mismatch", checkedAtMs: now, login };
+  const userOk = login.toLowerCase() === expected.toLowerCase();
+  if (!userOk) {
+    const res = {
+      ok: false,
+      apiReady: false,
+      reposAccess: false,
+      reason: "mismatch",
+      checkedAtMs: now,
+      login,
+      message: `Token belongs to ${login}, expected ${expected}.`,
+    };
+    tokenCache.set(accountName, res);
+    return res;
+  }
+
+  const reposR = await githubRequestJson({
+    url: "https://api.github.com/user/repos?per_page=1&affiliation=owner",
+    token,
+    timeoutMs: 15000,
+  });
+  const reposAccess = !!reposR.ok;
+  let reposReason = reposAccess ? "ok" : "repos_forbidden";
+  let message = null;
+  if (!reposAccess) {
+    reposReason = reposR.status === 403 ? "missing_repo_scope" : "repos_failed";
+    message =
+      reposR.status === 403
+        ? "Token is valid for your user, but cannot list repositories (GET /user/repos). Fine-grained PAT: Repository permissions → Contents → Read-only. Classic PAT: include the repo scope. See GitHub managing personal access tokens."
+        : "Token could not list repositories (GET /user/repos failed).";
+  }
+
+  const apiReady = userOk && reposAccess;
+  const res = {
+    ok: userOk,
+    apiReady,
+    reposAccess,
+    reposReason,
+    reason: apiReady ? "ok" : reposReason,
+    checkedAtMs: now,
+    login,
+    message: message || (apiReady ? "Token can access GitHub API for this account." : null),
+  };
   tokenCache.set(accountName, res);
   return res;
 }
@@ -998,11 +1353,24 @@ app.post("/api/accounts/:name/auth/token", async (req, res) => {
       if (validation.reason === "mismatch") {
         return res.status(400).json({ ok: false, error: `Token belongs to ${validation.login}, expected ${account.githubUser}` });
       }
-      return res.status(401).json({ ok: false, error: "Invalid token" });
+      return res.status(401).json({ ok: false, error: validation.message || "Invalid token" });
+    }
+    if (!validation.apiReady) {
+      return res.status(400).json({
+        ok: false,
+        error: validation.message || "Token cannot list repositories. Check fine-grained PAT permissions.",
+      });
     }
 
     const stored = await setAccountToken(name, token, remember);
-    return res.json({ ok: true, login: validation.login, stored: stored.stored });
+    return res.json({
+      ok: true,
+      login: validation.login,
+      stored: stored.stored,
+      storageMethod: stored.method || null,
+      warning: stored.warning || validation.message || null,
+      apiReady: !!validation.apiReady,
+    });
   } catch (e) {
     return res.status(500).json({ ok: false, error: e.message });
   }
@@ -1030,7 +1398,14 @@ app.get("/api/accounts/:name/auth/status", async (req, res) => {
     const token = await getAccountToken(name);
     if (!token) return res.json({ ok: true, connected: false });
     const validation = await validateAccountToken(name, account, token);
-    return res.json({ ok: true, connected: !!validation.ok, login: validation.login || null, reason: validation.reason });
+    return res.json({
+      ok: true,
+      connected: !!validation.apiReady,
+      login: validation.login || null,
+      reason: validation.reason,
+      reposAccess: !!validation.reposAccess,
+      message: validation.message || null,
+    });
   } catch (e) {
     return res.status(500).json({ ok: false, error: e.message });
   }
@@ -1045,6 +1420,7 @@ app.get("/api/accounts/:name/status", async (req, res) => {
 
     // Ensure SSH config is up-to-date before checking (fixes stale state after manual key adds)
     syncManagedSshConfigToAccounts();
+    const knownHostsResult = ensureGitHubKnownHosts();
 
     const sshDir = getSSHDir();
     const keyFile = path.join(sshDir, `id_ed25519_${name}`);
@@ -1091,14 +1467,21 @@ app.get("/api/accounts/:name/status", async (req, res) => {
       sshConfigured = hostFound && identityMatches;
     }
 
+    const sshHostUsed = sanitizeSshHostAlias(account.sshHost) || `github.com-${name}`;
     let sshConnects = false;
-    if (sshKeyExists && sshConfigured) {
-      const host = sanitizeSshHostAlias(account.sshHost) || `github.com-${name}`;
-      // IMPORTANT: ssh -T exits with code 1 even on successful auth (GitHub message),
-      // so we must not treat non-zero as failure by itself.
-      const r = spawnSync("ssh", ["-T", `git@${host}`], { cwd: BASE_DIR, encoding: "utf8", timeout: 10000 });
-      const out = String((r.stdout || "") + (r.stderr || "")).trim();
-      sshConnects = out.includes("successfully authenticated");
+    let sshTest = { tested: false, ok: false, reason: "skipped", message: "" };
+    if (!sshKeyExists) {
+      sshTest = { tested: false, ok: false, reason: "no_key", message: "Generate an SSH key first (step 2)." };
+    } else if (!sshConfigured) {
+      sshTest = {
+        tested: false,
+        ok: false,
+        reason: "not_configured",
+        message: "Local SSH config for this account is missing. Click Verify SSH to rebuild it.",
+      };
+    } else {
+      sshTest = testAccountSshConnection(sshHostUsed, account.githubUser);
+      sshConnects = !!sshTest.ok;
     }
 
     let ghAuthenticated = false;
@@ -1120,29 +1503,41 @@ app.get("/api/accounts/:name/status", async (req, res) => {
 
     // Token-based auth (preferred when available; no terminal required)
     let tokenAuthenticated = false;
+    let tokenApiReady = false;
+    let tokenReposAccess = false;
     let tokenLogin = null;
+    let tokenMessage = null;
     try {
       const token = await getAccountToken(name);
       if (token) {
         const validation = await validateAccountToken(name, account, token);
         tokenAuthenticated = !!validation.ok;
+        tokenApiReady = !!validation.apiReady;
+        tokenReposAccess = !!validation.reposAccess;
         tokenLogin = validation.login || null;
+        tokenMessage = validation.message || null;
       }
     } catch (e) { /* ignore */ }
 
     const gitconfigExists = fs.existsSync(gitconfigPath);
-    const hasAuth = Boolean(tokenAuthenticated || ghAuthenticated);
+    const hasAuth = Boolean(tokenApiReady || ghAuthenticated);
     const ready = Boolean(sshKeyExists && sshConfigured && sshConnects && hasAuth && gitconfigExists);
 
     res.set("Cache-Control", "no-store, no-cache, must-revalidate");
     return res.json({
       accountName: name,
+      sshHost: sshHostUsed,
       sshKeyExists,
       sshConfigured,
       sshConnects,
+      sshTest,
+      knownHosts: knownHostsResult,
       ghAuthenticated,
       ghActive,
       tokenAuthenticated,
+      tokenApiReady,
+      tokenReposAccess,
+      tokenMessage,
       tokenLogin,
       gitconfigExists,
       ready,
@@ -1245,6 +1640,7 @@ app.post("/api/accounts/:name/setup-ssh", (req, res) => {
       accountsWithDirs[n] = { ...acc, localDir: path.join(BASE_DIR, n) };
     }
     writeSSHConfigBlock(accountsWithDirs);
+    ensureGitHubKnownHosts();
 
     const pubPath = `${keyFile}.pub`;
     const publicKey = fs.existsSync(pubPath) ? fs.readFileSync(pubPath, "utf8").trim() : "";
@@ -1305,6 +1701,14 @@ app.post("/api/accounts/:name/github/ssh-key", async (req, res) => {
     });
 
     if (create.ok) return res.json({ ok: true, created: true });
+
+    if (create.status === 403) {
+      return res.status(403).json({
+        ok: false,
+        error:
+          "GitHub denied adding the SSH key. Fine-grained tokens need Account permissions → Git SSH keys → Read and write (see GitHub REST API docs for POST /user/keys).",
+      });
+    }
 
     // If 422, key may already exist. Verify by listing keys and matching the exact key string.
     if (create.status === 422) {
@@ -1368,7 +1772,7 @@ app.get("/api/repos", async (req, res) => {
       if (token) {
         try {
           const v = await validateAccountToken(accountName, account, token);
-          if (v.ok) {
+          if (v.apiReady) {
             const url = "https://api.github.com/user/repos?per_page=100&sort=updated&affiliation=owner&page=1";
             const result = await githubListAllPages({ initialUrl: url, token });
             if (result.ok) {
@@ -3041,6 +3445,8 @@ async function startHubAgent() {
 // Best-effort housekeeping (safe; does not delete SSH keys)
 cleanupOrphanedGitconfigs();
 syncManagedSshConfigToAccounts();
+ensureGitHubKnownHosts();
+loadPersistedTokensOnStartup();
 
 startServer(PORT);
 startHubAgent();

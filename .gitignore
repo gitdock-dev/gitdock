@@ -12,6 +12,8 @@ config.json
 dist/
 
 # Cloned repos live in the user's workspace directory (outside this project)
+# Safety: ignore local workspace folders if created inside this repo by mistake
+persona/
 
 # Environment variables
 .env
