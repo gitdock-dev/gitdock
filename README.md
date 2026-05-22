@@ -343,6 +343,9 @@ npm run dev
 
 # Check if it's running
 curl http://127.0.0.1:3847/api/health
+
+# Run automated tests (contributors)
+npm test
 ```
 
 ### GitHub CLI
@@ -526,7 +529,7 @@ In the local GitDock dashboard use the dashboard’s **Configure Hub** to set th
 
 ## Contributing
 
-We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, code style (vanilla JS, no frameworks), and how to submit pull requests and report issues.
+We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, `npm test`, release policy, code style (vanilla JS, no frameworks), and how to submit pull requests and report issues. See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ---
 
