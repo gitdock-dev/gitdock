@@ -40,8 +40,35 @@ const execBase = path.basename(process.execPath, ".exe").toLowerCase();
 const isStandalone = execBase === "gitdock";
 const APP_DIR = isPkg || isStandalone ? path.dirname(process.execPath) : __dirname;
 const workspaceModule = require("./workspace");
+const security = require("./lib/security");
+const gitParse = require("./lib/git-parse");
+const {
+  sanitizeAccountName,
+  sanitizeRepoName,
+  sanitizeOwnerName,
+  sanitizeSshHostAlias,
+  sanitizeBranchName,
+  sanitizeCommitMessage,
+  sanitizeCommitHash,
+  sanitizeStashRef,
+  isPathInsideDir,
+  parseGitHubRepoUrl,
+  parseGitHubOwnerRepoFromRemote,
+  GITHUB_KNOWN_HOSTS_MARKER,
+  GITHUB_KNOWN_HOSTS_END,
+  GITHUB_OFFICIAL_KNOWN_HOSTS_LINES,
+  githubOfficialKeysInKnownHosts,
+} = security;
+
 let BASE_DIR = (isPkg || isStandalone) ? (workspaceModule.loadWorkspace() || path.dirname(process.execPath)) : __dirname;
 let CONFIG_PATH = path.join(BASE_DIR, "config.json");
+
+if (process.env.GITDOCK_TEST === "1") {
+  const testRoot = process.env.GITDOCK_TEST_ROOT || path.join(os.tmpdir(), `gitdock-test-${process.pid}`);
+  BASE_DIR = testRoot;
+  CONFIG_PATH = path.join(BASE_DIR, "config.json");
+  fs.mkdirSync(BASE_DIR, { recursive: true });
+}
 
 function reloadBaseDirFromWorkspace() {
   if (!isPkg && !isStandalone) return;
@@ -152,15 +179,7 @@ const MAX_SSE_CLIENTS = 50;
 // --- Rate limiting (in-memory, no external dependency) ---
 const rateLimitBuckets = new Map();
 function checkRateLimit(bucketKey, maxRequests, windowMs) {
-  const now = Date.now();
-  const entry = rateLimitBuckets.get(bucketKey);
-  if (!entry || now > entry.resetAt) {
-    rateLimitBuckets.set(bucketKey, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (entry.count >= maxRequests) return false;
-  entry.count++;
-  return true;
+  return security.checkRateLimit(rateLimitBuckets, bucketKey, maxRequests, windowMs);
 }
 
 // --- Middleware ---
@@ -223,6 +242,13 @@ app.get("/", (req, res) => {
 // Workspace setup API
 app.get("/api/workspace/status", (req, res) => {
   const workspace = require("./workspace");
+  if (process.env.GITDOCK_TEST === "1") {
+    return res.json({
+      configured: true,
+      path: BASE_DIR,
+      defaultPath: workspace.getDefaultWorkspacePath(),
+    });
+  }
   const ws = workspace.loadWorkspace();
   res.json({
     configured: !!ws,
@@ -337,55 +363,6 @@ app.get("/gitdock-logo-nobg.png", (req, res) => {
 app.get("/config.json", (req, res) => res.status(404).send("Not found"));
 
 // --- Helpers ---
-
-function sanitizeAccountName(name) {
-  if (!name || typeof name !== "string") return null;
-  const clean = name.trim().toLowerCase().replace(/[^a-z0-9\-]/g, "");
-  if (clean.length === 0 || clean.length > 64) return null;
-  return clean;
-}
-
-function sanitizeRepoName(name) {
-  // Only allow alphanumeric, hyphens, underscores, dots
-  if (!name || typeof name !== "string") return null;
-  const clean = name.replace(/[^a-zA-Z0-9\-_.]/g, "");
-  if (clean !== name || clean.length === 0 || clean.includes("..")) return null;
-  return clean;
-}
-
-function sanitizeOwnerName(name) {
-  // GitHub owners: user/org. Keep same safety rules as repo name.
-  if (!name || typeof name !== "string") return null;
-  const clean = name.replace(/[^a-zA-Z0-9\-_.]/g, "");
-  if (clean !== name || clean.length === 0 || clean.includes("..")) return null;
-  return clean;
-}
-
-function sanitizeSshHostAlias(host) {
-  // SSH host alias is used as "git@{alias}" and as "Host {alias}" in ssh config.
-  // Restrict strictly to avoid surprising behavior and shell injection risk.
-  if (!host || typeof host !== "string") return null;
-  const trimmed = host.trim();
-  if (trimmed.length === 0 || trimmed.length > 128) return null;
-  if (!/^[a-zA-Z0-9._-]+$/.test(trimmed)) return null;
-  return trimmed;
-}
-
-// Published by GitHub for ~/.ssh/known_hosts (verify when GitHub rotates keys):
-// https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints
-// https://docs.github.com/en/rest/meta/meta#get-github-meta-information
-const GITHUB_KNOWN_HOSTS_MARKER = "# --- GitHub host keys (managed by GitDock) ---";
-const GITHUB_KNOWN_HOSTS_END = "# --- End GitHub host keys ---";
-const GITHUB_OFFICIAL_KNOWN_HOSTS_LINES = [
-  "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl",
-  "github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=",
-  "github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=",
-];
-
-function githubOfficialKeysInKnownHosts(content) {
-  if (!content || typeof content !== "string") return false;
-  return GITHUB_OFFICIAL_KNOWN_HOSTS_LINES.every((line) => content.includes(line));
-}
 
 /** Add GitHub's documented host key lines to ~/.ssh/known_hosts (no ssh-keyscan). */
 function ensureGitHubKnownHosts() {
@@ -502,63 +479,6 @@ function testAccountSshConnection(host, expectedGithubUser) {
   return { tested: true, ok: false, reason, message };
 }
 
-function parseGitHubRepoUrl(input) {
-  if (!input || typeof input !== "string") return null;
-  const raw = input.trim();
-  if (!raw || raw.length > 2048) return null;
-
-  // Accept common forms:
-  // - https://github.com/OWNER/REPO(.git)
-  // - git@github.com:OWNER/REPO(.git)
-  // - git@github.com-<alias>:OWNER/REPO(.git)
-  // - github.com/OWNER/REPO(.git)
-  let s = raw;
-  if (!/^https?:\/\//i.test(s) && /^github\.com\//i.test(s)) {
-    s = "https://" + s;
-  }
-
-  // https URL
-  try {
-    if (/^https?:\/\//i.test(s)) {
-      const u = new URL(s);
-      if (!/^github\.com$/i.test(u.hostname)) return null;
-      const parts = u.pathname.replace(/^\/+|\/+$/g, "").split("/");
-      if (parts.length < 2) return null;
-      const owner = sanitizeOwnerName(parts[0]);
-      const repo = sanitizeRepoName(String(parts[1]).replace(/\.git$/i, ""));
-      if (!owner || !repo) return null;
-      return { owner, repo };
-    }
-  } catch (e) {
-    // fall through to SSH parsing
-  }
-
-  // SSH forms
-  const sshMatch = s.match(/^git@github\.com(?:-[a-zA-Z0-9_-]+)?:([^\/\s]+)\/([^\/\s]+?)(?:\.git)?$/);
-  if (sshMatch) {
-    const owner = sanitizeOwnerName(sshMatch[1]);
-    const repo = sanitizeRepoName(sshMatch[2]);
-    if (!owner || !repo) return null;
-    return { owner, repo };
-  }
-
-  return null;
-}
-
-function parseGitHubOwnerRepoFromRemote(remoteUrl) {
-  const parsed = parseGitHubRepoUrl(remoteUrl);
-  if (parsed) return parsed;
-
-  // Also accept plain git@<alias>:OWNER/REPO.git that isn't github.com-* (rare)
-  if (!remoteUrl || typeof remoteUrl !== "string") return null;
-  const m = remoteUrl.trim().match(/^git@[^:]+:([^\/\s]+)\/([^\/\s]+?)(?:\.git)?$/);
-  if (!m) return null;
-  const owner = sanitizeOwnerName(m[1]);
-  const repo = sanitizeRepoName(m[2]);
-  if (!owner || !repo) return null;
-  return { owner, repo };
-}
-
 function getRepoPath(accountName, repoName) {
   const account = validateAccount(accountName);
   if (!account) return null;
@@ -568,17 +488,6 @@ function getRepoPath(accountName, repoName) {
   // SECURITY: Ensure path is within the expected directory (prefix-safe, Windows case-insensitive)
   if (!isPathInsideDir(account.localDir, repoPath)) return null;
   return repoPath;
-}
-
-function isPathInsideDir(baseDir, candidatePath) {
-  // Ensure candidatePath is within baseDir (prefix-safe).
-  // Use case-insensitive comparison on Windows.
-  const base = path.resolve(baseDir);
-  const cand = path.resolve(candidatePath);
-  const baseNorm = isWindows ? base.toLowerCase() : base;
-  const candNorm = isWindows ? cand.toLowerCase() : cand;
-  const baseWithSep = baseNorm.endsWith(path.sep) ? baseNorm : baseNorm + path.sep;
-  return candNorm === baseNorm || candNorm.startsWith(baseWithSep);
 }
 
 function makeUniqueLocalRepoName({ accountName, desiredName, fallbackHint }) {
@@ -612,35 +521,6 @@ function makeUniqueLocalRepoName({ accountName, desiredName, fallbackHint }) {
   }
 
   return null;
-}
-
-function sanitizeBranchName(name) {
-  if (!name || typeof name !== "string") return null;
-  const clean = name.trim().replace(/[^a-zA-Z0-9\-_.\/]/g, "");
-  if (clean.length === 0 || clean.length > 200) return null;
-  if (clean.includes("..")) return null;
-  return clean;
-}
-
-function sanitizeCommitMessage(msg) {
-  if (!msg || typeof msg !== "string") return "";
-  const trimmed = msg.trim().slice(0, 2048);
-  return trimmed.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
-}
-
-function sanitizeCommitHash(hash) {
-  if (!hash || typeof hash !== "string") return "";
-  const trimmed = hash.trim().toLowerCase();
-  if (!/^[a-f0-9]+$/.test(trimmed)) return "";
-  if (trimmed.length < 7 || trimmed.length > 40) return "";
-  return trimmed;
-}
-
-function sanitizeStashRef(ref) {
-  if (!ref || typeof ref !== "string") return null;
-  const trimmed = ref.trim();
-  if (!/^stash@\{\d+\}$/.test(trimmed)) return null;
-  return trimmed;
 }
 
 function runCommand(cmd, cwd = BASE_DIR, timeoutMs = 60000) {
@@ -1090,34 +970,7 @@ function broadcastSSE(data) {
   }
 }
 
-// Parse git status --porcelain lines into file list + summary counts (staged/unstaged/untracked/conflict)
-function parseStatusPorcelain(output) {
-  const lines = output ? output.split("\n").filter(Boolean) : [];
-  const files = [];
-  let stagedCount = 0, unstagedCount = 0, untrackedCount = 0, conflictCount = 0;
-  for (const line of lines) {
-    const xy = line.slice(0, 2);
-    const x = xy[0], y = xy[1];
-    const filePath = line.slice(3).trim().replace(/^["']|["']$/g, "");
-    if (filePath) {
-      let status = "modified";
-      if (xy === "??") status = "untracked";
-      else if (x === "A" || x === "M" || x === "D" || x === "R" || x === "C") status = "added";
-      else if (y === "M" || y === "D") status = "modified";
-      else if (x === "D" || y === "D") status = "deleted";
-      else if (x === "U" || y === "U") status = "unmerged";
-      files.push({ path: filePath, status });
-    }
-    if (xy === "??") {
-      untrackedCount += 1;
-    } else {
-      if (x !== " " && x !== "?") stagedCount += 1;
-      if (y !== " " && y !== "?") unstagedCount += 1;
-      if (x === "U" || y === "U") conflictCount += 1;
-    }
-  }
-  return { files, summary: { stagedCount, unstagedCount, untrackedCount, conflictCount } };
-}
+const parseStatusPorcelain = gitParse.parseStatusPorcelain;
 
 // Detect merge or rebase in progress
 function getRepoOperation(repoPath) {
@@ -1127,21 +980,7 @@ function getRepoOperation(repoPath) {
   return { isMerging: !!isMerging, isRebasing: !!isRebasing };
 }
 
-// Parse "git status -sb" first line for branch, upstream, ahead, behind
-function parseStatusBranchLine(line) {
-  if (!line || !line.startsWith("## ")) return { branch: "unknown", hasUpstream: false, ahead: 0, behind: 0, upstreamRef: null };
-  const rest = line.slice(3).trim();
-  const branchMatch = rest.match(/^([^\s.]+)(?:\.\.\.(\S+))?(?:\s+\[(.*)\])?/);
-  const branch = branchMatch ? branchMatch[1] : "unknown";
-  const upstreamRef = branchMatch && branchMatch[2] ? branchMatch[2] : null;
-  const bracket = branchMatch && branchMatch[3] ? branchMatch[3] : "";
-  let ahead = 0, behind = 0;
-  const aheadM = bracket.match(/ahead\s+(\d+)/);
-  const behindM = bracket.match(/behind\s+(\d+)/);
-  if (aheadM) ahead = parseInt(aheadM[1], 10) || 0;
-  if (behindM) behind = parseInt(behindM[1], 10) || 0;
-  return { branch, hasUpstream: !!upstreamRef, ahead, behind, upstreamRef };
-}
+const parseStatusBranchLine = gitParse.parseStatusBranchLine;
 
 function getRepoStatus(repoPath) {
   if (!fs.existsSync(repoPath)) return null;
@@ -3442,11 +3281,23 @@ async function startHubAgent() {
   }
 }
 
-// Best-effort housekeeping (safe; does not delete SSH keys)
-cleanupOrphanedGitconfigs();
-syncManagedSshConfigToAccounts();
-ensureGitHubKnownHosts();
-loadPersistedTokensOnStartup();
+module.exports = {
+  app,
+  startServer,
+  security,
+  gitParse,
+  loadConfig,
+  saveConfig,
+  getAccounts,
+  BASE_DIR: () => BASE_DIR,
+  CONFIG_PATH: () => CONFIG_PATH,
+};
 
-startServer(PORT);
-startHubAgent();
+if (require.main === module) {
+  cleanupOrphanedGitconfigs();
+  syncManagedSshConfigToAccounts();
+  ensureGitHubKnownHosts();
+  loadPersistedTokensOnStartup();
+  startServer(PORT);
+  startHubAgent();
+}

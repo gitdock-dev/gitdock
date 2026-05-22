@@ -11,6 +11,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "test": "node --test test/security.test.js test/git-parse.test.js test/dormant.test.js test/api.integration.test.js",
+    "test:unit": "node --test test/security.test.js test/git-parse.test.js test/dormant.test.js",
+    "test:api": "node --test test/api.integration.test.js",
     "build:bundle": "esbuild server.js --bundle --platform=node --outfile=dist/server.bundle.js --external:child_process --external:fs --external:path --external:os --external:https --external:http --external:crypto --external:net --external:tls --external:url --external:stream --external:zlib --external:events --external:util --external:querystring --external:buffer"
   },
   "bin": "server.js",
@@ -19,6 +22,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
-    "postject": "^1.0.0-alpha.4"
+    "postject": "^1.0.0-alpha.4",
+    "supertest": "^7.1.0"
   }
 }
