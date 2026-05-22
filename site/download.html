@@ -84,8 +84,9 @@
     .dl-alt a{color:var(--t2);font-size:13px}
 
     /* Other platforms */
-    .dl-others{display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
-    .dl-others-label{font-size:12px;color:var(--t3);width:100%;margin-bottom:4px}
+    .dl-others{display:flex;flex-direction:column;align-items:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);text-align:center}
+    .dl-others-label{font-size:12px;color:var(--t3);margin-bottom:10px}
+    .dl-others-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
     .btn-other{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--t2);font-size:13px;transition:all .2s;text-decoration:none;cursor:pointer}
     .btn-other:hover{border-color:var(--t3);color:var(--t1);text-decoration:none}
     .btn-other.active{border-color:var(--blue);color:var(--blue)}
@@ -109,11 +110,15 @@
     .os-warning strong{color:var(--yellow);font-weight:500}
 
     /* Requirements */
-    .req-list{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin:0;padding:0}
-    .req-list li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--t2);padding:8px 0;width:50%}
-    .req-list li svg{flex-shrink:0}
-    .req-list li strong{color:var(--t1);font-weight:500}
-    .req-optional{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg2);color:var(--t3);margin-left:2px}
+    .req-lead{font-size:14px;color:var(--t2);margin-bottom:14px;line-height:1.55}
+    .req-box{border:1px solid var(--border);border-radius:8px;background:var(--bg1);overflow:hidden}
+    .req-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 16px;font-size:14px;border-bottom:1px solid var(--border)}
+    .req-row:last-child{border-bottom:none}
+    .req-name{font-weight:600;color:var(--t1);flex-shrink:0}
+    .req-detail{color:var(--t2);text-align:right;line-height:1.45}
+    .req-foot{margin-top:12px;font-size:13px;color:var(--t3);line-height:1.55}
+    .req-foot strong{color:var(--t2);font-weight:500}
+    .req-box code{background:var(--bg0);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--blue)}
 
     /* Trust */
     .trust-list{list-style:none;margin:0;padding:0}
@@ -141,12 +146,12 @@
       .dl-card{padding:24px}
       .dl-meta{gap:16px}
       .dl-hero h1{font-size:24px}
-      .dl-others{flex-direction:column}
       .dl-actions{flex-direction:column;align-items:flex-start}
     }
     @media(max-width:480px){
       .dl-detected{flex-direction:column;text-align:center}
-      .req-list li{width:100%}
+      .req-row{flex-direction:column;align-items:flex-start;gap:4px}
+      .req-detail{text-align:left}
     }
   </style>
 </head>
@@ -173,7 +178,7 @@
   <!-- Hero -->
   <div class="dl-hero">
     <h1>Download <span class="grad">GitDock</span></h1>
-    <p>Free, open-source, and runs 100% on your machine. No account required. No data collected.</p>
+    <p>Free, open-source, runs on your machine only. No GitDock signup; no data collected.</p>
   </div>
 
   <!-- Main download card -->
@@ -219,6 +224,7 @@
 
     <div class="dl-others">
       <div class="dl-others-label">Also available for:</div>
+      <div class="dl-others-row">
       <button class="btn-other" data-platform="windows-x64" id="btn-windows">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
         Windows
@@ -231,8 +237,35 @@
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>
         Linux
       </button>
+      </div>
     </div>
   </div>
+
+  <!-- Requirements (before install steps) -->
+  <div class="dl-section">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+      Before you start
+    </h3>
+    <p class="req-lead">Standalone zip (no Node.js). On your computer:</p>
+    <div class="req-box">
+      <div class="req-row">
+        <span class="req-name">Git</span>
+        <span class="req-detail">clone, pull, commit, push</span>
+      </div>
+      <div class="req-row">
+        <span class="req-name">GitHub CLI (<code>gh</code>)</span>
+        <span class="req-detail">list repos, GitHub API</span>
+      </div>
+      <div class="req-row">
+        <span class="req-name">SSH to GitHub</span>
+        <span class="req-detail">guided in the app per account</span>
+      </div>
+    </div>
+    <p class="req-foot">Install from source needs Node.js — <a href="https://github.com/gitdock-dev/gitdock#prerequisites" target="_blank" rel="noopener">README prerequisites</a>.</p>
+  </div>
+
+  <div class="dl-divider"></div>
 
   <!-- Installation steps -->
   <div class="dl-section" id="install-section">
@@ -246,12 +279,12 @@
       <ol class="install-steps">
         <li>Download the <strong>.zip</strong> file above</li>
         <li>Extract the zip to a folder of your choice (e.g. <code>C:\GitDock</code>)</li>
-        <li>Double-click <strong>gitdock.exe</strong> to start</li>
-        <li>GitDock opens in your browser at <code>localhost:3847</code></li>
+        <li>Run <strong>gitdock.exe</strong> → browser opens at <code>localhost:3847</code></li>
+        <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
       <div class="os-warning">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
-        <p><strong>Windows SmartScreen</strong> may show a warning since the app is unsigned. Click "More info" then "Run anyway". This is standard for open-source apps. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">View the source code</a>.</p>
+        <p><strong>SmartScreen</strong> may warn (unsigned build): More info → Run anyway. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">Source on GitHub</a>.</p>
       </div>
     </div>
 
@@ -260,12 +293,12 @@
       <ol class="install-steps">
         <li>Download the <strong>.zip</strong> file above</li>
         <li>Extract the zip (double-click or <code>unzip gitdock-macos-x64.zip</code>)</li>
-        <li>Open Terminal, navigate to the folder, and run <code>./gitdock</code></li>
-        <li>GitDock opens in your browser at <code>localhost:3847</code></li>
+        <li>Run <code>./gitdock</code> in Terminal → <code>localhost:3847</code></li>
+        <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
       <div class="os-warning">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
-        <p><strong>macOS Gatekeeper</strong> may block the app. Go to System Settings > Privacy & Security > "Open Anyway", or run <code>xattr -cr ./gitdock</code>. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">View the source code</a>.</p>
+        <p><strong>Gatekeeper</strong> may block: Privacy & Security → Open Anyway, or <code>xattr -cr ./gitdock</code>. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">Source on GitHub</a>.</p>
       </div>
     </div>
 
@@ -274,38 +307,10 @@
       <ol class="install-steps">
         <li>Download the <strong>.zip</strong> file above</li>
         <li>Extract: <code>unzip gitdock-linux-x64.zip</code></li>
-        <li>Make executable: <code>chmod +x gitdock</code></li>
-        <li>Run: <code>./gitdock</code> (opens in your browser at <code>localhost:3847</code>)</li>
+        <li><code>chmod +x gitdock</code>, then <code>./gitdock</code> → <code>localhost:3847</code></li>
+        <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
     </div>
-  </div>
-
-  <div class="dl-divider"></div>
-
-  <!-- Requirements -->
-  <div class="dl-section">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-      Requirements
-    </h3>
-    <ul class="req-list">
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Git</strong> installed
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>GitHub CLI</strong> (gh)
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>SSH key</strong> configured
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--t3)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Node.js</strong> <span class="req-optional">not needed for standalone</span>
-      </li>
-    </ul>
   </div>
 
   <div class="dl-divider"></div>
@@ -319,19 +324,15 @@
     <ul class="trust-list">
       <li>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>100% open source</strong>: every line of code is public on <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
+        <strong>Open source</strong> on <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>; releases built by GitHub Actions
       </li>
       <li>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Runs on localhost only</strong>: binds to 127.0.0.1, no network exposure
+        <strong>Local only</strong>: 127.0.0.1, no exposure to your network
       </li>
       <li>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Zero tracking</strong>: no analytics, no ads, no data collection
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Built by GitHub Actions</strong>: release artifacts are automated, not manual uploads
+        <strong>No tracking</strong>: no analytics, ads, or data collection
       </li>
     </ul>
   </div>
@@ -346,7 +347,7 @@
     <a href="./terms.html">Terms of Service</a>
     <a href="mailto:support@gitdock.dev">Contact</a>
   </div>
-  <p>GitDock | Open source. Built for developers who want to organize their Git projects and stop wasting time.</p>
+  <p>GitDock · Open source · <a href="./privacy.html">Privacy</a></p>
 </footer>
 
 <script>
