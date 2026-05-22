@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Landing page (`site/index.html`): external CSS/JS, SEO (dashboard screenshot, manifest, sitemap.xml), security panel, aligned copy and Octicons; tentacle preview unchanged.
+- Landing page (`site/index.html`): external CSS/JS, SEO (dashboard screenshot, manifest, sitemap.xml), security panel, aligned copy and Octicons.
+- Landing preview on mobile (`site/index.html`, `site/css/index.css`): proportional dashboard scale (full screenshot visible), no horizontal scroll; fine-tuned tentacle positions/sizes on small screens only (desktop layout unchanged).
 - Download page (`site/download.html`): static manifest, shared nav styles via `common.css`, centered OS picker, clearer prerequisites, tighter install steps.
 - README header uses `site/gitdock-logo-removebg-preview.png` (transparent logo for GitHub light and dark themes).
 - `server.js` imports validation helpers from `lib/` (behavior preserved; easier to test).

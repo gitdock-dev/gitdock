@@ -1,0 +1,16 @@
+# Normalize line endings: LF in the repository (avoids false CRLF diffs on Windows).
+* text=auto eol=lf
+
+# Windows launcher scripts keep CRLF when checked out on Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets — do not modify line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.gif binary
+*.webp binary
+*.zip binary
+*.exe binary
