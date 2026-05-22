@@ -126,10 +126,19 @@
 
 /* Dashboard Preview (window only — tentacles in inline CSS) */
 .preview {
+  width: 100%;
   padding: 0 24px 80px;
   margin-top: -40px;
   position: relative;
   z-index: 1;
+}
+
+/* Scales on mobile via inline CSS; desktop = pass-through wrapper */
+.preview-stage {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .preview-window {
@@ -796,78 +805,18 @@
   .preview {
     padding: 0 16px 60px;
     margin-top: -20px;
+    display: flex;
+    justify-content: center;
+    overflow-x: clip;
   }
 
-  .tentacle-scene {
-    padding: 0 24px;
-  }
-
-  .preview-window {
-    max-width: 96%;
-  }
-
-  .t-left {
-    width: 180px;
-    left: -60px;
-  }
-
-  .t-left2 {
-    width: 190px;
-    left: -60px;
-  }
-
-  .t-right {
-    width: 140px;
-    right: -15px;
-  }
-
-  .t-bl {
-    width: 150px;
-    bottom: -40px;
-  }
-
-  .t-bottom {
-    width: 160px;
-    bottom: -25px;
-  }
-
-  .t-top {
-    width: 90px;
-    top: -40px;
+  html,
+  body {
+    overflow-x: clip;
   }
 }
 
 @media (max-width: 480px) {
-  .t-left {
-    width: 120px;
-    left: -45px;
-  }
-
-  .t-left2 {
-    width: 130px;
-    left: -45px;
-  }
-
-  .t-right {
-    width: 100px;
-    right: -10px;
-  }
-
-  .t-bl {
-    width: 110px;
-    bottom: -30px;
-  }
-
-  .t-bottom {
-    width: 120px;
-    bottom: -20px;
-  }
-
-  .t-top {
-    width: 70px;
-    top: -35px;
-  }
-
   .hero h1 {
     font-size: 24px;
   }

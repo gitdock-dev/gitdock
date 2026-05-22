@@ -189,6 +189,51 @@
         animation: none;
       }
     }
+
+    /* Mobile: one proportional scale — full dashboard always fits */
+    @media (max-width: 768px) {
+      .preview-stage {
+        --tentacle-scale: min(1, calc((100vw - 48px) / 1000));
+        width: 1000px;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+        zoom: var(--tentacle-scale);
+      }
+      @supports not (zoom: 1) {
+        .preview-stage {
+          transform: scale(var(--tentacle-scale));
+          transform-origin: top center;
+          margin-bottom: calc((1 - var(--tentacle-scale)) * -560px);
+        }
+      }
+      .t-left {
+        width: 270px;
+        top: 3%;
+      }
+      .t-left2 {
+        width: 225px;
+        bottom: -6%;
+      }
+      .t-bl {
+        width: 175px;
+        bottom: -58px;
+        left: 0%;
+      }
+      .t-bottom {
+        width: 190px;
+        bottom: -34px;
+        right: 20%;
+      }
+      .t-right {
+        z-index: 0;
+        top: auto;
+        right: -24px;
+        bottom: 4%;
+        width: 200px;
+        rotate: -22deg;
+      }
+    }
   </style>
 </head>
 <body>
@@ -238,21 +283,23 @@
 <section aria-label="Product screenshot">
 <!-- Dashboard Preview -->
 <div class="preview fade-in">
-  <div class="tentacle-scene">
-    <img class="tentacle t-left" src="./tentacle-left.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
-    <img class="tentacle t-left2" src="./tentacle-left2.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
-    <img class="tentacle t-right" src="./tentacle-right.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
-    <img class="tentacle t-top" src="./tentacle-top.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
-    <div class="preview-window">
-      <div class="preview-bar">
-        <span class="preview-dot" style="background:var(--red)"></span>
-        <span class="preview-dot" style="background:var(--yellow)"></span>
-        <span class="preview-dot" style="background:var(--green)"></span>
+  <div class="preview-stage">
+    <div class="tentacle-scene">
+      <img class="tentacle t-left" src="./tentacle-left.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+      <img class="tentacle t-left2" src="./tentacle-left2.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+      <img class="tentacle t-right" src="./tentacle-right.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+      <img class="tentacle t-top" src="./tentacle-top.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+      <div class="preview-window">
+        <div class="preview-bar">
+          <span class="preview-dot" style="background:var(--red)"></span>
+          <span class="preview-dot" style="background:var(--yellow)"></span>
+          <span class="preview-dot" style="background:var(--green)"></span>
+        </div>
+        <img src="./dashboard_v2.jpg" alt="GitDock Dashboard" class="preview-img">
       </div>
-      <img src="./dashboard_v2.jpg" alt="GitDock Dashboard" class="preview-img">
+      <img class="tentacle t-bl" src="./tentacle-bottomleft.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
+      <img class="tentacle t-bottom" src="./tentacle-bottom.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
     </div>
-    <img class="tentacle t-bl" src="./tentacle-bottomleft.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
-    <img class="tentacle t-bottom" src="./tentacle-bottom.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
   </div>
 </div>
 </section>
