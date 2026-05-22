@@ -8,7 +8,13 @@
   <img src="https://img.shields.io/badge/Network-Localhost_only-green?style=flat-square&logo=shield&logoColor=white" alt="Security">
 </p>
 
-<h1 align="center">GitDock</h1>
+<p align="center" style="margin-bottom: 0; line-height: 0;">
+  <a href="https://gitdock.dev">
+    <img src="site/gitdock-logo-removebg-preview.png" alt="" width="160" style="display: block; margin: 0 auto;">
+  </a>
+</p>
+
+<h1 align="center" style="margin-top: -0.55em; margin-bottom: 0.35em;">GitDock</h1>
 
 <p align="center">
   <strong>Open source</strong> local dashboard to manage all your GitHub repositories in one place.<br>
