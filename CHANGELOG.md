@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Download page (`site/download.html`): centered OS picker, clearer prerequisites table, tighter install steps, condensed trust section.
 - README header uses `site/gitdock-logo-removebg-preview.png` (transparent logo for GitHub light and dark themes).
 - `server.js` imports validation helpers from `lib/` (behavior preserved; easier to test).
 - Account name validation now rejects names that require stripping unsafe characters (e.g. `bad name!`, `work;rm`).
