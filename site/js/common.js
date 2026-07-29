@@ -1,5 +1,5 @@
 // Stagger: assign incremental delay to grid children
-document.querySelectorAll('.pain-grid, .features-grid, .security-panel-grid, .steps').forEach(function (grid) {
+document.querySelectorAll('.pain-grid, .features-grid, .how-spec-list, .security-spec-list').forEach(function (grid) {
   grid.querySelectorAll('.fade-in').forEach(function (child, i) {
     child.style.setProperty('--stagger', i * 0.06 + 's');
   });
