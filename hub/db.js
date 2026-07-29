@@ -137,6 +137,20 @@ function setUserPlan(userId, plan) {
   return r.changes > 0;
 }
 
+/** Permanently remove a user and all Hub data owned by them. */
+function deleteUserAccount(userId) {
+  const d = getDb();
+  const tx = d.transaction(() => {
+    d.prepare("DELETE FROM snapshots WHERE user_id = ?").run(userId);
+    d.prepare("DELETE FROM machines WHERE user_id = ?").run(userId);
+    d.prepare("DELETE FROM api_keys WHERE user_id = ?").run(userId);
+    d.prepare("DELETE FROM audit_log WHERE user_id = ?").run(userId);
+    const r = d.prepare("DELETE FROM users WHERE id = ?").run(userId);
+    return r.changes > 0;
+  });
+  return tx();
+}
+
 // --- API Keys ---
 function createApiKey(id, label, keyHash, userId) {
   const d = getDb();
@@ -274,6 +288,7 @@ module.exports = {
   getUserByEmail,
   getUserById,
   setUserPlan,
+  deleteUserAccount,
   createApiKey,
   getApiKeyHashesForVerification,
   listApiKeys,
