@@ -6,7 +6,7 @@
   <title>GitDock Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* GitDock Hub — same design language as main dashboard */
     :root {
@@ -115,8 +115,22 @@
       background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.03) 0%, transparent 60%);
     }
 
-    /* Login — landing-style card (cta-box + hero) */
+    /* Login — dev-tool panel (aligned with marketing site) */
     .login-wrap {
+      --login-bg0: #0a0e14;
+      --login-bg1: #111820;
+      --login-bg2: #1a2230;
+      --login-border: #2a3544;
+      --login-border-subtle: #1c2533;
+      --login-t1: #e6edf3;
+      --login-t2: #8b9cb3;
+      --login-t3: #5c6b7f;
+      --login-accent: #3b82f6;
+      --login-accent-hover: #2563eb;
+      --login-radius: 6px;
+      --login-radius-lg: 8px;
+      --login-font: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --login-mono: 'IBM Plex Mono', 'Cascadia Code', 'SF Mono', Consolas, monospace;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -124,37 +138,66 @@
       padding: 32px 24px;
       position: relative;
       overflow: hidden;
+      font-family: var(--login-font);
+      background: var(--login-bg0);
+      color: var(--login-t1);
     }
     .login-wrap::before {
       content: '';
       position: absolute;
-      top: -30%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 700px;
-      height: 700px;
-      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, rgba(167,139,250,0.04) 40%, transparent 70%);
+      inset: 0;
       pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(var(--login-border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--login-border-subtle) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 70%);
+    }
+    .login-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse 55% 45% at 50% 35%, rgba(59, 130, 246, 0.08) 0%, transparent 65%);
     }
     .login-box {
       position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 420px;
-      padding: 48px 40px;
-      background: var(--bg1);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(59,130,246,0.06);
+      max-width: 380px;
+      background: var(--login-bg0);
+      border: 1px solid var(--login-border);
+      border-radius: var(--login-radius-lg);
       overflow: hidden;
     }
-    .login-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--blue), var(--purple));
+    .login-panel-accent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: var(--login-bg2);
+      border-bottom: 1px solid var(--login-border);
+      font-family: var(--login-mono);
+      font-size: 12px;
+      color: var(--login-t3);
+    }
+    .login-panel-accent::before {
+      content: '● ● ●';
+      letter-spacing: 3px;
+      font-size: 7px;
+      color: var(--login-t3);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+    #loginBox .login-panel-accent::after {
+      content: 'hub.gitdock.dev / sign in';
+    }
+    #registerBox .login-panel-accent::after {
+      content: 'hub.gitdock.dev / create account';
+    }
+    .login-panel-inner {
+      padding: 36px 36px 40px;
     }
     .login-box .login-logo {
       margin: 0 auto 24px;
@@ -162,84 +205,131 @@
       text-align: center;
     }
     .login-box .login-logo img {
-      height: 120px;
+      height: 112px;
       width: auto;
       display: inline-block;
       vertical-align: middle;
     }
     .login-box h2 {
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 600;
       margin-bottom: 8px;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       text-align: center;
+      line-height: 1.2;
     }
     .login-box h2 .grad {
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--login-accent);
+      -webkit-text-fill-color: var(--login-accent);
+      background: none;
     }
     .login-box .login-sub {
-      color: var(--t2);
-      font-size: 14px;
+      color: var(--login-t2);
+      font-size: 15px;
       text-align: center;
       margin-bottom: 28px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
     .login-box input {
       width: 100%;
       padding: 12px 16px;
-      margin-bottom: 16px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--t1);
-      font-size: 14px;
-      font-family: var(--font);
+      margin-bottom: 14px;
+      background: var(--login-bg1);
+      border: 1px solid var(--login-border);
+      border-radius: var(--login-radius);
+      color: var(--login-t1);
+      font-size: 15px;
+      font-family: var(--login-font);
       outline: none;
-      transition: var(--tr);
+      transition: border-color 0.15s, background 0.15s;
     }
     .login-box input:focus {
-      border-color: rgba(59,130,246,0.5);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+      border-color: var(--login-t3);
+      background: var(--login-bg2);
+      box-shadow: none;
     }
-    .login-box input::placeholder { color: var(--t3); }
+    .login-box input::placeholder { color: var(--login-t3); }
     .login-box button[type="submit"] {
       width: 100%;
       padding: 12px 24px;
-      background: var(--blue);
+      background: var(--login-accent);
       border: none;
-      border-radius: 10px;
+      border-radius: var(--login-radius);
       color: #fff;
       font-size: 15px;
       font-weight: 600;
-      font-family: var(--font);
+      font-family: var(--login-mono);
       cursor: pointer;
-      transition: var(--tr);
-      margin-top: 8px;
+      transition: background 0.15s;
+      margin-top: 6px;
     }
     .login-box button[type="submit"]:hover {
-      background: #2563eb;
-      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+      background: var(--login-accent-hover);
+      box-shadow: none;
     }
     .login-box .error {
       color: var(--red);
-      font-size: 13px;
-      margin-top: 12px;
+      font-size: 14px;
+      margin-top: 14px;
       text-align: center;
     }
     .login-box .login-link {
       text-align: center;
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--t2);
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--login-t2);
     }
     .login-box .login-link a {
-      color: var(--blue);
+      color: var(--login-t1);
+      font-weight: 500;
       text-decoration: none;
     }
-    .login-box .login-link a:hover { text-decoration: underline; }
+    .login-box .login-link a:hover {
+      color: var(--login-accent);
+      text-decoration: underline;
+    }
+    .login-pw-hint {
+      font-size: 12px;
+      color: var(--login-t3);
+      margin: -6px 0 14px;
+      line-height: 1.45;
+    }
+    .login-legal {
+      font-size: 12px;
+      color: var(--login-t3);
+      text-align: center;
+      line-height: 1.5;
+      margin: 2px 0 16px;
+    }
+    .login-legal a {
+      color: var(--login-t2);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .login-legal a:hover {
+      color: var(--login-accent);
+      text-decoration: underline;
+    }
+    .login-footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--login-border);
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .login-footer a {
+      color: var(--login-t3);
+      text-decoration: none;
+    }
+    .login-footer a:hover {
+      color: var(--login-t2);
+      text-decoration: underline;
+    }
+    .login-footer-sep {
+      color: var(--login-border);
+      margin: 0 6px;
+    }
 
     /* Password field wrapper */
     .pw-wrap { position: relative; width: 100%; }
@@ -248,21 +338,21 @@
       position: absolute;
       right: 14px;
       top: 50%;
-      transform: translateY(calc(-50% - 8px));
+      transform: translateY(calc(-50% - 7px));
       background: none;
       border: none;
       padding: 0;
       margin: 0;
       cursor: pointer;
-      color: var(--t3);
+      color: var(--login-t3);
       width: 20px;
       height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s;
+      transition: color 0.15s;
     }
-    .pw-toggle:hover { color: var(--t1); }
+    .pw-toggle:hover { color: var(--login-t1); }
     .pw-toggle svg { width: 18px; height: 18px; }
 
     .view { display: none; }
@@ -590,6 +680,8 @@
   <div id="hub-tooltip"></div>
   <div id="loginView" class="login-wrap">
     <div class="login-box" id="loginBox">
+      <div class="login-panel-accent" aria-hidden="true"></div>
+      <div class="login-panel-inner">
       <span class="login-logo"><img src="/gitdock-logo-removebg.png" alt="GitDock"></span>
       <h2><span class="grad">GitDock Hub</span></h2>
       <p class="login-sub" id="loginSub">Sign in to view your machines and sync status.</p>
@@ -606,20 +698,27 @@
       </form>
       <p class="login-link"><a href="#" id="showRegister">Create account</a></p>
       <div id="loginError" class="error" style="display:none"></div>
+      <nav class="login-footer" aria-label="Legal">
+        <a href="https://www.gitdock.dev/privacy.html" target="_blank" rel="noopener">Privacy Policy</a><span class="login-footer-sep" aria-hidden="true">·</span><a href="https://www.gitdock.dev/terms.html" target="_blank" rel="noopener">Terms of Service</a>
+      </nav>
+      </div>
     </div>
     <div class="login-box" id="registerBox" style="display:none">
+      <div class="login-panel-accent" aria-hidden="true"></div>
+      <div class="login-panel-inner">
       <span class="login-logo"><img src="/gitdock-logo-removebg.png" alt="GitDock"></span>
       <h2><span class="grad">Create account</span></h2>
-      <p class="login-sub">Register to use GitDock Hub.</p>
+      <p class="login-sub">Create an account to sync machine metadata across devices.</p>
       <form id="registerForm">
         <input type="email" id="registerEmail" placeholder="Email" autocomplete="email" required>
         <div class="pw-wrap">
-          <input type="password" id="registerPassword" placeholder="Password" autocomplete="new-password" required>
+          <input type="password" id="registerPassword" placeholder="Password" autocomplete="new-password" required aria-describedby="registerPwHint">
           <button type="button" class="pw-toggle" tabindex="-1" aria-label="Toggle password visibility">
             <svg class="eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
             <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
+        <p class="login-pw-hint" id="registerPwHint">Min. 8 characters, 1 uppercase, 1 number.</p>
         <div class="pw-wrap">
           <input type="password" id="registerConfirm" placeholder="Confirm password" autocomplete="new-password" required>
           <button type="button" class="pw-toggle" tabindex="-1" aria-label="Toggle password visibility">
@@ -627,10 +726,12 @@
             <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
+        <p class="login-legal">By creating an account, you agree to our <a href="https://www.gitdock.dev/terms.html" target="_blank" rel="noopener">Terms of Service</a> and <a href="https://www.gitdock.dev/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
         <button type="submit">Create account</button>
       </form>
       <p class="login-link"><a href="#" id="showLogin">Already have an account? Sign in</a></p>
       <div id="registerError" class="error" style="display:none"></div>
+      </div>
     </div>
   </div>
 
