@@ -7,7 +7,7 @@ Central server for the GitDock multi-machine dashboard. Agents on each of your m
 | | Hosted (hub.gitdock.dev) | Self-host (this repo) |
 |---|--------------------------|------------------------|
 | **Infrastructure** | We manage hosting, SSL, backups, uptime | You deploy and maintain your own server |
-| **Pricing** | One machine free; unlimited machines for $5/month | No cost to us; you pay only for your server |
+| **Pricing** | One machine free; unlimited machines for $7/month | No cost to us; you pay only for your server |
 | **Limits** | Free: 1 machine. Pro: unlimited | No limits; full control |
 | **Support** | Billing and hosted service support | Community support; see main [README](../README.md) |
 
@@ -101,10 +101,10 @@ You can configure the Hub in `config.json` instead of the dashboard:
 
 ## Lemon Squeezy (hosted Hub only)
 
-If you run the **hosted** Hub (e.g. hub.gitdock.dev) and want to offer Pro ($5/month, unlimited machines) via Lemon Squeezy:
+If you run the **hosted** Hub (e.g. hub.gitdock.dev) and want to offer Pro ($7/month, unlimited machines) via Lemon Squeezy:
 
 1. **Lemon Squeezy**
-   - Create a subscription product (e.g. "GitDock Hub Pro") at $5/month.
+   - Create a subscription product (e.g. "GitDock Hub Pro") at $7/month.
    - In **Webhooks**, add a webhook URL: `https://hub.gitdock.dev/api/webhooks/lemonsqueezy` (or your Hub URL).
    - Choose events: `subscription_created`, `subscription_updated`, `subscription_expired`, `subscription_cancelled`, `subscription_resumed`, `subscription_paused`.
    - Copy the **Signing secret** (used to verify webhook requests).
