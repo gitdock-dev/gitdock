@@ -25,6 +25,18 @@ describe("parseStatusPorcelain", () => {
     assert.equal(summary.unstagedCount, 1);
   });
 
+  it("keeps unstaged-only lines as unstaged (leading space must be preserved)", () => {
+    const out = " M README.md\n";
+    const { files, summary } = gitParse.parseStatusPorcelain(out);
+    assert.equal(files[0].path, "README.md");
+    assert.equal(summary.stagedCount, 0);
+    assert.equal(summary.unstagedCount, 1);
+    // Regression: full .trim() on porcelain turns " M README.md" into "M README.md"
+    const broken = gitParse.parseStatusPorcelain(out.trim());
+    assert.equal(broken.summary.stagedCount, 1);
+    assert.equal(broken.summary.unstagedCount, 0);
+  });
+
   it("returns empty summary for clean tree", () => {
     const r = gitParse.parseStatusPorcelain("");
     assert.deepEqual(r.summary, {
