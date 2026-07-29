@@ -1,20 +1,29 @@
 :root {
-  --bg0: #0d1117;
-  --bg1: #161b22;
-  --bg2: #21262d;
-  --bg3: #30363d;
-  --border: #30363d;
+  --bg0: #0a0e14;
+  --bg1: #111820;
+  --bg2: #1a2230;
+  --bg3: #242f3f;
+  --border: #2a3544;
+  --border-subtle: #1c2533;
   --t1: #e6edf3;
-  --t2: #8b949e;
-  --t3: #6e7681;
-  --blue: #58a6ff;
+  --t2: #8b9cb3;
+  --t3: #5c6b7f;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-dim: rgba(59, 130, 246, 0.1);
+  --accent-glow: rgba(59, 130, 246, 0.08);
+  --warm: #c9a227;
+  --blue: #3b82f6;
   --green: #3fb950;
   --yellow: #d29922;
   --red: #f85149;
-  --purple: #bc8cff;
-  --orange: #f0883e;
+  --purple: #a78bfa;
+  --orange: #e0883e;
   --cyan: #39c5cf;
-  --grad: linear-gradient(135deg, #58a6ff, #bc8cff);
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  --radius: 6px;
+  --radius-lg: 8px;
 }
 
 * {
@@ -28,11 +37,26 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg0);
   color: var(--t1);
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 70%);
 }
 
 a {
@@ -50,17 +74,17 @@ a:hover {
   left: 16px;
   z-index: 200;
   padding: 8px 16px;
-  border-radius: 6px;
-  background: var(--blue);
+  border-radius: var(--radius);
+  background: var(--accent);
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .skip-link:focus {
   top: 16px;
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -71,19 +95,18 @@ a:hover {
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(13, 17, 23, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 14, 20, 0.92);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
 }
 
 .nav-inner {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
+  height: 52px;
 }
 
 .nav-brand {
@@ -91,9 +114,10 @@ a:hover {
   align-items: center;
   gap: 10px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--t1);
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 
 .nav-brand:hover {
@@ -104,7 +128,7 @@ a:hover {
 .nav-logo {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
@@ -124,7 +148,7 @@ a:hover {
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
 }
 
@@ -132,7 +156,7 @@ a:hover {
   color: var(--t2);
   font-size: 13px;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .nav-links a:hover {
@@ -141,66 +165,75 @@ a:hover {
 }
 
 .btn-nav {
-  padding: 6px 16px;
-  border-radius: 6px;
-  background: var(--blue);
+  padding: 5px 14px;
+  border-radius: var(--radius);
+  background: var(--accent);
   color: #fff !important;
+  font-family: var(--font-mono);
   font-weight: 500;
-  font-size: 13px;
-  transition: opacity 0.2s;
+  font-size: 12px;
+  transition: background 0.15s;
 }
 
 .btn-nav:hover {
-  opacity: 0.9;
+  background: var(--accent-hover);
   text-decoration: none !important;
 }
 
 /* Section base */
 .section {
-  padding: 100px 24px;
+  padding: 96px 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .section-inner {
-  max-width: 1100px;
+  max-width: 1060px;
   margin: 0 auto;
 }
 
 .section-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--blue);
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--t3);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.section-label::before {
+  content: '// ';
+  color: var(--t3);
+  opacity: 0.65;
 }
 
 .section-title {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 700;
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 600;
+  margin-bottom: 14px;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .section-desc {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--t2);
-  max-width: 600px;
-  line-height: 1.6;
+  max-width: 560px;
+  line-height: 1.65;
 }
 
 .section-header {
-  margin-bottom: 56px;
+  margin-bottom: 48px;
 }
 
 /* Buttons */
 .btn-hero {
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: all 0.2s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -212,34 +245,34 @@ a:hover {
 }
 
 .btn-primary {
-  background: var(--blue);
+  background: var(--accent);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #4a96ef;
-  box-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
   background: transparent;
   color: var(--t1);
   border: 1px solid var(--border);
+  font-weight: 500;
 }
 
 .btn-secondary:hover {
-  border-color: var(--t2);
+  border-color: var(--t3);
   background: var(--bg1);
 }
 
-/* Animations */
+/* Animations: subtle, not SaaS-bouncy */
 .fade-in {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(10px);
 }
 
 .fade-in.visible {
-  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0s) both;
+  animation: fadeInUp 0.5s ease-out var(--stagger, 0s) both;
 }
 
 @keyframes fadeInUp {
@@ -254,6 +287,8 @@ a:hover {
   padding: 32px 24px;
   border-top: 1px solid var(--border);
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .footer p {

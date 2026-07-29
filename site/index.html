@@ -10,7 +10,11 @@
   <link rel="apple-touch-icon" href="./gitdock-logo.png">
   <link rel="manifest" href="./manifest.json">
   <link rel="canonical" href="https://www.gitdock.dev/">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="theme-color" content="#0a0e14">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -72,11 +76,11 @@
       user-select: none;
       opacity: 0.6;
       translate: var(--px, 0) var(--py, 0);
-      filter: brightness(0.8) contrast(2.5) drop-shadow(0 0 20px rgba(88, 166, 255, 0.12));
+      filter: brightness(0.8) contrast(2.5) drop-shadow(0 0 20px rgba(59, 130, 246, 0.1));
     }
     .tentacle.t-ready {
       mix-blend-mode: normal;
-      filter: drop-shadow(0 0 25px rgba(88, 166, 255, 0.15));
+      filter: drop-shadow(0 0 25px rgba(59, 130, 246, 0.12));
       opacity: 0.75;
     }
     .t-left {
@@ -182,15 +186,12 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #hero-canvas {
-        display: none;
-      }
       .tentacle {
         animation: none;
       }
     }
 
-    /* Mobile: one proportional scale — full dashboard always fits */
+    /* Mobile: one proportional scale; full dashboard always fits */
     @media (max-width: 768px) {
       .preview-stage {
         --tentacle-scale: min(1, calc((100vw - 48px) / 1000));
@@ -262,7 +263,6 @@
 
 <!-- Hero -->
 <section class="hero">
-  <canvas id="hero-canvas"></canvas>
   <div class="hero-content fade-in">
     <h1>Your Git projects.<br><span class="grad">One Space.</span></h1>
     <p>Stop wasting time switching between accounts, tabs, and terminals. Search, organize, and operate on all your repos from one local interface.</p>
@@ -290,9 +290,12 @@
       <img class="tentacle t-top" src="./tentacle-top.png" alt="" aria-hidden="true" draggable="false" loading="lazy" onerror="this.remove()">
       <div class="preview-window">
         <div class="preview-bar">
-          <span class="preview-dot" style="background:var(--red)"></span>
-          <span class="preview-dot" style="background:var(--yellow)"></span>
-          <span class="preview-dot" style="background:var(--green)"></span>
+          <div class="preview-dots">
+            <span class="preview-dot" style="background:var(--red)"></span>
+            <span class="preview-dot" style="background:var(--yellow)"></span>
+            <span class="preview-dot" style="background:var(--green)"></span>
+          </div>
+          <span class="preview-url">127.0.0.1:3847</span>
         </div>
         <img src="./dashboard_v2.jpg" alt="GitDock Dashboard" class="preview-img">
       </div>
@@ -501,14 +504,14 @@
           </div>
           <ul class="security-list">
             <li><strong>Tokens stay local</strong><span>Not in <code>config.json</code>. <code>gh</code> keyring or optional PAT (session or OS store). Never sent to GitDock.</span></li>
-            <li><strong>Serialized API calls</strong><span><code>gh</code> queued per account — no races when switching accounts.</span></li>
+            <li><strong>Serialized API calls</strong><span><code>gh</code> queued per account, no races when switching accounts.</span></li>
           </ul>
         </div>
       </div>
       <div class="security-hub">
         <span class="security-hub-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v4c0 .372-.116.717-.314 1 .198.283.314.628.314 1v4a1.75 1.75 0 0 1-1.75 1.75H1.75A1.75 1.75 0 0 1 0 12.75v-4c0-.358.109-.707.314-1a1.739 1.739 0 0 1-.314-1v-4C0 1.784.784 1 1.75 1ZM1.5 2.75v4c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-4a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25Zm.25 5.75a.25.25 0 0 0-.25.25v4c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-4a.25.25 0 0 0-.25-.25ZM7 4.75A.75.75 0 0 1 7.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 7 4.75ZM7.75 10h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM3 4.75A.75.75 0 0 1 3.75 4h.5a.75.75 0 0 1 0 1.5h-.5A.75.75 0 0 1 3 4.75ZM3.75 10h.5a.75.75 0 0 1 0 1.5h-.5a.75.75 0 0 1 0-1.5Z"/></svg></span>
         <div class="security-hub-text">
-          <strong>Hub — optional</strong>
+          <strong>Hub (optional)</strong>
           <span>Metadata only: repo names, branch, ahead/behind. No source code, no tokens.</span>
           <span class="security-hub-tag">Only if you enable it</span>
         </div>
@@ -523,15 +526,15 @@
   <h2 class="section-title">Open repos directly in your favorite editor.</h2>
   <div class="editor-logos">
     <div class="editor-item">
-      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--blue)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
       Cursor
     </div>
     <div class="editor-item">
-      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="var(--blue)"><path d="M17.583 2.261L9.831 9.92l-3.712-2.874L3 8.562l4.312 3.45L3 15.464l3.119 1.516 3.712-2.874 7.752 7.66L21 19.665V4.36z"/></svg></div>
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.583 2.261L9.831 9.92l-3.712-2.874L3 8.562l4.312 3.45L3 15.464l3.119 1.516 3.712-2.874 7.752 7.66L21 19.665V4.36z"/></svg></div>
       VS Code
     </div>
     <div class="editor-item">
-      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 16 16" fill="var(--t2)"><path d="M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z"/></svg></div>
+      <div class="editor-box"><svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor"><path d="M0 3.75C0 2.784.784 2 1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25Zm1.75-.25a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25ZM3.5 6.25a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Zm.75 2.25h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1 0-1.5Z"/></svg></div>
       Terminal
     </div>
   </div>
@@ -568,7 +571,6 @@
 </footer>
 
 <script src="./js/common.js" defer></script>
-<script src="./js/index-hero.js" defer></script>
 <script>
 // Tentacle alpha processing: convert dark pixels to transparent
 (function() {
@@ -600,7 +602,7 @@
       cx.putImageData(id, 0, 0);
       img.src = cv.toDataURL('image/png');
       img.classList.add('t-ready');
-    } catch (e) { /* CORS or security — fallback to blend mode */ }
+    } catch (e) { /* CORS or security: fallback to blend mode */ }
   }
 })();
 

@@ -10,10 +10,12 @@
   <meta name="robots" content="index, follow">
   <link rel="manifest" href="./manifest.json">
   <link rel="canonical" href="https://www.gitdock.dev/download.html">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="theme-color" content="#0a0e14">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/common.css">
-
-  <!-- Open Graph -->
+  <link rel="stylesheet" href="./css/download.css">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="GitDock">
   <meta property="og:title" content="Download GitDock | Free, Local Git Dashboard">
@@ -24,173 +26,68 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="GitDock logo">
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Download GitDock | Free, Local Git Dashboard">
   <meta name="twitter:description" content="Download GitDock for Windows, macOS, or Linux. Free, open-source, runs locally.">
   <meta name="twitter:image" content="https://www.gitdock.dev/og-card-white.png">
   <meta name="twitter:image:alt" content="GitDock logo">
-
-  <style>
-    :root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#30363d;--border:#30363d;--t1:#e6edf3;--t2:#8b949e;--t3:#6e7681;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--orange:#f0883e;--cyan:#39c5cf;--grad:linear-gradient(135deg,#58a6ff,#bc8cff)}
-    *{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg0);color:var(--t1);line-height:1.6;overflow-x:hidden}
-    a{color:var(--blue);text-decoration:none}
-    a:hover{text-decoration:underline}
-
-    /* Navigation */
-    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
-    .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;color:var(--t1);text-decoration:none}
-    .nav-brand:hover{text-decoration:none;color:var(--t1)}
-    .nav-logo{width:28px;height:28px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;transform:scale(1.25);transform-origin:center}
-    .nav-logo img{width:100%;height:100%;object-fit:cover;transform:scale(1.25);transform-origin:center}
-    .nav-links{display:flex;gap:24px;align-items:center}
-    .nav-links a{color:var(--t2);font-size:13px;text-decoration:none;transition:color .2s}
-    .nav-links a:hover{color:var(--t1);text-decoration:none}
-    .btn-nav{padding:6px 16px;border-radius:6px;background:var(--blue);color:#fff!important;font-weight:500;font-size:13px;transition:opacity .2s}
-    .btn-nav:hover{opacity:.9;text-decoration:none!important}
-
-    /* Page */
-    .page{max-width:800px;margin:0 auto;padding:100px 24px 60px}
-
-    /* Hero download */
-    .dl-hero{text-align:center;margin-bottom:56px}
-    .dl-hero h1{font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:12px;letter-spacing:-.01em}
-    .dl-hero h1 .grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .dl-hero p{color:var(--t2);font-size:16px;max-width:560px;margin:0 auto}
-
-    /* Main download card */
-    .dl-card{border-radius:12px;border:1px solid var(--border);background:var(--bg1);padding:36px;margin-bottom:32px;position:relative;overflow:hidden}
-    .dl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
-
-    .dl-detected{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-    .dl-os-icon{width:48px;height:48px;border-radius:12px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-    .dl-os-info h2{font-size:20px;font-weight:600;margin-bottom:2px}
-    .dl-os-info p{font-size:13px;color:var(--t2)}
-
-    .dl-meta{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:24px;padding:16px;border-radius:8px;background:var(--bg0);border:1px solid var(--border)}
-    .dl-meta-item{display:flex;flex-direction:column}
-    .dl-meta-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:2px}
-    .dl-meta-value{font-size:14px;font-weight:500;color:var(--t1)}
-    .dl-meta-value code{background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px}
-
-    .btn-download{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:8px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
-    .btn-download:hover{background:#4a96ef;box-shadow:0 0 24px rgba(88,166,255,.3);text-decoration:none;color:#fff}
-    .btn-download svg{flex-shrink:0}
-
-    .dl-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-    .dl-alt{font-size:13px;color:var(--t3)}
-    .dl-alt a{color:var(--t2);font-size:13px}
-
-    /* Other platforms */
-    .dl-others{display:flex;flex-direction:column;align-items:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);text-align:center}
-    .dl-others-label{font-size:12px;color:var(--t3);margin-bottom:10px}
-    .dl-others-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-    .btn-other{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--t2);font-size:13px;transition:all .2s;text-decoration:none;cursor:pointer}
-    .btn-other:hover{border-color:var(--t3);color:var(--t1);text-decoration:none}
-    .btn-other.active{border-color:var(--blue);color:var(--blue)}
-
-    /* Steps */
-    .dl-section{margin-bottom:32px}
-    .dl-section h3{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .dl-section h3 svg{flex-shrink:0}
-
-    .install-steps{list-style:none;counter-reset:step;padding-left:32px;border-left:2px solid var(--border);margin:0}
-    .install-steps li{counter-increment:step;position:relative;padding:0 0 24px 20px;font-size:14px;color:var(--t2);line-height:1.6}
-    .install-steps li:last-child{padding-bottom:0}
-    .install-steps li::before{content:counter(step);position:absolute;left:-43px;top:0;width:24px;height:24px;border-radius:50%;background:var(--bg0);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue)}
-    .install-steps li strong{color:var(--t1);font-weight:500}
-    .install-steps code{background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--blue)}
-
-    /* OS warning */
-    .os-warning{margin-top:20px;padding:14px 0 0;border-top:1px dashed var(--border);display:flex;gap:10px;align-items:flex-start}
-    .os-warning svg{flex-shrink:0;margin-top:1px}
-    .os-warning p{font-size:13px;color:var(--t3);line-height:1.6}
-    .os-warning strong{color:var(--yellow);font-weight:500}
-
-    /* Requirements */
-    .req-lead{font-size:14px;color:var(--t2);margin-bottom:14px;line-height:1.55}
-    .req-box{border:1px solid var(--border);border-radius:8px;background:var(--bg1);overflow:hidden}
-    .req-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 16px;font-size:14px;border-bottom:1px solid var(--border)}
-    .req-row:last-child{border-bottom:none}
-    .req-name{font-weight:600;color:var(--t1);flex-shrink:0}
-    .req-detail{color:var(--t2);text-align:right;line-height:1.45}
-    .req-foot{margin-top:12px;font-size:13px;color:var(--t3);line-height:1.55}
-    .req-foot strong{color:var(--t2);font-weight:500}
-    .req-box code{background:var(--bg0);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--blue)}
-
-    /* Trust */
-    .trust-list{list-style:none;margin:0;padding:0}
-    .trust-list li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--t2);padding:6px 0}
-    .trust-list li svg{flex-shrink:0}
-    .trust-list li strong{color:var(--t1);font-weight:500}
-
-    /* Divider */
-    .dl-divider{height:1px;background:var(--border);margin:8px 0 32px}
-
-    /* Footer */
-    .footer{padding:32px 24px;border-top:1px solid var(--border);text-align:center}
-    .footer p{font-size:12px;color:var(--t3)}
-    .footer-links{margin-bottom:8px}
-    .footer-links a{color:var(--t3);margin:0 8px;font-size:12px;text-decoration:none}
-    .footer-links a:hover{color:var(--t1)}
-
-    /* Hidden */
-    .hidden{display:none!important}
-
-    /* Responsive */
-    @media(max-width:768px){
-      .nav-links a:not(.btn-nav){display:none}
-      .page{padding:80px 16px 40px}
-      .dl-card{padding:24px}
-      .dl-meta{gap:16px}
-      .dl-hero h1{font-size:24px}
-      .dl-actions{flex-direction:column;align-items:flex-start}
-    }
-    @media(max-width:480px){
-      .dl-detected{flex-direction:column;text-align:center}
-      .req-row{flex-direction:column;align-items:flex-start;gap:4px}
-      .req-detail{text-align:left}
-    }
-  </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav class="nav">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Main">
   <div class="nav-inner">
-    <a href="./index.html" class="nav-brand">
+    <a href="./" class="nav-brand">
       <span class="nav-logo"><img src="./gitdock-logo.png" alt="GitDock"></span>
       GitDock
     </a>
     <div class="nav-links">
-      <a href="./index.html#features">Features</a>
-      <a href="./index.html#hub">Hub</a>
+      <a href="./#features">Features</a>
+      <a href="./#hub">Hub</a>
       <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
       <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener" class="btn-nav">All Releases</a>
     </div>
   </div>
 </nav>
 
-<div class="page">
+<div class="page" id="main">
 
-  <!-- Hero -->
   <div class="dl-hero">
     <h1>Download <span class="grad">GitDock</span></h1>
     <p>Free, open-source, runs on your machine only. No GitDock signup; no data collected.</p>
   </div>
 
+  <!-- Prerequisites first -->
+  <section class="dl-section" aria-labelledby="req-title">
+    <p class="section-label" id="req-label">Before you start</p>
+    <h2 class="dl-section-title" id="req-title">Standalone zip, no Node.js required</h2>
+    <p class="req-lead">You still need these on your computer before the app can manage repos:</p>
+    <div class="req-box">
+      <div class="req-row">
+        <span class="req-name">Git</span>
+        <span class="req-detail">clone, pull, commit, push</span>
+      </div>
+      <div class="req-row">
+        <span class="req-name">GitHub CLI (<code>gh</code>)</span>
+        <span class="req-detail">list repos, GitHub API</span>
+      </div>
+      <div class="req-row">
+        <span class="req-name">SSH to GitHub</span>
+        <span class="req-detail">guided in the app per account</span>
+      </div>
+    </div>
+    <p class="req-foot">Full prerequisite commands: <a href="https://github.com/gitdock-dev/gitdock#prerequisites" target="_blank" rel="noopener">README</a>.</p>
+  </section>
+
   <!-- Main download card -->
   <div class="dl-card">
     <div class="dl-detected">
       <div class="dl-os-icon">
-          <svg class="os-icon-svg" data-os="windows-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
-          <svg class="os-icon-svg hidden" data-os="macos-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>
-          <svg class="os-icon-svg hidden" data-os="linux-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--blue)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>
-        </div>
+        <svg class="os-icon-svg" data-os="windows-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--accent)" aria-hidden="true"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
+        <svg class="os-icon-svg hidden" data-os="macos-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--accent)" aria-hidden="true"><path d="M12.786 1.258C11.536.88 10.698 1.845 9.982 2.528c-.695.665-1.782 1.268-2.646 1.268-.806 0-1.529-.64-2.516-.59-1.082.055-2.087.652-2.692 1.532-.926 1.352-1.671 3.856-.691 5.543.692 1.186 1.963 1.932 3.354 1.937 1.035-.015 1.963-.679 2.692-.679.729 0 1.856.837 3.021.721.517-.022 1.978-.208 2.916-1.612-.076-.045-1.743-1.02-1.764-3.043-.021-1.918 1.498-2.836 1.566-2.887-.855-1.253-2.185-1.398-2.653-1.425ZM10.025 0c-.072 1.044.381 2.127 1.14 2.808.761.682 2.012 1.206 3.053 1.132.09-1.018-.353-2.078-1.103-2.772-.749-.695-1.992-1.239-3.09-1.168Z"/></svg>
+        <svg class="os-icon-svg hidden" data-os="linux-x64" width="24" height="24" viewBox="0 0 16 16" fill="var(--accent)" aria-hidden="true"><path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v8.5c0 .966-.784 1.75-1.75 1.75H1.75A1.75 1.75 0 0 1 0 11.25v-8.5ZM4.05 5.25a.75.75 0 0 1 1.06 0L7 7.19l1.89-1.94a.75.75 0 1 1 1.08 1.04L7.54 8.72a.75.75 0 0 1-1.08 0L4.05 6.29a.75.75 0 0 1 0-1.04ZM4.5 10.5a.75.75 0 0 0 0 1.5h7a.75.75 0 0 0 0-1.5h-7Z"/></svg>
+      </div>
       <div class="dl-os-info">
         <h2 id="os-title">Detecting your system...</h2>
         <p id="os-subtitle"></p>
@@ -207,141 +104,113 @@
         <span class="dl-meta-value" id="meta-version">Latest</span>
       </div>
       <div class="dl-meta-item">
-        <span class="dl-meta-label">Type</span>
-        <span class="dl-meta-value">Standalone executable (.zip)</span>
-      </div>
-      <div class="dl-meta-item">
-        <span class="dl-meta-label">License</span>
-        <span class="dl-meta-value">Apache 2.0</span>
+        <span class="dl-meta-label">Size</span>
+        <span class="dl-meta-value" id="meta-size">n/a</span>
       </div>
     </div>
 
     <div class="dl-actions">
       <a id="btn-download" href="https://github.com/gitdock-dev/gitdock/releases" class="btn-download">
-        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14ZM7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14ZM7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/></svg>
         <span id="btn-download-text">Download for your system</span>
       </a>
       <span class="dl-alt">or <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener">view all releases on GitHub</a></span>
     </div>
 
+    <ul class="trust-list trust-list--compact" aria-label="Why it's safe">
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <span><strong>Open source</strong>: built by GitHub Actions, inspect on <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a></span>
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <span><strong>Local only</strong>: binds to <code>127.0.0.1</code>, nothing exposed to your network</span>
+      </li>
+      <li>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+        <span><strong>No tracking</strong>: no analytics, ads, or data collection</span>
+      </li>
+    </ul>
+    <p class="dl-verify">Verify downloads on <a href="https://github.com/gitdock-dev/gitdock/releases" target="_blank" rel="noopener">GitHub Releases</a> (asset details &amp; release notes).</p>
+
     <div class="dl-others">
       <div class="dl-others-label">Also available for:</div>
       <div class="dl-others-row">
-      <button class="btn-other" data-platform="windows-x64" id="btn-windows">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
-        Windows
-      </button>
-      <button class="btn-other" data-platform="macos-x64" id="btn-macos">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 14.5a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"/></svg>
-        macOS
-      </button>
-      <button class="btn-other" data-platform="linux-x64" id="btn-linux">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.5 9H8.25a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 1.5 0v3h2.5a.75.75 0 0 1 0 1.5Z"/></svg>
-        Linux
-      </button>
+        <button type="button" class="btn-other" data-platform="windows-x64" id="btn-windows">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h4v6.5H1V2.5ZM1 9h5.5v6H2.5A1.5 1.5 0 0 1 1 13.5V9Zm7.5 6V9H15v4.5a1.5 1.5 0 0 1-1.5 1.5H8.5ZM15 7.5H8.5V1h5A1.5 1.5 0 0 1 15 2.5v5Z"/></svg>
+          Windows
+        </button>
+        <button type="button" class="btn-other" data-platform="macos-x64" id="btn-macos">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M12.786 1.258C11.536.88 10.698 1.845 9.982 2.528c-.695.665-1.782 1.268-2.646 1.268-.806 0-1.529-.64-2.516-.59-1.082.055-2.087.652-2.692 1.532-.926 1.352-1.671 3.856-.691 5.543.692 1.186 1.963 1.932 3.354 1.937 1.035-.015 1.963-.679 2.692-.679.729 0 1.856.837 3.021.721.517-.022 1.978-.208 2.916-1.612-.076-.045-1.743-1.02-1.764-3.043-.021-1.918 1.498-2.836 1.566-2.887-.855-1.253-2.185-1.398-2.653-1.425ZM10.025 0c-.072 1.044.381 2.127 1.14 2.808.761.682 2.012 1.206 3.053 1.132.09-1.018-.353-2.078-1.103-2.772-.749-.695-1.992-1.239-3.09-1.168Z"/></svg>
+          macOS
+        </button>
+        <button type="button" class="btn-other" data-platform="linux-x64" id="btn-linux">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v8.5c0 .966-.784 1.75-1.75 1.75H1.75A1.75 1.75 0 0 1 0 11.25v-8.5ZM4.05 5.25a.75.75 0 0 1 1.06 0L7 7.19l1.89-1.94a.75.75 0 1 1 1.08 1.04L7.54 8.72a.75.75 0 0 1-1.08 0L4.05 6.29a.75.75 0 0 1 0-1.04ZM4.5 10.5a.75.75 0 0 0 0 1.5h7a.75.75 0 0 0 0-1.5h-7Z"/></svg>
+          Linux
+        </button>
       </div>
     </div>
   </div>
-
-  <!-- Requirements (before install steps) -->
-  <div class="dl-section">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-      Before you start
-    </h3>
-    <p class="req-lead">Standalone zip (no Node.js). On your computer:</p>
-    <div class="req-box">
-      <div class="req-row">
-        <span class="req-name">Git</span>
-        <span class="req-detail">clone, pull, commit, push</span>
-      </div>
-      <div class="req-row">
-        <span class="req-name">GitHub CLI (<code>gh</code>)</span>
-        <span class="req-detail">list repos, GitHub API</span>
-      </div>
-      <div class="req-row">
-        <span class="req-name">SSH to GitHub</span>
-        <span class="req-detail">guided in the app per account</span>
-      </div>
-    </div>
-    <p class="req-foot">Install from source needs Node.js — <a href="https://github.com/gitdock-dev/gitdock#prerequisites" target="_blank" rel="noopener">README prerequisites</a>.</p>
-  </div>
-
-  <div class="dl-divider"></div>
 
   <!-- Installation steps -->
-  <div class="dl-section" id="install-section">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--blue)"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25Zm-.025 5.45a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 1 1-2.83-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25Z"/></svg>
-      How to install
-    </h3>
+  <section class="dl-section" id="install-section" aria-labelledby="install-title">
+    <p class="section-label">How to install</p>
+    <h2 class="dl-section-title" id="install-title">On Windows</h2>
 
-    <!-- Windows steps -->
     <div id="steps-windows">
       <ol class="install-steps">
-        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Use the <strong>download button</strong> at the top of this page to get the <strong>.zip</strong></li>
         <li>Extract the zip to a folder of your choice (e.g. <code>C:\GitDock</code>)</li>
         <li>Run <strong>gitdock.exe</strong> → browser opens at <code>localhost:3847</code></li>
         <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
       <div class="os-warning">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
         <p><strong>SmartScreen</strong> may warn (unsigned build): More info → Run anyway. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">Source on GitHub</a>.</p>
       </div>
     </div>
 
-    <!-- macOS steps -->
     <div id="steps-macos" class="hidden">
       <ol class="install-steps">
-        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Use the <strong>download button</strong> at the top of this page to get the <strong>.zip</strong></li>
         <li>Extract the zip (double-click or <code>unzip gitdock-macos-x64.zip</code>)</li>
         <li>Run <code>./gitdock</code> in Terminal → <code>localhost:3847</code></li>
         <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
       <div class="os-warning">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
-        <p><strong>Gatekeeper</strong> may block: Privacy & Security → Open Anyway, or <code>xattr -cr ./gitdock</code>. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">Source on GitHub</a>.</p>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--yellow)" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm1 6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z"/></svg>
+        <p><strong>Gatekeeper</strong> may block: Privacy &amp; Security → Open Anyway, or <code>xattr -cr ./gitdock</code>. <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">Source on GitHub</a>.</p>
       </div>
     </div>
 
-    <!-- Linux steps -->
     <div id="steps-linux" class="hidden">
       <ol class="install-steps">
-        <li>Download the <strong>.zip</strong> file above</li>
+        <li>Use the <strong>download button</strong> at the top of this page to get the <strong>.zip</strong></li>
         <li>Extract: <code>unzip gitdock-linux-x64.zip</code></li>
         <li><code>chmod +x gitdock</code>, then <code>./gitdock</code> → <code>localhost:3847</code></li>
         <li>First run: choose a <strong>workspace</strong>, then <strong>Add Account</strong> (in-app setup)</li>
       </ol>
     </div>
-  </div>
+  </section>
 
   <div class="dl-divider"></div>
 
-  <!-- Trust / Why it's safe -->
-  <div class="dl-section">
-    <h3>
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--purple)"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.28 5.78-4 4a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 0 1 1.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 0 1 1.06 1.06Z"/></svg>
-      Why it's safe
-    </h3>
-    <ul class="trust-list">
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Open source</strong> on <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>; releases built by GitHub Actions
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>Local only</strong>: 127.0.0.1, no exposure to your network
-      </li>
-      <li>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--green)"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
-        <strong>No tracking</strong>: no analytics, ads, or data collection
-      </li>
-    </ul>
-  </div>
+  <!-- Install from source -->
+  <section class="dl-section dl-source" aria-labelledby="source-title">
+    <p class="section-label">Alternative</p>
+    <h2 class="dl-section-title" id="source-title">Install from source</h2>
+    <p class="req-lead">Prefer cloning the repo or hacking on GitDock? You need Node.js 18+.</p>
+    <div class="source-box">
+      <pre class="source-code"><code>git clone https://github.com/gitdock-dev/gitdock.git
+cd gitdock
+npm install
+node server.js</code></pre>
+      <p class="source-foot">Opens at <code>localhost:3847</code>. See the <a href="https://github.com/gitdock-dev/gitdock#step-by-step-installation-developer" target="_blank" rel="noopener">developer setup</a> in the README.</p>
+    </div>
+  </section>
 
 </div>
 
-<!-- Footer -->
 <footer class="footer">
   <div class="footer-links">
     <a href="https://github.com/gitdock-dev/gitdock" target="_blank" rel="noopener">GitHub</a>
@@ -358,7 +227,6 @@
 
   var REPO = 'https://github.com/gitdock-dev/gitdock';
 
-  // Platform detection — userAgent only (navigator.platform is deprecated)
   var ua = navigator.userAgent || '';
   var platform = 'linux-x64';
   if (/Windows/i.test(ua)) platform = 'windows-x64';
@@ -370,64 +238,75 @@
     'linux-x64':   { name: 'Linux',   steps: 'steps-linux' }
   };
 
-  var currentPlatform = platform;
+  var releaseAssets = null;
 
-  // GitHub's /releases/latest/download/ redirects to the latest release asset automatically.
-  // No API call needed for the download to work.
+  function formatSize(bytes) {
+    if (!bytes || bytes < 1) return 'n/a';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
   function getDirectURL(plat) {
     return REPO + '/releases/latest/download/gitdock-' + plat + '.zip';
   }
 
+  function findAsset(plat) {
+    if (!releaseAssets) return null;
+    var name = 'gitdock-' + plat + '.zip';
+    for (var i = 0; i < releaseAssets.length; i++) {
+      if (releaseAssets[i].name === name) return releaseAssets[i];
+    }
+    return null;
+  }
+
   function updateUI(plat) {
-    currentPlatform = plat;
     var info = PLATFORMS[plat];
     var asset = 'gitdock-' + plat + '.zip';
 
-    // OS icon — toggle visibility of pre-rendered SVGs
     document.querySelectorAll('.os-icon-svg').forEach(function(svg) {
       svg.classList.toggle('hidden', svg.getAttribute('data-os') !== plat);
     });
 
-    // OS title
     document.getElementById('os-title').textContent = 'GitDock for ' + info.name;
     document.getElementById('os-subtitle').textContent = 'Standalone executable. No Node.js needed.';
-
-    // Meta — textContent only, no innerHTML
     document.getElementById('meta-file').textContent = asset;
+    document.getElementById('install-title').textContent = 'On ' + info.name;
 
-    // Download button — always ready, no API dependency
     document.getElementById('btn-download').href = getDirectURL(plat);
     document.getElementById('btn-download-text').textContent = 'Download for ' + info.name;
 
-    // Steps visibility
+    var matched = findAsset(plat);
+    document.getElementById('meta-size').textContent = matched ? formatSize(matched.size) : 'n/a';
+
     ['steps-windows', 'steps-macos', 'steps-linux'].forEach(function(id) {
       document.getElementById(id).classList.toggle('hidden', id !== info.steps);
     });
 
-    // Platform buttons
     document.querySelectorAll('.btn-other').forEach(function(b) {
       b.classList.toggle('active', b.dataset.platform === plat);
     });
   }
 
-  // Platform switch buttons
   document.querySelectorAll('.btn-other').forEach(function(btn) {
     btn.addEventListener('click', function() {
       updateUI(btn.dataset.platform);
     });
   });
 
-  // Initial render — instant, no waiting for API
   updateUI(platform);
 
-  // Fetch version number in the background (cosmetic only — does not block download)
   fetch('https://api.github.com/repos/gitdock-dev/gitdock/releases/latest', {
     headers: { Accept: 'application/vnd.github.v3+json' }
   })
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(data) {
-      if (data && data.tag_name) {
+      if (!data) return;
+      if (data.tag_name) {
         document.getElementById('meta-version').textContent = data.tag_name;
+      }
+      if (data.assets && data.assets.length) {
+        releaseAssets = data.assets;
+        updateUI(platform);
       }
     })
     .catch(function() {});
