@@ -73,6 +73,13 @@ function destroySession(token) {
   if (value) sessions.delete(value);
 }
 
+function destroySessionsForUser(userId) {
+  if (!userId) return;
+  for (const [sessionId, s] of sessions.entries()) {
+    if (s && s.userId === userId) sessions.delete(sessionId);
+  }
+}
+
 function apiKeyFromHeader(authHeader) {
   if (!authHeader || typeof authHeader !== "string") return null;
   const m = authHeader.trim().match(/^Bearer\s+(.+)$/i);
@@ -103,5 +110,6 @@ module.exports = {
   createSession,
   verifySessionCookie,
   destroySession,
+  destroySessionsForUser,
   apiKeyFromHeader,
 };

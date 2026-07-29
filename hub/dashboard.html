@@ -913,7 +913,78 @@
     .btn-primary:hover { background: var(--accent-hover); box-shadow: none; }
     .btn-danger { border-color: var(--border); color: var(--t2); }
     .btn-danger:hover { border-color: rgba(248,81,73,0.4); color: var(--red); background: rgba(248,81,73,0.06); }
+    .btn-danger-solid {
+      background: rgba(248,81,73,0.14);
+      border-color: rgba(248,81,73,0.45);
+      color: var(--red);
+      font-weight: 600;
+    }
+    .btn-danger-solid:hover {
+      background: rgba(248,81,73,0.22);
+      border-color: rgba(248,81,73,0.6);
+      color: #fecaca;
+    }
+    .btn-danger-solid:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: var(--r); }
+
+    .danger-card {
+      margin-top: 32px;
+      padding: 0;
+      background: var(--bg1);
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(248,81,73,0.28);
+      overflow: hidden;
+    }
+    .danger-card-bar {
+      padding: 8px 14px;
+      background: rgba(248,81,73,0.08);
+      border-bottom: 1px solid rgba(248,81,73,0.22);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--red);
+    }
+    .danger-card-body { padding: 16px 16px 18px; }
+    .danger-card .section-title { margin-bottom: 8px; color: var(--red); }
+    .danger-card .danger-lead {
+      color: var(--t2);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .danger-card .danger-lead a { color: #93c5fd; }
+    .danger-card .danger-lead a:hover { color: #bfdbfe; }
+    .danger-card label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--t3);
+      margin-bottom: 6px;
+    }
+    .danger-card input[type="email"],
+    .danger-card input[type="text"] {
+      width: 100%;
+      max-width: 360px;
+      padding: 9px 12px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      background: var(--bg0);
+      color: var(--t1);
+      font-family: var(--font);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .danger-card input:focus {
+      outline: none;
+      border-color: rgba(248,81,73,0.5);
+      background: var(--bg2);
+    }
+    .danger-error {
+      color: var(--red);
+      font-size: 13px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .danger-error.visible { display: block; }
 
     .plan-card {
       margin-bottom: 24px;
@@ -1260,6 +1331,25 @@
         </div>
         <ul id="keysList" class="keys-list"></ul>
         <p id="keysEmpty" class="empty-msg" style="display:none;">No API keys yet. Create one above to connect a machine.</p>
+
+        <div id="dangerCard" class="danger-card">
+          <div class="danger-card-bar">danger zone</div>
+          <div class="danger-card-body">
+            <div class="section-title">Delete account</div>
+            <p class="danger-lead">
+              Permanently deletes your Hub account, API keys, machines, and snapshots. This cannot be undone.
+              Local GitDock on your machines is not affected.
+            </p>
+            <p id="dangerProNote" class="danger-lead" style="display:none;">
+              You are on Pro. Deleting the Hub account does not automatically cancel a Lemon Squeezy subscription.
+              Cancel billing in Lemon Squeezy or email <a href="mailto:support@gitdock.dev">support@gitdock.dev</a>.
+            </p>
+            <label for="deleteAccountEmail">Type your account email to confirm</label>
+            <input type="email" id="deleteAccountEmail" autocomplete="off" spellcheck="false" placeholder="you@example.com">
+            <p id="deleteAccountError" class="danger-error" role="alert"></p>
+            <button type="button" id="deleteAccountBtn" class="btn btn-danger-solid" disabled>Delete my account</button>
+          </div>
+        </div>
       </div>
         </div>
       </div>
@@ -1324,12 +1414,18 @@
           return r.json();
         });
       }
-      function apiDelete(path) {
+      function apiDelete(path, body) {
         var headers = {};
+        if (body !== undefined) headers['Content-Type'] = 'application/json';
         if (csrfToken) headers['X-CSRF-TOKEN'] = csrfToken;
-        return fetch(API + path, { method: 'DELETE', credentials: 'include', headers: headers }).then(function(r) {
+        var opts = { method: 'DELETE', credentials: 'include', headers: headers };
+        if (body !== undefined) opts.body = JSON.stringify(body);
+        return fetch(API + path, opts).then(function(r) {
           if (r.status === 401) throw new Error('Unauthorized');
-          return r.json();
+          return r.json().then(function(data) {
+            data._httpStatus = r.status;
+            return data;
+          });
         });
       }
 
@@ -1933,9 +2029,11 @@
           var plan = (me && me.plan) ? me.plan : 'free';
           var statusEl = document.getElementById('planStatus');
           var btnEl = document.getElementById('upgradeToProBtn');
+          var proNote = document.getElementById('dangerProNote');
           if (plan === 'pro') {
             statusEl.textContent = 'You are on Pro. Unlimited machines.';
             btnEl.style.display = 'none';
+            if (proNote) proNote.style.display = 'block';
           } else {
             statusEl.textContent = 'Free plan: 1 machine. Upgrade to Pro for unlimited machines.';
             if (me.checkoutUrl) {
@@ -1944,6 +2042,12 @@
             } else {
               btnEl.style.display = 'none';
             }
+            if (proNote) proNote.style.display = 'none';
+          }
+          if (me && me.email) {
+            var emailEl = document.getElementById('userEmail');
+            if (emailEl) emailEl.textContent = me.email;
+            updateDeleteAccountBtn();
           }
         }).catch(function() {});
         apiGet('/api/keys').then(function(data) {
@@ -1968,6 +2072,51 @@
           });
         }).catch(function() { checkAuth(); });
       }
+
+      function updateDeleteAccountBtn() {
+        var input = document.getElementById('deleteAccountEmail');
+        var btn = document.getElementById('deleteAccountBtn');
+        var emailEl = document.getElementById('userEmail');
+        if (!input || !btn || !emailEl) return;
+        var typed = (input.value || '').trim().toLowerCase();
+        var account = (emailEl.textContent || '').trim().toLowerCase();
+        btn.disabled = !account || typed !== account;
+      }
+
+      document.getElementById('deleteAccountEmail').addEventListener('input', function() {
+        var err = document.getElementById('deleteAccountError');
+        if (err) { err.textContent = ''; err.classList.remove('visible'); }
+        updateDeleteAccountBtn();
+      });
+
+      document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+        var input = document.getElementById('deleteAccountEmail');
+        var err = document.getElementById('deleteAccountError');
+        var btn = document.getElementById('deleteAccountBtn');
+        var email = (input && input.value || '').trim();
+        if (!email || btn.disabled) return;
+        if (!confirm('Delete your Hub account permanently? This cannot be undone.')) return;
+        btn.disabled = true;
+        apiDelete('/api/auth/account', { confirmEmail: email }).then(function(data) {
+          if (data && data.success) {
+            csrfToken = null;
+            input.value = '';
+            checkAuth();
+            return;
+          }
+          if (err) {
+            err.textContent = (data && data.error) || 'Could not delete account';
+            err.classList.add('visible');
+          }
+          updateDeleteAccountBtn();
+        }).catch(function() {
+          if (err) {
+            err.textContent = 'Could not delete account';
+            err.classList.add('visible');
+          }
+          updateDeleteAccountBtn();
+        });
+      });
 
       document.getElementById('createKeyBtn').addEventListener('click', function() {
         var label = document.getElementById('newKeyLabel').value.trim() || 'Default';

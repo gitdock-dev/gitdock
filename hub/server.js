@@ -290,6 +290,38 @@ app.get("/api/auth/me", apiLimiter, requireSession, (req, res) => {
   res.json({ email: user.email, plan, checkoutUrl, csrfToken: req.session.csrfToken });
 });
 
+app.delete("/api/auth/account", apiLimiter, requireSession, requireCsrf, (req, res) => {
+  const user = db.getUserById(req.userId);
+  if (!user) return res.status(401).json({ error: "Unauthorized" });
+  const confirmEmail =
+    (req.body && req.body.confirmEmail && String(req.body.confirmEmail).trim().toLowerCase()) || "";
+  if (!confirmEmail || confirmEmail !== String(user.email || "").toLowerCase()) {
+    return res.status(400).json({
+      success: false,
+      error: "Type your account email to confirm deletion",
+    });
+  }
+  const userId = req.userId;
+  const wasPro = (user.plan || "free") === "pro";
+  const deleted = db.deleteUserAccount(userId);
+  if (!deleted) {
+    return res.status(500).json({ success: false, error: "Failed to delete account" });
+  }
+  auth.destroySessionsForUser(userId);
+  const token = req.cookies && req.cookies[auth.SESSION_COOKIE];
+  if (token) auth.destroySession(token);
+  res.clearCookie(auth.SESSION_COOKIE, { path: "/" });
+  res.clearCookie(CSRF_COOKIE, { path: "/" });
+  console.log(`[auth] account deleted userId=${userId} wasPro=${wasPro}`);
+  res.json({
+    success: true,
+    wasPro,
+    message: wasPro
+      ? "Account deleted. If you have an active Pro subscription, cancel it in Lemon Squeezy or email support@gitdock.dev."
+      : "Account deleted.",
+  });
+});
+
 // --- Agent: receive snapshot ---
 app.post("/api/agent/snapshot", snapshotLimiter, requireApiKey, (req, res) => {
   const body = req.body || {};
