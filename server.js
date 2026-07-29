@@ -531,7 +531,8 @@ function runCommand(cmd, cwd = BASE_DIR, timeoutMs = 60000) {
       timeout: timeoutMs,
       stdio: ["pipe", "pipe", "pipe"],
     });
-    return { success: true, output: result.trim() };
+    // trimEnd only: leading spaces are meaningful in `git status --porcelain` (e.g. " M file")
+    return { success: true, output: String(result).replace(/\s+$/, "") };
   } catch (err) {
     return {
       success: false,
@@ -551,7 +552,8 @@ function runGit(args, cwd = BASE_DIR, timeoutMs = 60000) {
       timeout: timeoutMs,
       stdio: ["pipe", "pipe", "pipe"],
     });
-    return { success: true, output: result.trim() };
+    // trimEnd only: leading spaces are meaningful in `git status --porcelain` (e.g. " M file")
+    return { success: true, output: String(result).replace(/\s+$/, "") };
   } catch (err) {
     return {
       success: false,
@@ -3069,9 +3071,11 @@ app.post("/api/hub/config", async (req, res) => {
       if (trimmed.length > 0 && trimmed.length < 2048) {
         try {
           const parsedUrl = new URL(trimmed);
-          // SECURITY: Enforce HTTPS for Hub communication
-          if (parsedUrl.protocol !== "https:") {
-            return res.status(400).json({ error: "Hub URL must use HTTPS for secure communication" });
+          const host = (parsedUrl.hostname || "").toLowerCase();
+          const isLocalHost = host === "localhost" || host === "127.0.0.1";
+          // SECURITY: HTTPS required in production; HTTP allowed only for local Hub development
+          if (parsedUrl.protocol !== "https:" && !(parsedUrl.protocol === "http:" && isLocalHost)) {
+            return res.status(400).json({ error: "Hub URL must use HTTPS (http://localhost is allowed for local Hub only)" });
           }
           if (!config.hub) config.hub = {};
           config.hub.url = trimmed;
@@ -3086,8 +3090,14 @@ app.post("/api/hub/config", async (req, res) => {
       const key = String(apiKey).trim();
       if (key.length > 0 && key.length < 512) {
         await setHubApiKey(key);
+        if (!config.hub) config.hub = {};
+        config.hub.apiKey = key;
       } else {
         await deleteHubApiKey();
+        if (config.hub) {
+          delete config.hub.apiKey;
+          delete config.hub.apiKeySecure;
+        }
       }
     }
     if (intervalMinutes !== undefined) {
