@@ -1,7 +1,7 @@
 // Stagger: assign incremental delay to grid children
 document.querySelectorAll('.pain-grid, .features-grid, .security-panel-grid, .steps').forEach(function (grid) {
   grid.querySelectorAll('.fade-in').forEach(function (child, i) {
-    child.style.setProperty('--stagger', i * 0.09 + 's');
+    child.style.setProperty('--stagger', i * 0.06 + 's');
   });
 });
 
@@ -23,26 +23,9 @@ var observer = new IntersectionObserver(
       }
     });
   },
-  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  { threshold: 0.08, rootMargin: '0px 0px -32px 0px' }
 );
 
 document.querySelectorAll('.fade-in').forEach(function (el) {
   observer.observe(el);
 });
-
-// Spotlight: mouse-tracking glow on cards
-(function () {
-  var cards = document.querySelectorAll('.feat-card, .pain-card');
-  if (!cards.length) return;
-  cards.forEach(function (card) {
-    card.addEventListener(
-      'mousemove',
-      function (e) {
-        var rect = card.getBoundingClientRect();
-        card.style.setProperty('--mx', e.clientX - rect.left + 'px');
-        card.style.setProperty('--my', e.clientY - rect.top + 'px');
-      },
-      { passive: true }
-    );
-  });
-})();
