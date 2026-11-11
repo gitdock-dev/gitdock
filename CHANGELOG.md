@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Interpolated `gh` and `git rev-list` commands in `server.js` now run through `execFileSync` with an argument list (`githubApiForAccount`, `gh repo list`, `gh repo view`, repository transfer, unpushed commits, and GraphQL `--input`). Those values were already sanitized, so the practical risk was low. The change removes the shell-injection class for those call sites. Fixed git commands that do not interpolate variables still use `runCommand`. `GH_TOKEN` and the rest of the environment are still inherited, and `shell` is not enabled (Windows `git.exe` / `gh.exe`).
 - Stricter `sanitizeAccountName` so shell-like input cannot be silently normalized into a valid account id.
 
 ## [1.2.0] - 2026-05-21

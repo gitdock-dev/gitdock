@@ -563,6 +563,121 @@ function runGit(args, cwd = BASE_DIR, timeoutMs = 60000) {
   }
 }
 
+// Shell-free execution for interpolated git and gh commands.
+// Same cwd, inherited env (GH_TOKEN and the rest), encoding, timeout, stdio,
+// error shape, and trailing-whitespace trim as runGit. shell is left unset:
+// official git and gh on Windows are .exe and must not run through a shell.
+function runExecFile(file, args, cwd = BASE_DIR, timeoutMs = 60000) {
+  try {
+    const result = execFileSync(file, args, {
+      cwd,
+      encoding: "utf8",
+      timeout: timeoutMs,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    // trimEnd only: leading spaces are meaningful in `git status --porcelain` (e.g. " M file")
+    return { success: true, output: String(result).replace(/\s+$/, "") };
+  } catch (err) {
+    return {
+      success: false,
+      output: (err.stdout || "") + (err.stderr || ""),
+      error: err.message,
+    };
+  }
+}
+
+// Split a previously shell-concatenated gh suffix into literal argv.
+// Quotes group one argument. No globbing, $VAR, $(), or backticks.
+function literalArgv(fragment) {
+  const args = [];
+  const text = String(fragment || "");
+  let current = "";
+  let quote = null;
+  let started = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === quote) quote = null;
+      else current += ch;
+      started = true;
+      continue;
+    }
+    if (ch === "\"" || ch === "'") {
+      quote = ch;
+      started = true;
+      continue;
+    }
+    if (ch === " " || ch === "\t" || ch === "\n" || ch === "\r") {
+      if (started) {
+        args.push(current);
+        current = "";
+        started = false;
+      }
+      continue;
+    }
+    current += ch;
+    started = true;
+  }
+  if (started) args.push(current);
+  return args;
+}
+
+function ghApiArgs(apiPath, opts = {}) {
+  const args = ["api"];
+  if (opts.method && opts.method !== "GET") {
+    args.push("--method", String(opts.method));
+  }
+  args.push(String(apiPath));
+  if (opts.ghBodyArgs) args.push(...literalArgv(opts.ghBodyArgs));
+  if (opts.jq) args.push("--jq", String(opts.jq));
+  return args;
+}
+
+function ghRepoListArgs(user) {
+  return [
+    "repo",
+    "list",
+    String(user),
+    "--json",
+    "name,description,isPrivate,primaryLanguage,updatedAt,url,stargazerCount,forkCount,diskUsage",
+    "--limit",
+    "100",
+  ];
+}
+
+function ghRepoViewArgs(owner, repo) {
+  return [
+    "repo",
+    "view",
+    `${owner}/${repo}`,
+    "--json",
+    "name,description,isPrivate,primaryLanguage,updatedAt,url,stargazerCount,forkCount,diskUsage",
+  ];
+}
+
+function ghRepoTransferArgs(sourceUser, repo, destUser) {
+  return [
+    "api",
+    "--method",
+    "POST",
+    `/repos/${sourceUser}/${repo}/transfer`,
+    "-f",
+    `new_owner=${destUser}`,
+  ];
+}
+
+function ghRepoFullNameArgs(user, repo) {
+  return ["api", `/repos/${user}/${repo}`, "--jq", ".full_name"];
+}
+
+function gitRevListUnpushedArgs(safeBranch) {
+  return ["rev-list", `origin/${safeBranch}..HEAD`, "--format=%h"];
+}
+
+function ghGraphqlInputArgs(inputFile) {
+  return ["api", "graphql", "--input", String(inputFile)];
+}
+
 // =============================================================================
 // GitHub REST API helpers (official)
 // =============================================================================
@@ -652,13 +767,10 @@ async function githubApiForAccount(accountName, apiPath, opts = {}) {
       if (r.ok) return { ok: true, json: r.json, raw: r.raw, source: "token" };
     } catch (e) { /* fall through to gh CLI */ }
   }
-  // Fallback: gh CLI
+  // Fallback: gh CLI. method, path, body fields, and jq are literal argv.
   try {
-    const jqArg = opts.jq ? ` --jq "${opts.jq}"` : "";
-    const methodArg = opts.method && opts.method !== "GET" ? ` --method ${opts.method}` : "";
-    const bodyArgs = opts.ghBodyArgs || "";
     const result = await enqueueGh(account.githubUser, () =>
-      runCommand(`gh api${methodArg} "${apiPath}"${bodyArgs}${jqArg}`, BASE_DIR, opts.timeoutMs || 15000)
+      runExecFile("gh", ghApiArgs(apiPath, opts), BASE_DIR, opts.timeoutMs || 15000)
     );
     if (result.success && result.output) {
       let json = null;
@@ -1637,11 +1749,7 @@ app.get("/api/repos", async (req, res) => {
         if (isGhAuthed) {
           try {
             const result = await enqueueGh(safeUser, () =>
-              runCommand(
-                `gh repo list ${safeUser} --json name,description,isPrivate,primaryLanguage,updatedAt,url,stargazerCount,forkCount,diskUsage --limit 100`,
-                BASE_DIR,
-                20000
-              )
+              runExecFile("gh", ghRepoListArgs(safeUser), BASE_DIR, 20000)
             );
             if (result.success) {
               const parsed = JSON.parse(result.output || "[]");
@@ -1723,11 +1831,7 @@ app.get("/api/repos", async (req, res) => {
         if (parsed) {
           try {
             const metaResult = await enqueueGh(account.githubUser, () =>
-              runCommand(
-                `gh repo view ${owner}/${remoteRepo} --json name,description,isPrivate,primaryLanguage,updatedAt,url,stargazerCount,forkCount,diskUsage`,
-                BASE_DIR,
-                15000
-              )
+              runExecFile("gh", ghRepoViewArgs(owner, remoteRepo), BASE_DIR, 15000)
             );
             if (metaResult.success && metaResult.output) {
               meta = JSON.parse(metaResult.output);
@@ -2179,9 +2283,7 @@ app.post("/api/repos/transfer", async (req, res) => {
 
   // GitHub CLI has no "gh repo transfer"; use REST API via gh api
   const result = await enqueueGh(source.githubUser, () =>
-    runCommand(
-      `gh api --method POST "/repos/${source.githubUser}/${safeName}/transfer" -f "new_owner=${dest.githubUser}"`
-    )
+    runExecFile("gh", ghRepoTransferArgs(source.githubUser, safeName, dest.githubUser))
   );
 
   if (!result.success) {
@@ -2198,7 +2300,7 @@ app.post("/api/repos/transfer", async (req, res) => {
   await new Promise((r) => setTimeout(r, 3000));
 
   const verifyResult = await enqueueGh(dest.githubUser, () =>
-    runCommand(`gh api "/repos/${dest.githubUser}/${safeName}" --jq ".full_name"`)
+    runExecFile("gh", ghRepoFullNameArgs(dest.githubUser, safeName))
   );
 
   if (verifyResult.success && verifyResult.output.includes(dest.githubUser)) {
@@ -2457,10 +2559,7 @@ app.get("/api/repos/:account/:name/git-status", (req, res) => {
   if (currentBranch && currentBranch !== "unknown" && currentBranch !== "HEAD") {
     const safeBranch = currentBranch.replace(/[^a-zA-Z0-9/_.-]/g, "");
     if (repoStatus.upstream.hasUpstream) {
-      const unpushedResult = runCommand(
-        `git rev-list origin/${safeBranch}..HEAD --format="%h"`,
-        repoPath
-      );
+      const unpushedResult = runGit(gitRevListUnpushedArgs(safeBranch), repoPath);
       if (unpushedResult.success && unpushedResult.output) {
         unpushedResult.output
           .split("\n")
@@ -2984,7 +3083,7 @@ app.post("/api/repos/extras", async (req, res) => {
         try {
           const result = await enqueueGh(account.githubUser, () => {
             fs.writeFileSync(tmpFile, JSON.stringify(gqlBody));
-            return runCommand(`gh api graphql --input "${tmpFile}"`, BASE_DIR, 30000);
+            return runExecFile("gh", ghGraphqlInputArgs(tmpFile), BASE_DIR, 30000);
           });
           if (result.success) data = JSON.parse(result.output);
         } finally {
@@ -3301,6 +3400,14 @@ module.exports = {
   getAccounts,
   BASE_DIR: () => BASE_DIR,
   CONFIG_PATH: () => CONFIG_PATH,
+  runExecFile,
+  ghApiArgs,
+  ghRepoListArgs,
+  ghRepoViewArgs,
+  ghRepoTransferArgs,
+  ghRepoFullNameArgs,
+  gitRevListUnpushedArgs,
+  ghGraphqlInputArgs,
 };
 
 if (require.main === module) {
