@@ -586,49 +586,12 @@ function runExecFile(file, args, cwd = BASE_DIR, timeoutMs = 60000) {
   }
 }
 
-// Split a previously shell-concatenated gh suffix into literal argv.
-// Quotes group one argument. No globbing, $VAR, $(), or backticks.
-function literalArgv(fragment) {
-  const args = [];
-  const text = String(fragment || "");
-  let current = "";
-  let quote = null;
-  let started = false;
-  for (let i = 0; i < text.length; i += 1) {
-    const ch = text[i];
-    if (quote) {
-      if (ch === quote) quote = null;
-      else current += ch;
-      started = true;
-      continue;
-    }
-    if (ch === "\"" || ch === "'") {
-      quote = ch;
-      started = true;
-      continue;
-    }
-    if (ch === " " || ch === "\t" || ch === "\n" || ch === "\r") {
-      if (started) {
-        args.push(current);
-        current = "";
-        started = false;
-      }
-      continue;
-    }
-    current += ch;
-    started = true;
-  }
-  if (started) args.push(current);
-  return args;
-}
-
 function ghApiArgs(apiPath, opts = {}) {
   const args = ["api"];
   if (opts.method && opts.method !== "GET") {
     args.push("--method", String(opts.method));
   }
   args.push(String(apiPath));
-  if (opts.ghBodyArgs) args.push(...literalArgv(opts.ghBodyArgs));
   if (opts.jq) args.push("--jq", String(opts.jq));
   return args;
 }
@@ -767,7 +730,7 @@ async function githubApiForAccount(accountName, apiPath, opts = {}) {
       if (r.ok) return { ok: true, json: r.json, raw: r.raw, source: "token" };
     } catch (e) { /* fall through to gh CLI */ }
   }
-  // Fallback: gh CLI. method, path, body fields, and jq are literal argv.
+  // Fallback: gh CLI. method, path, and jq are literal argv.
   try {
     const result = await enqueueGh(account.githubUser, () =>
       runExecFile("gh", ghApiArgs(apiPath, opts), BASE_DIR, opts.timeoutMs || 15000)

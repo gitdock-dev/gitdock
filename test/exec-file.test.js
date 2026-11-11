@@ -75,25 +75,17 @@ describe("execFileSync literal arguments", () => {
     }
   });
 
-  it("keeps a hostile githubApiForAccount path, method, field, and jq as single arguments", () => {
+  it("keeps a hostile githubApiForAccount path, method, and jq as single arguments", () => {
     assert.deepEqual(ghApiArgs("repos/octo/hello/readme"), ["api", "repos/octo/hello/readme"]);
     assert.deepEqual(ghApiArgs("repos/octo/hello/commits?per_page=5"), [
       "api",
       "repos/octo/hello/commits?per_page=5",
     ]);
-    const field = "title=a; b && c | d $(id) `id`";
     const args = ghApiArgs(payload, {
       method: "POST",
       jq: payload,
-      ghBodyArgs: `-f "${field}"`,
     });
-    assert.deepEqual(args, ["api", "--method", "POST", payload, "-f", field, "--jq", payload]);
-    assert.deepEqual(ghApiArgs("repos/a/b", { ghBodyArgs: ' -f "new_owner=bob"' }), [
-      "api",
-      "repos/a/b",
-      "-f",
-      "new_owner=bob",
-    ]);
+    assert.deepEqual(args, ["api", "--method", "POST", payload, "--jq", payload]);
     assertChildArgv(args);
   });
 
