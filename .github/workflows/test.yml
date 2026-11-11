@@ -7,9 +7,11 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  test-os:
+    name: test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
@@ -24,3 +26,15 @@ jobs:
 
       - name: Run test suite
         run: npm test
+
+  test:
+    needs: test-os
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require ubuntu and windows
+        shell: bash
+        run: |
+          if [ "${{ needs.test-os.result }}" != "success" ]; then
+            exit 1
+          fi
