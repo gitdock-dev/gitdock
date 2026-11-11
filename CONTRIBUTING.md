@@ -80,11 +80,15 @@ Track user-facing work in [CHANGELOG.md](CHANGELOG.md) under **Unreleased**. Whe
 
 ## Submitting changes
 
-1. **Fork** the repository and create a branch from `main` (e.g. `feat/your-feature` or `fix/issue-description`).
+With write access to `gitdock-dev/gitdock`, create the branch on that repository. That is the path used in this repo.
+
+1. **Create a branch** from `main` on `gitdock-dev/gitdock` (e.g. `feat/your-feature` or `fix/issue-description`).
 2. **Make your changes** and run the automated suite: `npm test` (unit + API integration). Also smoke-test the dashboard when UI changes: `npm start`.
 3. **Commit** with clear messages (e.g. `feat: add X`, `fix: resolve Y`).
-4. **Push** to your fork and open a **Pull Request** against `gitdock-dev/gitdock` `main`.
+4. **Push** the branch to `gitdock-dev/gitdock` and open a **Pull Request** against `main`.
 5. Describe what you changed and why. Reference any related issues.
+
+Without write access, fork the repository, create the branch on your fork, push to that fork, and open the pull request against `gitdock-dev/gitdock` `main`. Run the same checks.
 
 ## Issues
 
