@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- GitHub Actions tests run on `ubuntu-latest` and `windows-latest`. Node.js stays 22 and the install step stays `npm ci`.
 - Minimum supported Node.js is now 22 (`engines.node` is `>=22` in the root and Hub `package.json`). Node.js 18 and 20 no longer receive official support from the Node.js project, so GitDock does not claim to support them.
 - `package-lock.json` is tracked for the root app and for `hub/`. The root lock resolves express 4.22.3 with body-parser 1.20.9, qs 6.16.2, and proxy-addr 2.0.8. esbuild stays at 0.24.2 (devDependency for the SEA bundle only).
 - GitHub Actions install steps use `npm ci` and still run on Node.js 22.
