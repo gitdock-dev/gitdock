@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://gitdock.dev"><img src="https://img.shields.io/badge/website-gitdock.dev-58a6ff?style=flat-square" alt="Website"></a>
   <img src="https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square" alt="License">
-  <img src="https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/Node.js-v22+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js">
   <img src="https://img.shields.io/badge/Express-4.21-000000?style=flat-square&logo=express&logoColor=white" alt="Express">
   <img src="https://img.shields.io/badge/GitHub_CLI-2.0+-24292e?style=flat-square&logo=github&logoColor=white" alt="GitHub CLI">
   <img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-blue?style=flat-square" alt="Platform">
@@ -156,7 +156,7 @@ Before installing, you need:
 
 | Tool | Minimum version | Check installation |
 |---|---|---|
-| **Node.js** | v18+ | `node --version` |
+| **Node.js** | v22+ | `node --version` |
 | **npm** | v9+ (comes with Node.js) | `npm --version` |
 | **Git** | v2.30+ | `git --version` |
 | **GitHub CLI (gh)** | v2.0+ | `gh --version` |

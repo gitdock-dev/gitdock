@@ -10,7 +10,7 @@ Be respectful and constructive. We aim to keep the community welcoming and focus
 
 ### Prerequisites
 
-- **Node.js** v18 or later
+- **Node.js** v22 or later
 - **Git** v2.30+
 - **GitHub CLI (gh)** v2.0+ (for API and auth)
 - **SSH** (OpenSSH) for Git operations
