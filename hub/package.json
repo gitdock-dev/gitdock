@@ -4,6 +4,9 @@
   "description": "GitDock Hub - central server for multi-machine git status",
   "private": true,
   "main": "server.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"

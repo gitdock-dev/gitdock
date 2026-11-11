@@ -8,6 +8,9 @@
     "url": "https://github.com/gitdock-dev/gitdock.git"
   },
   "homepage": "https://gitdock.dev",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
