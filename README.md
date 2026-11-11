@@ -239,7 +239,7 @@ The dashboard opens automatically in your browser.
 
 > **Windows note:** SmartScreen may warn that the app is unrecognized because the executable is not code-signed yet. Click **"More info"** then **"Run anyway"**. You can also right-click the zip before extracting, select **Properties**, and check **"Unblock"** to prevent this.
 
-You still need **Git** and **GitHub CLI (gh)** installed. See [Prerequisites](#prerequisites). Use a fine-grained personal access token or an authenticated gh CLI for the account.
+The program starts on its own. To work with repositories it needs Git. The account uses a fine-grained personal access token or an authenticated `gh`.
 
 ---
 
@@ -263,7 +263,7 @@ node server.js
 
 Open your browser at **http://127.0.0.1:3847** (or the next available port if `3847` is in use).
 
-`start.ps1` (Windows) and `start.sh` (macOS/Linux) stay as an alternative for a clone. They start the same server and open the browser.
+`start.ps1` (Windows) and `start.sh` (macOS/Linux) can also be used to start a clone. They start the same server and open the browser.
 
 **Windows:**
 
@@ -336,6 +336,10 @@ gitdock/
     ├── privacy.html
     └── terms.html
 ```
+
+In a source clone, `config.json` and one folder per account sit in the repository folder.
+Git ignores `config.json`.
+In the executable, they sit in the folder chosen on the first screen (default `~/GitDock`).
 
 ---
 
