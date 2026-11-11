@@ -2,7 +2,7 @@
   <a href="https://gitdock.dev"><img src="https://img.shields.io/badge/website-gitdock.dev-58a6ff?style=flat-square" alt="Website"></a>
   <img src="https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/Node.js-v22+-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/Express-4.21-000000?style=flat-square&logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/Express-4.22.3-000000?style=flat-square&logo=express&logoColor=white" alt="Express">
   <img src="https://img.shields.io/badge/GitHub_CLI-2.0+-24292e?style=flat-square&logo=github&logoColor=white" alt="GitHub CLI">
   <img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-blue?style=flat-square" alt="Platform">
   <img src="https://img.shields.io/badge/Network-Localhost_only-green?style=flat-square&logo=shield&logoColor=white" alt="Security">
@@ -33,7 +33,7 @@
 
 GitDock is a **local tool** that runs on your machine and provides a web dashboard to search, organize, and operate on all your repositories from one interface.
 
-**It is not a cloud service.** It is not an extension. It is a Node.js server that listens **only on localhost (127.0.0.1)** - no data leaves your machine, no port is exposed to the network.
+**It is not a cloud service.** It is not an extension. It is a Node.js server that listens **only on localhost (127.0.0.1)**. No port is exposed to the network. With the optional Hub off, no data leaves your machine.
 
 ### Who is it for?
 
@@ -47,8 +47,8 @@ Developers who:
 
 - **Does not replace GitHub** - it's a local facilitator
 - **Has no database** - uses the GitHub CLI and Git directly
-- **Does not send data anywhere** - everything runs on localhost (default `127.0.0.1:3847`; auto-falls back if the port is in use)
-- **Does not require a special account** - just an authenticated GitHub CLI
+- **Does not send data anywhere** while the Hub is off - everything runs on localhost (default `127.0.0.1:3847`; auto-falls back if the port is in use). With the Hub on, GitDock sends the snapshot described in [Hub (multi-machine sync)](#hub-multi-machine-sync)
+- **Does not require a special account** - a fine-grained personal access token or an authenticated GitHub CLI (`gh`) is enough
 
 ---
 
@@ -157,7 +157,7 @@ Before installing, you need:
 | Tool | Minimum version | Check installation |
 |---|---|---|
 | **Node.js** | v22+ | `node --version` |
-| **npm** | v9+ (comes with Node.js) | `npm --version` |
+| **npm** | 10 (included with Node.js 22) | `npm --version` |
 | **Git** | v2.30+ | `git --version` |
 | **GitHub CLI (gh)** | v2.0+ | `gh --version` |
 | **SSH** | OpenSSH | `ssh -V` |
@@ -232,13 +232,14 @@ If you just want to run GitDock without installing Node.js or cloning the repo:
 3. Extract the zip to a folder of your choice
 4. Run the executable:
    - **Windows:** double-click `start.bat` (runs minimized) or `gitdock.exe` (shows server logs)
-   - **macOS / Linux:** run `./gitdock` from a terminal
+   - **macOS:** run `./gitdock` from a terminal
+   - **Linux:** in the extracted folder, run `chmod +x gitdock`, then `./gitdock`
 
 The dashboard opens automatically in your browser.
 
 > **Windows note:** SmartScreen may warn that the app is unrecognized because the executable is not code-signed yet. Click **"More info"** then **"Run anyway"**. You can also right-click the zip before extracting, select **Properties**, and check **"Unblock"** to prevent this.
 
-You still need **Git** and **GitHub CLI (gh)** installed and authenticated. See [Prerequisites](#prerequisites) below.
+The program starts on its own. To work with repositories it needs Git. The account uses a fine-grained personal access token or an authenticated `gh`.
 
 ---
 
@@ -252,9 +253,17 @@ cd gitdock
 npm install
 ```
 
-This installs Express (the sole dependency).
+This installs the dependencies and the devDependencies.
 
 ### 2. Start the server
+
+```bash
+node server.js
+```
+
+Open your browser at **http://127.0.0.1:3847** (or the next available port if `3847` is in use).
+
+`start.ps1` (Windows) and `start.sh` (macOS/Linux) can also be used to start a clone. They start the same server and open the browser.
 
 **Windows:**
 
@@ -268,14 +277,6 @@ This installs Express (the sole dependency).
 chmod +x start.sh
 ./start.sh
 ```
-
-**Or directly:**
-
-```bash
-node server.js
-```
-
-Open your browser at **http://127.0.0.1:3847** (or the next available port if `3847` is in use).
 
 ### 3. Add your account
 
@@ -297,7 +298,7 @@ The dashboard shows an empty state: **"No repositories yet. Add a GitHub account
    - When all steps are green, click **Load Repos & Close**
 4. Your repositories appear in the dashboard. Clone, pull, commit, and push from there.
 
-Accounts and workspace data are stored in your workspace directory (e.g. `~/.gitdock` or a path you chose), in `config.json`.
+A source clone started with `node server.js` stores `config.json` and one folder per account in the repository folder. The executable asks for a folder on the first screen. The default is `~/GitDock`. `~/.gitdock/workspace.json` stores that chosen path and a `createdAt` timestamp. It does not store accounts, tokens, or repositories.
 
 ### 4. Add more accounts (optional)
 
@@ -310,29 +311,35 @@ Repeat step 3 for each additional GitHub account. The dashboard manages SSH host
 ```
 gitdock/
 ├── server.js                  # Express server (API + security)
-├── workspace.js               # Workspace path management (~/.gitdock)
+├── workspace.js               # Executable workspace path (~/.gitdock/workspace.json)
 ├── dashboard.html             # Web interface (single HTML/CSS/JS file)
 ├── workspace-setup.html       # First-run workspace picker (packaged build)
-├── package.json               # Dependencies (Express only)
-├── start.ps1                  # Startup script (Windows)
-├── start.sh                   # Startup script (macOS/Linux)
+├── package.json               # npm manifest (dependencies and devDependencies)
+├── package-lock.json          # Locked dependency tree
+├── start.bat                  # Windows zip launcher (starts gitdock.exe minimized)
+├── start.ps1                  # Alternative start for a clone (Windows)
+├── start.sh                   # Alternative start for a clone (macOS/Linux)
+├── lib/                       # Security checks, git status parsing, dormant logic
+├── test/                      # Automated tests
+├── scripts/                   # SEA build scripts, publish script, and notes
 ├── .gitignore
 ├── LICENSE                    # Apache 2.0
 ├── README.md
+├── CHANGELOG.md               # Version history
 ├── CONTRIBUTING.md            # Contribution guide
 ├── hub/                       # Multi-machine Hub (optional)
 │   ├── server.js              # Hub API and dashboard
 │   ├── README.md              # Hub setup and deploy
 │   └── ...
-├── site/                      # Landing page (gitdock.dev)
-│   ├── index.html
-│   ├── privacy.html
-│   └── terms.html
-└── <workspace>/               # Your chosen data dir (e.g. ~/GitDock)
-    ├── config.json            # Accounts, machine, Hub settings
-    ├── account1/              # Clones for account 1
-    └── account2/              # Clones for account 2
+└── site/                      # Landing page (gitdock.dev)
+    ├── index.html
+    ├── privacy.html
+    └── terms.html
 ```
+
+In a source clone, `config.json` and one folder per account sit in the repository folder.
+Git ignores `config.json`.
+In the executable, they sit in the folder chosen on the first screen (default `~/GitDock`).
 
 ---
 
@@ -531,6 +538,16 @@ The Hub code is in the `hub/` folder. You can [self-host it](hub/README.md) at n
 We also run a hosted Hub at [hub.gitdock.dev](https://hub.gitdock.dev): one machine is free; unlimited machines are $7/month. Sign up there, create an API key in Settings, then in each machine set **Hub URL** to `https://hub.gitdock.dev` and paste the key.
 In the local GitDock dashboard use the dashboard’s **Configure Hub** to set the URL and key so this machine sends snapshots.
 
+With the Hub off, GitDock does not send a snapshot. With the Hub on, `collectHubSnapshot` in `server.js` posts this JSON body:
+
+- `machineId`
+- `machineName` (the saved machine name, or `os.hostname()` when none is saved)
+- `platform` (`process.platform`)
+- `timestamp`
+- `repos`: one entry for each account subdirectory that contains `.git`. Each entry has `name` (folder name), `account`, `githubUser`, `branch`, `localStatus`, `isCloned` (true), `ahead`, `behind`, `lastCommit` (`timeAgo`, `message`, `author`, and `date` when the latest commit can be read), and `summary` (`stagedCount`, `unstagedCount`, `untrackedCount`, `conflictCount`)
+
+The snapshot JSON does not include source code, tokens, or local paths.
+
 **Terminology:** The main dashboard uses **dormant** for repos with no recent activity (commits or GitHub updates). The optional Hub uses **stale** only for machines that have not reported in over an hour (offline / last seen), not for repository age.
 
 ## Contributing
@@ -543,8 +560,8 @@ We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for development
 
 | Aspect | Detail |
 |---|---|
-| **Where is data stored?** | Everything is local. Cloned repos in your workspace directory (e.g. `~/.gitdock`), not inside the GitDock source tree. Account settings in `config.json`. UI preferences (pins, aliases, filters) in the browser's `localStorage` |
-| **What is sent to the internet?** | Only HTTPS calls to the GitHub API (via `gh` CLI or your PAT) to list repos, fetch READMEs, and count PRs/Issues. These go from your machine to `api.github.com`, same as manual use |
+| **Where is data stored?** | For a source clone started with `node server.js`, `config.json` and cloned repositories are in the repository folder (one folder per account). For the executable, the first screen asks for a folder. The default is `~/GitDock`. `~/.gitdock/workspace.json` stores that path and a `createdAt` timestamp, not the accounts or repositories. UI preferences (pins, aliases, filters) are in the browser's `localStorage` |
+| **What is sent to the internet?** | HTTPS calls to the GitHub API (via `gh` or your PAT) to list repos, fetch READMEs, and count PRs/Issues. These go from your machine to `api.github.com`. With the optional Hub off, no other data leaves your machine. With the Hub on, GitDock also sends the snapshot described in [Hub (multi-machine sync)](#hub-multi-machine-sync) |
 | **Can anyone access the dashboard?** | No. The server only accepts connections from `127.0.0.1`. No device on your network can access it |
 | **Are tokens exposed?** | Tokens are never written to `config.json` or sent to GitDock servers. Use **GitHub CLI** (`gh`, OS keyring) or a **personal access token**: kept in server memory for the current session only, or stored with **Remember** in your OS credential store (Windows Credential Manager, macOS Keychain, or Linux Secret Service via `secret-tool`). The server uses them only for local GitHub API calls |
 | **Can I use it on a corporate network?** | Yes. No port is opened externally. Traffic flows only between the browser and the server, both on your machine |
